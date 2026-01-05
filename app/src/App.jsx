@@ -4,7 +4,7 @@ function App() {
 
   return (
     <>
-      <NiiVue imageUrl={"/flair.nii.gz"} />
+      <NiiVue imageUrl={"/flair.nii.gz"} segmentationUrl={"/seg.nii.gz"} />
     </>
   )
 }

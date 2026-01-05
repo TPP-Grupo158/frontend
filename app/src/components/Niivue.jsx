@@ -9,12 +9,13 @@ const defaultNiivueOptions = {
     crosshairWidthUnit: "mm",
     sliceType: SLICE_TYPE.MULTIPLANAR,
     multiplanarShowRender: SHOW_RENDER.AUTO,
+    multiplanarEqualSize: true
 }
 
 const HIDE_CROSSHAIR_SIZE = 0;
 const SHOW_CROSSHAIR_SIZE = 1;
 
-const NiiVue = ({ imageUrl }) => {
+const NiiVue = ({ imageUrl, segmentationUrl }) => {
     const canvas = useRef();
     const nvRef = useRef();
 
@@ -28,6 +29,7 @@ const NiiVue = ({ imageUrl }) => {
         ];
     
     const [isCrosshairChecked, setIsCrosshairChecked] = useState(false);
+    const [isDrawOpacityChecked, setIsDrawOpacityChecked] = useState(false);
 
     const [availableColormaps, setAvailableColormaps] = useState([]); 
     const [currentColormap, setCurrentColormap] = useState("gray");
@@ -43,9 +45,9 @@ const NiiVue = ({ imageUrl }) => {
             const availableColormaps = nv.colormaps();
             setAvailableColormaps(availableColormaps);
             nv.setMultiplanarLayout(MULTIPLANAR_TYPE.ROW); 
-            nv.opts.multiplanarEqualSize = true;
             nv.attachToCanvas(canvas.current);
             await nv.loadVolumes(volumeList);
+            await nv.loadDrawingFromUrl(segmentationUrl);
             nvRef.current = nv
         }
 
@@ -77,6 +79,14 @@ const NiiVue = ({ imageUrl }) => {
             nvRef.current.opts.show3Dcrosshair = !isChecked;
             nvRef.current.drawScene();
             setIsCrosshairChecked(isChecked);
+        }
+    }
+
+    const handleDrawOpacityChange = (event) => {
+        const isChecked = event.target.checked;
+        if (nvRef.current) {
+            isChecked ? nvRef.current.setDrawOpacity(0.0) : nvRef.current.setDrawOpacity(0.9); 
+            setIsDrawOpacityChecked(isChecked);
         }
     }
 
@@ -125,6 +135,15 @@ const NiiVue = ({ imageUrl }) => {
                 onChange={handleCrosshairChange}
                 />
                 Hide Crosshair
+            </label>
+
+            <label>
+                <input
+                type="checkbox"
+                checked={isDrawOpacityChecked}
+                onChange={handleDrawOpacityChange}
+                />
+                Hide Segmentation
             </label>
         </div>
         <div>
