@@ -97,7 +97,11 @@ const NiiVue = ({ imagesUrls, segmentationUrl }) => {
         console.debug("Changing volume to:", newVolumeUrl);
         if (nvRef.current) {
             await nvRef.current.removeVolumeByUrl(currentVolumeUrl);
-            await nvRef.current.addVolumeFromUrl({url: newVolumeUrl,...defaultVolumeOptions});
+            await nvRef.current.addVolumeFromUrl({
+                url: newVolumeUrl,
+                ...defaultVolumeOptions, 
+                colormap: currentColormap
+            });
             setCurrentVolumeUrl(newVolumeUrl);
         }
     }
