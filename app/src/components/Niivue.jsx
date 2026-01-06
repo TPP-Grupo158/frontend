@@ -12,21 +12,22 @@ const defaultNiivueOptions = {
     multiplanarEqualSize: true
 }
 
+const defaultVolumeOptions = {
+    colormap: "gray",
+    opacity: 1,
+}
+
 const HIDE_CROSSHAIR_SIZE = 0;
 const SHOW_CROSSHAIR_SIZE = 1;
+
+const DRAW_OPACITY_HIDDEN = 0.0;
+const DRAW_OPACITY_VISIBLE = 0.9;
 
 const NiiVue = ({ imageUrl, segmentationUrl }) => {
     const canvas = useRef();
     const nvRef = useRef();
 
-    const volumeList = [
-            {
-            url: imageUrl,
-            colormap: "gray",
-            opacity: 1,
-            visible: true,
-            },
-        ];
+    const volumeList = [{url: imageUrl,...defaultVolumeOptions}, {url: "bravo.nii.gz",...defaultVolumeOptions, opacity: 0}];
     
     const [isCrosshairChecked, setIsCrosshairChecked] = useState(false);
     const [isDrawOpacityChecked, setIsDrawOpacityChecked] = useState(false);
@@ -44,10 +45,14 @@ const NiiVue = ({ imageUrl, segmentationUrl }) => {
             
             const availableColormaps = nv.colormaps();
             setAvailableColormaps(availableColormaps);
+
             nv.setMultiplanarLayout(MULTIPLANAR_TYPE.ROW); 
+
             nv.attachToCanvas(canvas.current);
+
             await nv.loadVolumes(volumeList);
             await nv.loadDrawingFromUrl(segmentationUrl);
+
             nvRef.current = nv
         }
 
@@ -85,7 +90,7 @@ const NiiVue = ({ imageUrl, segmentationUrl }) => {
     const handleDrawOpacityChange = (event) => {
         const isChecked = event.target.checked;
         if (nvRef.current) {
-            isChecked ? nvRef.current.setDrawOpacity(0.0) : nvRef.current.setDrawOpacity(0.9); 
+            isChecked ? nvRef.current.setDrawOpacity(DRAW_OPACITY_HIDDEN) : nvRef.current.setDrawOpacity(DRAW_OPACITY_VISIBLE); 
             setIsDrawOpacityChecked(isChecked);
         }
     }
@@ -111,11 +116,11 @@ const NiiVue = ({ imageUrl, segmentationUrl }) => {
         <>  
         <div>
             <label>
-                Colormap:
+                cmap:
                 <select value={currentColormap} onChange={handleColormapChange}>
                     {availableColormaps.map((colormap) => (
-                        <option key={colormap} value={colormap}>{colormap}</option>
-                    ))}
+                            <option key={colormap} value={colormap}>{colormap}</option>
+                        ))}
                 </select>
             </label>
 
