@@ -106,6 +106,11 @@ const NiiVue = ({ imagesUrls, segmentationUrl }) => {
         }
     }
 
+    const handleSaveDrawing = () => {
+        if (!nvRef.current) return;
+            nvRef.current.saveImage({filename: 'segmentation.nii.gz', isSaveDrawing: true});
+    }
+
     const getSliceName = (sliceType) => {
         switch (sliceType) {
             case SLICE_TYPE.MULTIPLANAR:
@@ -170,6 +175,7 @@ const NiiVue = ({ imagesUrls, segmentationUrl }) => {
                 />
                 Hide Segmentation
             </label>
+            <button onClick={handleSaveDrawing}>Save Segmentation</button>
         </div>
         <div>
             <canvas ref={canvas} height={700} width={700} />
