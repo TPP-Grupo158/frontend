@@ -3,12 +3,12 @@ import { Niivue, SLICE_TYPE, SHOW_RENDER, MULTIPLANAR_TYPE } from "@niivue/niivu
 
 
 const defaultNiivueOptions = {
-    logLevel: "info",
+    logLevel: "debug",
     show3Dcrosshair: true,
     crosshairWidth: 1,
     crosshairWidthUnit: "mm",
     sliceType: SLICE_TYPE.MULTIPLANAR,
-    multiplanarShowRender: SHOW_RENDER.AUTO,
+    multiplanarShowRender: SHOW_RENDER.NEVER,
     multiplanarEqualSize: true
 }
 
@@ -23,12 +23,13 @@ const SHOW_CROSSHAIR_SIZE = 1;
 const DRAW_OPACITY_HIDDEN = 0.0;
 const DRAW_OPACITY_VISIBLE = 0.9;
 
-const NiiVue = ({ imageUrl, segmentationUrl }) => {
+const NiiVue = ({ imagesUrls, segmentationUrl }) => {
     const canvas = useRef();
     const nvRef = useRef();
 
-    const volumeList = [{url: imageUrl,...defaultVolumeOptions}, {url: "bravo.nii.gz",...defaultVolumeOptions, opacity: 0}];
-    
+    const [currentVolumeUrl, setCurrentVolumeUrl] = useState(imagesUrls[0]);
+    const volumeList = [{url: currentVolumeUrl,...defaultVolumeOptions}];
+
     const [isCrosshairChecked, setIsCrosshairChecked] = useState(false);
     const [isDrawOpacityChecked, setIsDrawOpacityChecked] = useState(false);
 
@@ -39,20 +40,16 @@ const NiiVue = ({ imageUrl, segmentationUrl }) => {
     const [currentSliceView, setCurrentSliceView] = useState(SLICE_TYPE.MULTIPLANAR);
 
     useEffect(() => {
-        
+
         async function setupAndLoad() {
             const nv = new Niivue(defaultNiivueOptions);
             
             const availableColormaps = nv.colormaps();
             setAvailableColormaps(availableColormaps);
-
             nv.setMultiplanarLayout(MULTIPLANAR_TYPE.ROW); 
-
             nv.attachToCanvas(canvas.current);
-
             await nv.loadVolumes(volumeList);
             await nv.loadDrawingFromUrl(segmentationUrl);
-
             nvRef.current = nv
         }
 
@@ -95,6 +92,16 @@ const NiiVue = ({ imageUrl, segmentationUrl }) => {
         }
     }
 
+    const handleVolumeChange = async (event) => {
+        const newVolumeUrl = event.target.value;
+        console.debug("Changing volume to:", newVolumeUrl);
+        if (nvRef.current) {
+            await nvRef.current.removeVolumeByUrl(currentVolumeUrl);
+            await nvRef.current.addVolumeFromUrl({url: newVolumeUrl,...defaultVolumeOptions});
+            setCurrentVolumeUrl(newVolumeUrl);
+        }
+    }
+
     const getSliceName = (sliceType) => {
         switch (sliceType) {
             case SLICE_TYPE.MULTIPLANAR:
@@ -134,6 +141,15 @@ const NiiVue = ({ imageUrl, segmentationUrl }) => {
             </label>
 
             <label>
+                Volume shown:
+                <select value={currentVolumeUrl} onChange={handleVolumeChange}>
+                    {imagesUrls.map((volume) => (
+                            <option key={volume} value={volume}>{volume}</option>
+                        ))}
+                </select>
+            </label>
+
+            <label>
                 <input
                 type="checkbox"
                 checked={isCrosshairChecked}
@@ -154,7 +170,6 @@ const NiiVue = ({ imageUrl, segmentationUrl }) => {
         <div>
             <canvas ref={canvas} height={700} width={700} />
         </div>
-            
         </>
     )
 };
