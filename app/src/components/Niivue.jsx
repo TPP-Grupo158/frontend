@@ -106,6 +106,10 @@ const NiiVue = ({ imagesUrls, segmentationUrl }) => {
         const newVolumeUrl = event.target.value;
         console.debug("Changing volume to:", newVolumeUrl);
         if (nvRef.current) {
+
+            nvRef.current.setDrawingEnabled(false);
+            setIsDrawModeActive(false)
+
             await nvRef.current.removeVolumeByUrl(currentVolumeUrl);
             await nvRef.current.addVolumeFromUrl({
                 url: newVolumeUrl,
