@@ -23,6 +23,12 @@ const SHOW_CROSSHAIR_SIZE = 1;
 const DRAW_OPACITY_HIDDEN = 0.0;
 const DRAW_OPACITY_VISIBLE = 0.9;
 
+const PEN_ERASER = 0
+const PEN_COLOR_RED = 1
+const PEN_COLOR_GREEN = 2
+const PEN_COLOR_BLUE = 3
+const PEN_COLOR_YELLOW = 4
+
 const NiiVue = ({ imagesUrls, segmentationUrl }) => {
     const canvas = useRef();
     const nvRef = useRef();
@@ -40,6 +46,7 @@ const NiiVue = ({ imagesUrls, segmentationUrl }) => {
     const [currentSliceView, setCurrentSliceView] = useState(SLICE_TYPE.MULTIPLANAR);
 
     const [isDrawModeActive, setIsDrawModeActive] = useState(false);
+    const [penValue, setPenValue] = useState(PEN_COLOR_RED);
 
     useEffect(() => {
 
@@ -117,8 +124,15 @@ const NiiVue = ({ imagesUrls, segmentationUrl }) => {
         const isChecked = event.target.checked;
         if (nvRef.current) {
             nvRef.current.setDrawingEnabled(isChecked);
-            nvRef.current.setPenValue(4, true)
             setIsDrawModeActive(isChecked);
+        }
+    }
+
+    const handlePenColorChange = (event) => {
+        const newPenValue = parseInt(event.target.value);
+        if (nvRef.current) {
+            nvRef.current.setPenValue(newPenValue);
+            setPenValue(newPenValue);
         }
     }
 
@@ -196,6 +210,20 @@ const NiiVue = ({ imagesUrls, segmentationUrl }) => {
                 />
                 Draw Mode
             </label>
+
+            {isDrawModeActive && (
+                <label>
+                    Pen Color:
+                    <select value={penValue} onChange={handlePenColorChange}>
+                        <option value={PEN_ERASER}>Eraser</option>
+                        <option value={PEN_COLOR_RED}>Red</option>
+                        <option value={PEN_COLOR_GREEN}>Green</option>
+                        <option value={PEN_COLOR_BLUE}>Blue</option>
+                        <option value={PEN_COLOR_YELLOW}>Yellow</option>
+                    </select>
+                </label>
+            )}
+            
         </div>
         <div>
             <canvas ref={canvas} height={700} width={700} />
