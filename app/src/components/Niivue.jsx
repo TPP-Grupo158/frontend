@@ -39,6 +39,8 @@ const NiiVue = ({ imagesUrls, segmentationUrl }) => {
     const availibleViews = [SLICE_TYPE.MULTIPLANAR, SLICE_TYPE.AXIAL, SLICE_TYPE.CORONAL, SLICE_TYPE.SAGITTAL, SLICE_TYPE.RENDER];   
     const [currentSliceView, setCurrentSliceView] = useState(SLICE_TYPE.MULTIPLANAR);
 
+    const [isDrawModeActive, setIsDrawModeActive] = useState(false);
+
     useEffect(() => {
 
         async function setupAndLoad() {
@@ -111,6 +113,15 @@ const NiiVue = ({ imagesUrls, segmentationUrl }) => {
             nvRef.current.saveImage({filename: 'segmentation.nii.gz', isSaveDrawing: true});
     }
 
+    const handleDrawingActivation = (event) => {
+        const isChecked = event.target.checked;
+        if (nvRef.current) {
+            nvRef.current.setDrawingEnabled(isChecked);
+            nvRef.current.setPenValue(4, true)
+            setIsDrawModeActive(isChecked);
+        }
+    }
+
     const getSliceName = (sliceType) => {
         switch (sliceType) {
             case SLICE_TYPE.MULTIPLANAR:
@@ -176,6 +187,15 @@ const NiiVue = ({ imagesUrls, segmentationUrl }) => {
                 Hide Segmentation
             </label>
             <button onClick={handleSaveDrawing}>Save Segmentation</button>
+
+            <label>
+                <input
+                type="checkbox"
+                checked={isDrawModeActive}
+                onChange={handleDrawingActivation}
+                />
+                Draw Mode
+            </label>
         </div>
         <div>
             <canvas ref={canvas} height={700} width={700} />
