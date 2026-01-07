@@ -145,6 +145,10 @@ const NiiVue = ({ imagesUrls, segmentationUrl }) => {
         }
     }
 
+    const handleDrawingUndo = () => {
+        if (nvRef.current) { nvRef.current.drawUndo(); }
+    }
+
     const getSliceName = (sliceType) => {
         switch (sliceType) {
             case SLICE_TYPE.MULTIPLANAR:
@@ -240,8 +244,9 @@ const NiiVue = ({ imagesUrls, segmentationUrl }) => {
                     />
                     Fill mode
                 </label>
+
+                <button onClick={handleDrawingUndo}>Undo</button>
                 </>
-                
             )}
 
         </div>
