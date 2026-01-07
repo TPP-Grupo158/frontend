@@ -47,6 +47,7 @@ const NiiVue = ({ imagesUrls, segmentationUrl }) => {
 
     const [isDrawModeActive, setIsDrawModeActive] = useState(false);
     const [penValue, setPenValue] = useState(PEN_COLOR_RED);
+    const [isFillerModeActive, setIsFillerModeActive] = useState(false);
 
     useEffect(() => {
 
@@ -131,8 +132,16 @@ const NiiVue = ({ imagesUrls, segmentationUrl }) => {
     const handlePenColorChange = (event) => {
         const newPenValue = parseInt(event.target.value);
         if (nvRef.current) {
-            nvRef.current.setPenValue(newPenValue);
+            nvRef.current.setPenValue(newPenValue, isFillerModeActive);
             setPenValue(newPenValue);
+        }
+    }
+
+    const handleFillerModeChange = (event) => {
+        const isChecked = event.target.checked;
+        if (nvRef.current) {
+            nvRef.current.setPenValue(penValue, isChecked);
+            setIsFillerModeActive(isChecked);
         }
     }
 
@@ -212,6 +221,7 @@ const NiiVue = ({ imagesUrls, segmentationUrl }) => {
             </label>
 
             {isDrawModeActive && (
+                <>
                 <label>
                     Pen Color:
                     <select value={penValue} onChange={handlePenColorChange}>
@@ -222,8 +232,18 @@ const NiiVue = ({ imagesUrls, segmentationUrl }) => {
                         <option value={PEN_COLOR_YELLOW}>Yellow</option>
                     </select>
                 </label>
+                <label>
+                <input
+                    type="checkbox"
+                    checked={isFillerModeActive}
+                    onChange={handleFillerModeChange}
+                    />
+                    Fill mode
+                </label>
+                </>
+                
             )}
-            
+
         </div>
         <div>
             <canvas ref={canvas} height={700} width={700} />
