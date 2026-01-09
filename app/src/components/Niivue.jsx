@@ -51,7 +51,7 @@ const NiiVue = ({ images, segmentationUrl }) => {
     useEffect(() => {
 
         async function setupAndLoad() {
-            if (nvRef.current) return;
+            console.log("Setting up Niivue instance...");
             const nv = new Niivue(defaultNiivueOptions);
             
             const availableColormaps = nv.colormaps();
@@ -71,7 +71,14 @@ const NiiVue = ({ images, segmentationUrl }) => {
             nvRef.current = nv
         }
 
-        setupAndLoad()
+        if (!nvRef.current) {
+            setupAndLoad();
+        }
+        
+        return () => {
+            console.log("Cleaning up Niivue instance...");
+            nvRef.current = null;
+        };
 
     }, []);
 

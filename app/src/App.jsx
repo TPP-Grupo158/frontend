@@ -22,7 +22,7 @@ function App() {
       {file: t1preFile, name: t1preFile.name},
     ];
 
-    console.log("Uploaded files:", newImagesUrls);
+    console.debug("Uploaded files:", newImagesUrls);
 
     setImages(newImagesUrls);
     setSegmentationUrl({ file: segmentationFile });
