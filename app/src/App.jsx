@@ -6,19 +6,15 @@ function App() {
   const [images, setImages] = useState([]);
   const [segmentationUrl, setSegmentationUrl] = useState(null);
 
+  const [flairFile, setFlairFile] = useState(null);
+  const [bravoFile, setBravoFile] = useState(null);
+  const [t1gdFile, setT1gdFile] = useState(null);
+  const [t1preFile, setT1preFile] = useState(null);
+  const [segmentationFile, setSegmentationFile] = useState(null);
+
   const onFormSubmit = (e) => {
     e.preventDefault();
 
-    const formData = new FormData(e.target);
-    const bravoFile = formData.get('bravoUpload');
-    const flairFile = formData.get('flairUpload');
-    const t1gdFile = formData.get('t1gdUpload');
-    const t1preFile = formData.get('t1preUpload');
-
-    //segmentation should come from server after processing the images
-    const segmentationFile = formData.get('segmentationUpload');
-    setSegmentationUrl({file: segmentationFile});
-    
     const newImagesUrls = [
       {file: flairFile, name: flairFile.name},
       {file: bravoFile, name: bravoFile.name},
@@ -27,7 +23,9 @@ function App() {
     ];
 
     console.log("Uploaded files:", newImagesUrls);
+
     setImages(newImagesUrls);
+    setSegmentationUrl({ file: segmentationFile });
   }
 
   return (
@@ -37,27 +35,27 @@ function App() {
         <h2>Niivue file upload</h2>
         <label>
           Upload Flair:
-          <input type="file" id="flairUpload" name="flairUpload" accept=".nii,.nii.gz" />
+          <input type="file" accept=".nii,.nii.gz" onChange={(e) => setFlairFile(e.target.files[0])} />
         </label>
         <br />
         <label>
           Upload Bravo:
-          <input type="file" id="bravoUpload" name="bravoUpload" accept=".nii,.nii.gz" />
+          <input type="file" accept=".nii,.nii.gz" onChange={(e) => setBravoFile(e.target.files[0])} />
         </label>
         <br />
         <label>
           Upload T1 GD:
-          <input type="file" id="t1gdUpload" name="t1gdUpload" accept=".nii,.nii.gz" />
+          <input type="file" accept=".nii,.nii.gz" onChange={(e) => setT1gdFile(e.target.files[0])} />
         </label>
         <br />
         <label>
           Upload T1 PRE:
-          <input type="file" id="t1preUpload" name="t1preUpload" accept=".nii,.nii.gz" />
+          <input type="file" accept=".nii,.nii.gz" onChange={(e) => setT1preFile(e.target.files[0])} />
         </label>
         <br />
         <label>
           Upload Segmentation:
-          <input type="file" id="segmentationUpload" name="segmentationUpload" accept=".nii,.nii.gz" />
+          <input type="file" accept=".nii,.nii.gz" onChange={(e) => setSegmentationFile(e.target.files[0])} />
         </label>
         <br />
         <button type="submit">Load Files</button>
