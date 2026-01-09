@@ -1,5 +1,5 @@
 import { useRef, useEffect, useState } from "react";
-import { Niivue, SLICE_TYPE, SHOW_RENDER, MULTIPLANAR_TYPE } from "@niivue/niivue";
+import { Niivue, SLICE_TYPE, SHOW_RENDER, MULTIPLANAR_TYPE, NVImage } from "@niivue/niivue";
 
 
 const defaultNiivueOptions = {
@@ -29,12 +29,11 @@ const PEN_COLOR_GREEN = 2
 const PEN_COLOR_BLUE = 3
 const PEN_COLOR_YELLOW = 4
 
-const NiiVue = ({ imagesUrls, segmentationUrl }) => {
+const NiiVue = ({ images, segmentationUrl }) => {
     const canvas = useRef();
     const nvRef = useRef();
 
-    const [currentVolumeUrl, setCurrentVolumeUrl] = useState(imagesUrls[0]);
-    const volumeList = [{url: currentVolumeUrl,...defaultVolumeOptions}];
+    const [currentVolume, setCurrentVolume] = useState(images[0]);
 
     const [isCrosshairChecked, setIsCrosshairChecked] = useState(false);
     const [isDrawOpacityChecked, setIsDrawOpacityChecked] = useState(false);
@@ -52,14 +51,23 @@ const NiiVue = ({ imagesUrls, segmentationUrl }) => {
     useEffect(() => {
 
         async function setupAndLoad() {
+            if (nvRef.current) return;
             const nv = new Niivue(defaultNiivueOptions);
             
             const availableColormaps = nv.colormaps();
             setAvailableColormaps(availableColormaps);
             nv.setMultiplanarLayout(MULTIPLANAR_TYPE.ROW); 
             nv.attachToCanvas(canvas.current);
-            await nv.loadVolumes(volumeList);
-            await nv.loadDrawingFromUrl(segmentationUrl);
+            
+            const current = await NVImage.loadFromFile({
+                file: currentVolume.file,
+                name: currentVolume.name,
+                ...defaultVolumeOptions
+            });
+            await nv.addVolume(current);
+
+            await nv.loadDrawing(await NVImage.loadFromFile({file: segmentationUrl.file}));
+            // await nv.loadDrawingFromUrl(segmentationUrl); //this will be used when fetching the segmentation from the server
             nvRef.current = nv
         }
 
@@ -103,20 +111,26 @@ const NiiVue = ({ imagesUrls, segmentationUrl }) => {
     }
 
     const handleVolumeChange = async (event) => {
-        const newVolumeUrl = event.target.value;
-        console.debug("Changing volume to:", newVolumeUrl);
+        const newVolumeName = event.target.value;
+        const newVolume = images.find(v => v.name === newVolumeName);
+        
+        console.debug("Changing volume to:", newVolume.name);
         if (nvRef.current) {
 
             nvRef.current.setDrawingEnabled(false);
             setIsDrawModeActive(false)
 
-            await nvRef.current.removeVolumeByUrl(currentVolumeUrl);
-            await nvRef.current.addVolumeFromUrl({
-                url: newVolumeUrl,
+            await nvRef.current.removeVolumeByIndex(0);
+            console.log(nvRef.current.volumes)
+            console.log(newVolume)
+            const current = await NVImage.loadFromFile({
+                file: newVolume.file,
+                name: newVolume.name,
                 ...defaultVolumeOptions, 
                 colormap: currentColormap
             });
-            setCurrentVolumeUrl(newVolumeUrl);
+            await nvRef.current.addVolume(current);
+            setCurrentVolume(newVolume);
         }
     }
 
@@ -193,9 +207,9 @@ const NiiVue = ({ imagesUrls, segmentationUrl }) => {
 
             <label>
                 Volume shown:
-                <select value={currentVolumeUrl} onChange={handleVolumeChange}>
-                    {imagesUrls.map((volume) => (
-                            <option key={volume} value={volume}>{volume}</option>
+                <select value={currentVolume.name} onChange={handleVolumeChange}>
+                    {images.map((volume) => (
+                            <option key={volume.name} value={volume.name}>{volume.name}</option>
                         ))}
                 </select>
             </label>
