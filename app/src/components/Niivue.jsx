@@ -1,6 +1,5 @@
 import { useRef, useEffect, useState } from "react";
-import { Niivue, SLICE_TYPE, SHOW_RENDER, MULTIPLANAR_TYPE, NVImage } from "@niivue/niivue";
-
+import { Niivue, SLICE_TYPE, SHOW_RENDER, MULTIPLANAR_TYPE, NVImage, DRAG_MODE } from "@niivue/niivue";
 
 const defaultNiivueOptions = {
     logLevel: "debug",
@@ -9,7 +8,8 @@ const defaultNiivueOptions = {
     crosshairWidthUnit: "mm",
     sliceType: SLICE_TYPE.MULTIPLANAR,
     multiplanarShowRender: SHOW_RENDER.NEVER,
-    multiplanarEqualSize: true
+    multiplanarEqualSize: true,
+    dragMode: DRAG_MODE.none,
 }
 
 const defaultVolumeOptions = {
@@ -47,6 +47,9 @@ const NiiVue = ({ images, segmentationUrl }) => {
     const [isDrawModeActive, setIsDrawModeActive] = useState(false);
     const [penValue, setPenValue] = useState(PEN_COLOR_RED);
     const [isFillerModeActive, setIsFillerModeActive] = useState(false);
+
+    const availableDragModes = [DRAG_MODE.none, DRAG_MODE.measurement, DRAG_MODE.angle, DRAG_MODE.pan];
+    const [currentDragMode, setCurrentDragMode] = useState(DRAG_MODE.none);
 
     useEffect(() => {
 
@@ -174,6 +177,14 @@ const NiiVue = ({ images, segmentationUrl }) => {
         if (nvRef.current) { nvRef.current.drawUndo(); }
     }
 
+    const handleDragModeChange = (event) => {
+        const newDragMode = parseInt(event.target.value)
+        if (nvRef.current) {
+            nvRef.current.setDragMode(newDragMode);
+            setCurrentDragMode(newDragMode);
+        }
+    }
+
     const getSliceName = (sliceType) => {
         switch (sliceType) {
             case SLICE_TYPE.MULTIPLANAR:
@@ -186,6 +197,21 @@ const NiiVue = ({ images, segmentationUrl }) => {
                 return "Sagittal";
             case SLICE_TYPE.RENDER:
                 return "Render";
+            default:
+                return "Unknown";
+        }
+    }
+
+    const getDragModeName = (dragMode) => {
+        switch (dragMode) {
+            case DRAG_MODE.none:
+                return "None";
+            case DRAG_MODE.angle:
+                return "angle";
+            case DRAG_MODE.measurement:
+                return "measurement";
+            case DRAG_MODE.pan:
+                return "pan/zoom";
             default:
                 return "Unknown";
         }
@@ -217,6 +243,15 @@ const NiiVue = ({ images, segmentationUrl }) => {
                 <select value={currentVolume.name} onChange={handleVolumeChange}>
                     {images.map((volume) => (
                             <option key={volume.name} value={volume.name}>{volume.name}</option>
+                        ))}
+                </select>
+            </label>
+
+             <label>
+                Drag Mode:
+                <select value={currentDragMode} onChange={handleDragModeChange}>
+                    {availableDragModes.map((dragMode) => (
+                            <option key={dragMode} value={dragMode}>{getDragModeName(dragMode)}</option>
                         ))}
                 </select>
             </label>
