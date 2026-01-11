@@ -10,6 +10,8 @@ const defaultNiivueOptions = {
     multiplanarShowRender: SHOW_RENDER.NEVER,
     multiplanarEqualSize: true,
     dragMode: DRAG_MODE.none,
+    measureTextJustify: "center",
+    measureTextHeight: 0.05,
 }
 
 const defaultVolumeOptions = {
@@ -29,6 +31,8 @@ const PEN_COLOR_GREEN = 2
 const PEN_COLOR_BLUE = 3
 const PEN_COLOR_YELLOW = 4
 
+const MEASURE_TEXT_HEIGHT = 0.05;
+
 const NiiVue = ({ images, segmentationUrl }) => {
     const canvas = useRef();
     const nvRef = useRef();
@@ -42,14 +46,14 @@ const NiiVue = ({ images, segmentationUrl }) => {
     const [currentColormap, setCurrentColormap] = useState("gray");
     
     const availibleViews = [SLICE_TYPE.MULTIPLANAR, SLICE_TYPE.AXIAL, SLICE_TYPE.CORONAL, SLICE_TYPE.SAGITTAL, SLICE_TYPE.RENDER];   
-    const [currentSliceView, setCurrentSliceView] = useState(SLICE_TYPE.MULTIPLANAR);
+    const [currentSliceView, setCurrentSliceView] = useState(defaultNiivueOptions.sliceType);
 
     const [isDrawModeActive, setIsDrawModeActive] = useState(false);
     const [penValue, setPenValue] = useState(PEN_COLOR_RED);
     const [isFillerModeActive, setIsFillerModeActive] = useState(false);
 
     const availableDragModes = [DRAG_MODE.none, DRAG_MODE.measurement, DRAG_MODE.angle, DRAG_MODE.pan];
-    const [currentDragMode, setCurrentDragMode] = useState(DRAG_MODE.none);
+    const [currentDragMode, setCurrentDragMode] = useState(defaultNiivueOptions.dragMode);
 
     useEffect(() => {
 
@@ -185,6 +189,14 @@ const NiiVue = ({ images, segmentationUrl }) => {
         }
     }
 
+    const handleHideMeasurementFont = (event) => {
+        const isChecked = event.target.checked;
+        if (nvRef.current) {
+            nvRef.current.opts.measureTextHeight = isChecked ? 0.0 : MEASURE_TEXT_HEIGHT;
+            nvRef.current.drawScene();
+        }
+    }
+
     const getSliceName = (sliceType) => {
         switch (sliceType) {
             case SLICE_TYPE.MULTIPLANAR:
@@ -277,6 +289,14 @@ const NiiVue = ({ images, segmentationUrl }) => {
 
             <label>
                 <input
+                    type="checkbox"
+                    onChange={handleHideMeasurementFont}
+                />
+                Hide Text
+            </label>
+
+            <label>
+                <input
                 type="checkbox"
                 checked={isDrawModeActive}
                 onChange={handleDrawingActivation}
@@ -310,8 +330,14 @@ const NiiVue = ({ images, segmentationUrl }) => {
             )}
 
         </div>
-        <div>
-            <canvas ref={canvas} height={700} width={700} />
+        <div style={{ 
+                border: "1px solid black", 
+                display: "flex", 
+                justifyContent: "center", 
+                marginTop: "10px",
+                width: "100%" 
+            }}>
+            <canvas ref={canvas} height={700} width={2000} />
         </div>
         </>
     )
