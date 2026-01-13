@@ -1,4 +1,4 @@
-import NiiVue from './components/Niivue.jsx'
+import NiiVue from './components/Niivue/Niivue.jsx'
 import { useState } from 'react';
 
 function App() {

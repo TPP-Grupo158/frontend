@@ -1,60 +1,28 @@
 import { useRef, useEffect, useState } from "react";
+
 import { 
     Niivue, 
     NVImage, 
     SLICE_TYPE, 
-    SHOW_RENDER, 
     MULTIPLANAR_TYPE, 
-    DRAG_MODE, 
-    PEN_TYPE, } from "@niivue/niivue";
+    DRAG_MODE,
+    PEN_TYPE,  } from "@niivue/niivue";
 
-const defaultNiivueOptions = {
-    logLevel: "debug",
-    show3Dcrosshair: true,
-    crosshairWidth: 1,
-    crosshairWidthUnit: "mm",
-    sliceType: SLICE_TYPE.MULTIPLANAR,
-    multiplanarShowRender: SHOW_RENDER.NEVER,
-    multiplanarEqualSize: true,
-    dragMode: DRAG_MODE.none,
-    measureTextJustify: "center",
-    measureTextHeight: 0.05,
-    maxDrawUndoBitmaps: 30,
-}
+import {
+    DEFAULT_NIIVUE_OPTIONS, 
+    DEFAULT_VOLUME_OPTIONS,
+    AVAILABLE_DRAG_MODES,
+    AVAILABLE_PEN_TYPES,
+    AVAILABLE_VIEWS,
+    CROSSHAIR,
+    SEGMENTATION,
+    PEN
+} from "./constants.js";
 
-//if using this, nv.setDragMode does not work fo changing the right click behavior
-const defaultMouseConfig = {
-    leftButton: { 
-        primary:  DRAG_MODE.crosshair,
-        withCtrl: DRAG_MODE.pan, 
-        withShift: DRAG_MODE.slicer3D //zoom
-    },
-    centerButton: DRAG_MODE.crosshair,
-    rightButton: DRAG_MODE.none
-}
-
-const defaultVolumeOptions = {
-    colormap: "gray",
-    opacity: 1,
-}
-
-const HIDE_CROSSHAIR_SIZE = 0;
-const SHOW_CROSSHAIR_SIZE = 1;
-
-const DRAW_OPACITY_HIDDEN = 0.0;
-const DRAW_OPACITY_VISIBLE = 0.9;
-
-const PEN_ERASER = 0
-const PEN_COLOR_RED = 1
-const PEN_COLOR_GREEN = 2
-const PEN_COLOR_BLUE = 3
-const PEN_COLOR_YELLOW = 4
-
-const MEASURE_TEXT_HEIGHT = 0.05;
 
 const NiiVue = ({ images, segmentationUrl }) => {
-    const canvas = useRef();
-    const nvRef = useRef();
+    const canvas = useRef(null);
+    const nvRef = useRef(null);
 
     const [currentVolume, setCurrentVolume] = useState(images[0]);
 
@@ -62,20 +30,17 @@ const NiiVue = ({ images, segmentationUrl }) => {
     const [isDrawOpacityChecked, setIsDrawOpacityChecked] = useState(false);
 
     const [availableColormaps, setAvailableColormaps] = useState([]); 
-    const [currentColormap, setCurrentColormap] = useState("gray");
+    const [currentColormap, setCurrentColormap] = useState(DEFAULT_VOLUME_OPTIONS.colormap);
     
-    const availibleViews = [SLICE_TYPE.MULTIPLANAR, SLICE_TYPE.AXIAL, SLICE_TYPE.CORONAL, SLICE_TYPE.SAGITTAL, SLICE_TYPE.RENDER];   
-    const [currentSliceView, setCurrentSliceView] = useState(defaultNiivueOptions.sliceType);
+    const [currentSliceView, setCurrentSliceView] = useState(DEFAULT_NIIVUE_OPTIONS.sliceType);
 
     const [isDrawModeActive, setIsDrawModeActive] = useState(false);
-    const [penValue, setPenValue] = useState(PEN_COLOR_RED);
+    const [penValue, setPenValue] = useState(PEN.RED);
     const [isFillerModeActive, setIsFillerModeActive] = useState(false);
 
-    const availableDragModes = [DRAG_MODE.none, DRAG_MODE.measurement, DRAG_MODE.angle, DRAG_MODE.pan];
-    const [currentDragMode, setCurrentDragMode] = useState(defaultNiivueOptions.dragMode);
+    const [currentDragMode, setCurrentDragMode] = useState(DEFAULT_NIIVUE_OPTIONS.dragMode);
 
-    const availablePenTypes = [PEN_TYPE.PEN, PEN_TYPE.ELLIPSE, PEN_TYPE.RECTANGLE]
-    const [currentPenType, setCurrentPenType] = useState(availablePenTypes[0]);
+    const [currentPenType, setCurrentPenType] = useState(PEN.RED);
 
     const [currentPenSize, setCurrentPenSize] = useState(1);
 
@@ -85,7 +50,7 @@ const NiiVue = ({ images, segmentationUrl }) => {
 
         async function setupAndLoad() {
             console.log("Setting up Niivue instance...");
-            const nv = new Niivue(defaultNiivueOptions);
+            const nv = new Niivue(DEFAULT_NIIVUE_OPTIONS);
 
             //nv.opts.mouseEventConfig = defaultMouseConfig;
             const availableColormaps = nv.colormaps();
@@ -104,7 +69,7 @@ const NiiVue = ({ images, segmentationUrl }) => {
             const current = await NVImage.loadFromFile({
                 file: currentVolume.file,
                 name: currentVolume.name,
-                ...defaultVolumeOptions
+                ...DEFAULT_VOLUME_OPTIONS
             });
             await nv.addVolume(current);
 
@@ -151,7 +116,7 @@ const NiiVue = ({ images, segmentationUrl }) => {
     const handleCrosshairChange = (event) => {
         const isChecked = event.target.checked;
         if (nvRef.current) {
-            nvRef.current.opts.crosshairWidth = isChecked ? HIDE_CROSSHAIR_SIZE : SHOW_CROSSHAIR_SIZE;
+            nvRef.current.opts.crosshairWidth = isChecked ? CROSSHAIR.HIDDEN : CROSSHAIR.VISIBLE;
             nvRef.current.opts.show3Dcrosshair = !isChecked;
             nvRef.current.drawScene();
             setIsCrosshairChecked(isChecked);
@@ -161,7 +126,7 @@ const NiiVue = ({ images, segmentationUrl }) => {
     const handleDrawOpacityChange = (event) => {
         const isChecked = event.target.checked;
         if (nvRef.current) {
-            isChecked ? nvRef.current.setDrawOpacity(DRAW_OPACITY_HIDDEN) : nvRef.current.setDrawOpacity(DRAW_OPACITY_VISIBLE); 
+            isChecked ? nvRef.current.setDrawOpacity(SEGMENTATION.HIDDEN) : nvRef.current.setDrawOpacity(SEGMENTATION.VISIBLE); 
             setIsDrawOpacityChecked(isChecked);
         }
     }
@@ -182,7 +147,7 @@ const NiiVue = ({ images, segmentationUrl }) => {
             const current = await NVImage.loadFromFile({
                 file: newVolume.file,
                 name: newVolume.name,
-                ...defaultVolumeOptions, 
+                ...DEFAULT_VOLUME_OPTIONS, 
                 colormap: currentColormap
             });
             await nvRef.current.addVolume(current);
@@ -234,7 +199,7 @@ const NiiVue = ({ images, segmentationUrl }) => {
     const handleHideMeasurementFont = (event) => {
         const isChecked = event.target.checked;
         if (nvRef.current) {
-            nvRef.current.opts.measureTextHeight = isChecked ? 0.0 : MEASURE_TEXT_HEIGHT;
+            nvRef.current.opts.measureTextHeight = isChecked ? 0.0 : DEFAULT_NIIVUE_OPTIONS.measureTextHeight;
             nvRef.current.drawScene();
         }
     }
@@ -289,6 +254,19 @@ const NiiVue = ({ images, segmentationUrl }) => {
         }
     }
 
+    const getPenTypeName = (penType) => {
+        switch (penType) {
+            case PEN_TYPE.PEN:
+                return "Pen";
+            case PEN_TYPE.RECTANGLE:
+                return "Rectangle";
+            case PEN_TYPE.ELLIPSE:
+                return "Ellipse";
+            default:
+                return "Unknown";
+        }
+    }
+
     return (
         <>  
         <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
@@ -304,7 +282,7 @@ const NiiVue = ({ images, segmentationUrl }) => {
             <label>
                 Slice view:
                 <select value={currentSliceView} onChange={handleSliceViewChange}>
-                    {availibleViews.map((sliceView) => (
+                    {AVAILABLE_VIEWS.map((sliceView) => (
                         <option key={sliceView} value={sliceView}>{getSliceName(sliceView)}</option>
                     ))}
                 </select>
@@ -322,7 +300,7 @@ const NiiVue = ({ images, segmentationUrl }) => {
              <label>
                 Drag Mode:
                 <select value={currentDragMode} onChange={handleDragModeChange}>
-                    {availableDragModes.map((dragMode) => (
+                    {AVAILABLE_DRAG_MODES.map((dragMode) => (
                             <option key={dragMode} value={dragMode}>{getDragModeName(dragMode)}</option>
                         ))}
                 </select>
@@ -370,11 +348,11 @@ const NiiVue = ({ images, segmentationUrl }) => {
                 <label>
                     Pen Color:
                     <select value={penValue} onChange={handlePenColorChange}>
-                        <option value={PEN_ERASER}>Eraser</option>
-                        <option value={PEN_COLOR_RED}>Red</option>
-                        <option value={PEN_COLOR_GREEN}>Green</option>
-                        <option value={PEN_COLOR_BLUE}>Blue</option>
-                        <option value={PEN_COLOR_YELLOW}>Yellow</option>
+                        <option value={PEN.ERASER}>Eraser</option>
+                        <option value={PEN.RED}>Red</option>
+                        <option value={PEN.GREEN}>Green</option>
+                        <option value={PEN.BLUE}>Blue</option>
+                        <option value={PEN.YELLOW}>Yellow</option>
                     </select>
                 </label>
                 <label>
@@ -388,8 +366,8 @@ const NiiVue = ({ images, segmentationUrl }) => {
                 <label>
                    { } Pen Type:
                     <select value={currentPenType} onChange={handlePenTypeChange}>
-                        {availablePenTypes.map((penType) => (
-                                <option key={penType} value={penType}>{PEN_TYPE[penType]}</option>
+                        {AVAILABLE_PEN_TYPES.map((penType) => (
+                                <option key={penType} value={penType}>{getPenTypeName(penType)}</option>
                             ))}
                     </select>
                 </label>
