@@ -22,6 +22,17 @@ const defaultNiivueOptions = {
     maxDrawUndoBitmaps: 30,
 }
 
+//if using this, nv.setDragMode does not work fo changing the right click behavior
+const defaultMouseConfig = {
+    leftButton: { 
+        primary:  DRAG_MODE.crosshair,
+        withCtrl: DRAG_MODE.pan, 
+        withShift: DRAG_MODE.slicer3D //zoom
+    },
+    centerButton: DRAG_MODE.crosshair,
+    rightButton: DRAG_MODE.none
+}
+
 const defaultVolumeOptions = {
     colormap: "gray",
     opacity: 1,
@@ -75,6 +86,8 @@ const NiiVue = ({ images, segmentationUrl }) => {
         async function setupAndLoad() {
             console.log("Setting up Niivue instance...");
             const nv = new Niivue(defaultNiivueOptions);
+
+            //nv.opts.mouseEventConfig = defaultMouseConfig;
             const availableColormaps = nv.colormaps();
             setAvailableColormaps(availableColormaps);
             nv.setMultiplanarLayout(MULTIPLANAR_TYPE.ROW); 
