@@ -66,6 +66,8 @@ const NiiVue = ({ images, segmentationUrl }) => {
     const availablePenTypes = [PEN_TYPE.PEN, PEN_TYPE.ELLIPSE, PEN_TYPE.RECTANGLE]
     const [currentPenType, setCurrentPenType] = useState(availablePenTypes[0]);
 
+    const [currentPenSize, setCurrentPenSize] = useState(1);
+
     useEffect(() => {
 
         async function setupAndLoad() {
@@ -217,6 +219,15 @@ const NiiVue = ({ images, segmentationUrl }) => {
         }
     }
 
+    const handlePenSizeChange = (event) => {
+        const newPenSize = parseInt(event.target.value);
+        if (nvRef.current) {
+            nvRef.current.opts.penSize = newPenSize;
+            nvRef.current.drawScene();
+            setCurrentPenSize(newPenSize);
+        }
+    }
+
     const getSliceName = (sliceType) => {
         switch (sliceType) {
             case SLICE_TYPE.MULTIPLANAR:
@@ -251,7 +262,7 @@ const NiiVue = ({ images, segmentationUrl }) => {
 
     return (
         <>  
-        <div>
+        <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
             <label>
                 cmap:
                 <select value={currentColormap} onChange={handleColormapChange}>
@@ -323,7 +334,8 @@ const NiiVue = ({ images, segmentationUrl }) => {
                 />
                 Draw Mode
             </label>
-
+        </div>
+        <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
             {isDrawModeActive && (
                 <>
                 <label>
@@ -345,18 +357,29 @@ const NiiVue = ({ images, segmentationUrl }) => {
                     Fill mode
                 </label>
                 <label>
-                    Pen Type:
+                   { } Pen Type:
                     <select value={currentPenType} onChange={handlePenTypeChange}>
                         {availablePenTypes.map((penType) => (
                                 <option key={penType} value={penType}>{PEN_TYPE[penType]}</option>
                             ))}
                     </select>
                 </label>
+                <label>
+                    { } Pen Size:
+                    <input
+                        type="range"
+                        min={0}
+                        max={20}
+                        step={1}
+                        value={currentPenSize}
+                        onChange={handlePenSizeChange}
+                    />
+                    {currentPenSize}
+                </label>
 
                 <button onClick={handleDrawingUndo}>Undo</button>
                 </>
             )}
-
         </div>
         <div style={{ 
                 border: "1px solid black", 
