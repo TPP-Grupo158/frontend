@@ -12,6 +12,7 @@ const defaultNiivueOptions = {
     dragMode: DRAG_MODE.none,
     measureTextJustify: "center",
     measureTextHeight: 0.05,
+    maxDrawUndoBitmaps: 30,
 }
 
 const defaultVolumeOptions = {
