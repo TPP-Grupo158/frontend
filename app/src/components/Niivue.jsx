@@ -68,16 +68,25 @@ const NiiVue = ({ images, segmentationUrl }) => {
 
     const [currentPenSize, setCurrentPenSize] = useState(1);
 
+    const [currentSlice, setCurrentSlice] = useState({ x: 0, y: 0, z: 0 });
+
     useEffect(() => {
 
         async function setupAndLoad() {
             console.log("Setting up Niivue instance...");
             const nv = new Niivue(defaultNiivueOptions);
-            
             const availableColormaps = nv.colormaps();
             setAvailableColormaps(availableColormaps);
             nv.setMultiplanarLayout(MULTIPLANAR_TYPE.ROW); 
             nv.attachToCanvas(canvas.current);
+
+            nv.onLocationChange = (location) => {
+                setCurrentSlice({
+                    x: location.vox[0],
+                    y: location.vox[1],
+                    z: location.vox[2]
+                });
+            };
             
             const current = await NVImage.loadFromFile({
                 file: currentVolume.file,
@@ -89,6 +98,13 @@ const NiiVue = ({ images, segmentationUrl }) => {
             await nv.loadDrawing(await NVImage.loadFromFile({file: segmentationUrl.file}));
             // await nv.loadDrawingFromUrl(segmentationUrl); //this will be used when fetching the segmentation from the server
             nvRef.current = nv
+
+            const initialVox = nv.frac2vox(nv.scene.crosshairPos);
+            setCurrentSlice({
+                x: initialVox[0],
+                y: initialVox[1],
+                z: initialVox[2]
+            });
         }
 
         if (!nvRef.current) {
@@ -380,7 +396,7 @@ const NiiVue = ({ images, segmentationUrl }) => {
                 <button onClick={handleDrawingUndo}>Undo</button>
                 </>
             )}
-        </div>
+        </div>  
         <div style={{ 
                 border: "1px solid black", 
                 display: "flex", 
@@ -389,6 +405,9 @@ const NiiVue = ({ images, segmentationUrl }) => {
                 width: "100%" 
             }}>
             <canvas ref={canvas} height={700} width={2000} />
+        </div>
+        <div>
+            <strong>{`X: ${currentSlice.x}, Y: ${currentSlice.y}, Z: ${currentSlice.z}`}</strong>
         </div>
         </>
     )
