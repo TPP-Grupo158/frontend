@@ -3,10 +3,8 @@ import { useRef, useEffect, useState } from "react";
 import { 
     Niivue, 
     NVImage, 
-    SLICE_TYPE, 
     MULTIPLANAR_TYPE, 
-    DRAG_MODE,
-    PEN_TYPE,  } from "@niivue/niivue";
+} from "@niivue/niivue";
 
 import {
     DEFAULT_NIIVUE_OPTIONS, 
@@ -19,6 +17,7 @@ import {
     PEN
 } from "./constants.js";
 
+import { getSliceName, getDragModeName, getPenTypeName } from "./helpers.js";
 
 const NiiVue = ({ images, segmentationUrl }) => {
     const canvas = useRef(null);
@@ -219,51 +218,6 @@ const NiiVue = ({ images, segmentationUrl }) => {
             nvRef.current.opts.penSize = newPenSize;
             nvRef.current.drawScene();
             setCurrentPenSize(newPenSize);
-        }
-    }
-
-    const getSliceName = (sliceType) => {
-        switch (sliceType) {
-            case SLICE_TYPE.MULTIPLANAR:
-                return "Multiplanar";
-            case SLICE_TYPE.AXIAL:
-                return "Axial";
-            case SLICE_TYPE.CORONAL:
-                return "Coronal";
-            case SLICE_TYPE.SAGITTAL:
-                return "Sagittal";
-            case SLICE_TYPE.RENDER:
-                return "Render";
-            default:
-                return "Unknown";
-        }
-    }
-
-    const getDragModeName = (dragMode) => {
-        switch (dragMode) {
-            case DRAG_MODE.none:
-                return "None";
-            case DRAG_MODE.angle:
-                return "angle";
-            case DRAG_MODE.measurement:
-                return "measurement";
-            case DRAG_MODE.pan:
-                return "pan/zoom";
-            default:
-                return "Unknown";
-        }
-    }
-
-    const getPenTypeName = (penType) => {
-        switch (penType) {
-            case PEN_TYPE.PEN:
-                return "Pen";
-            case PEN_TYPE.RECTANGLE:
-                return "Rectangle";
-            case PEN_TYPE.ELLIPSE:
-                return "Ellipse";
-            default:
-                return "Unknown";
         }
     }
 
