@@ -1,5 +1,12 @@
 import { useRef, useEffect, useState } from "react";
-import { Niivue, SLICE_TYPE, SHOW_RENDER, MULTIPLANAR_TYPE, NVImage, DRAG_MODE } from "@niivue/niivue";
+import { 
+    Niivue, 
+    NVImage, 
+    SLICE_TYPE, 
+    SHOW_RENDER, 
+    MULTIPLANAR_TYPE, 
+    DRAG_MODE, 
+    PEN_TYPE, } from "@niivue/niivue";
 
 const defaultNiivueOptions = {
     logLevel: "debug",
@@ -55,6 +62,9 @@ const NiiVue = ({ images, segmentationUrl }) => {
 
     const availableDragModes = [DRAG_MODE.none, DRAG_MODE.measurement, DRAG_MODE.angle, DRAG_MODE.pan];
     const [currentDragMode, setCurrentDragMode] = useState(defaultNiivueOptions.dragMode);
+
+    const availablePenTypes = [PEN_TYPE.PEN, PEN_TYPE.ELLIPSE, PEN_TYPE.RECTANGLE]
+    const [currentPenType, setCurrentPenType] = useState(availablePenTypes[0]);
 
     useEffect(() => {
 
@@ -198,6 +208,15 @@ const NiiVue = ({ images, segmentationUrl }) => {
         }
     }
 
+    const handlePenTypeChange = (event) => {
+        const newPenType = parseInt(event.target.value);
+        if (nvRef.current) {
+            nvRef.current.opts.penType = newPenType;
+            nvRef.current.drawScene();
+            setCurrentPenType(newPenType);
+        }
+    }
+
     const getSliceName = (sliceType) => {
         switch (sliceType) {
             case SLICE_TYPE.MULTIPLANAR:
@@ -324,6 +343,14 @@ const NiiVue = ({ images, segmentationUrl }) => {
                     onChange={handleFillerModeChange}
                     />
                     Fill mode
+                </label>
+                <label>
+                    Pen Type:
+                    <select value={currentPenType} onChange={handlePenTypeChange}>
+                        {availablePenTypes.map((penType) => (
+                                <option key={penType} value={penType}>{PEN_TYPE[penType]}</option>
+                            ))}
+                    </select>
                 </label>
 
                 <button onClick={handleDrawingUndo}>Undo</button>
