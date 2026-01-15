@@ -45,6 +45,8 @@ const NiiVue = ({ images, segmentationUrl }) => {
 
     const [currentSlice, setCurrentSlice] = useState({ x: 0, y: 0, z: 0 });
 
+    const[currentVolumeGamma, setCurrentVolumeGamma] = useState(1.0);
+
     useEffect(() => {
 
         async function setupAndLoad() {
@@ -221,6 +223,14 @@ const NiiVue = ({ images, segmentationUrl }) => {
         }
     }
 
+    const handleVolumeGammaChange = (event) => {
+        const newGamma = parseFloat(event.target.value);
+        if (nvRef.current) {
+            nvRef.current.setGamma(newGamma);
+            setCurrentVolumeGamma(newGamma);
+        }
+    }
+    
     return (
         <>  
         <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
@@ -296,6 +306,20 @@ const NiiVue = ({ images, segmentationUrl }) => {
                 Draw Mode
             </label>
         </div>
+        <div>
+            <label style={{ display: "flex", alignItems: "center", gap: "8px" }}>
+                { } Gamma:
+                <input
+                    type="range"
+                    min={0.5}
+                    max={2.0}
+                    step={0.1}
+                    value={currentVolumeGamma}
+                    onChange={handleVolumeGammaChange}
+                />
+                {currentVolumeGamma}
+            </label>
+        </div>
         <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
             {isDrawModeActive && (
                 <>
@@ -325,11 +349,11 @@ const NiiVue = ({ images, segmentationUrl }) => {
                             ))}
                     </select>
                 </label>
-                <label>
+                <label style={{ display: "flex", alignItems: "center", gap: "8px" }}>
                     { } Pen Size:
                     <input
                         type="range"
-                        min={0}
+                        min={1}
                         max={20}
                         step={1}
                         value={currentPenSize}
