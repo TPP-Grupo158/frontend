@@ -236,7 +236,7 @@ const NiiVue = ({ images, segmentationUrl }) => {
         <>  
         <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
             <label>
-                cmap:
+                cmap
                 <select value={currentColormap} onChange={handleColormapChange}>
                     {availableColormaps.map((colormap) => (
                             <option key={colormap} value={colormap}>{colormap}</option>
@@ -245,7 +245,7 @@ const NiiVue = ({ images, segmentationUrl }) => {
             </label>
 
             <label>
-                Slice view:
+                Slice view
                 <select value={currentSliceView} onChange={handleSliceViewChange}>
                     {AVAILABLE_VIEWS.map((sliceView) => (
                         <option key={sliceView} value={sliceView}>{getSliceName(sliceView)}</option>
@@ -254,7 +254,7 @@ const NiiVue = ({ images, segmentationUrl }) => {
             </label>
 
             <label>
-                Volume shown:
+                Volume shown
                 <select value={currentVolume.name} onChange={handleVolumeChange}>
                     {images.map((volume) => (
                             <option key={volume.name} value={volume.name}>{volume.name}</option>
@@ -263,14 +263,14 @@ const NiiVue = ({ images, segmentationUrl }) => {
             </label>
 
              <label>
-                Drag Mode:
+                Drag Mode
                 <select value={currentDragMode} onChange={handleDragModeChange}>
                     {AVAILABLE_DRAG_MODES.map((dragMode) => (
                             <option key={dragMode} value={dragMode}>{getDragModeName(dragMode)}</option>
                         ))}
                 </select>
             </label>
-
+            <button onClick={handleSaveDrawing}>Save Segmentation</button>
             <label>
                 <input
                 type="checkbox"
@@ -299,7 +299,7 @@ const NiiVue = ({ images, segmentationUrl }) => {
         </div>
         <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
             <label style={{ display: "flex", alignItems: "center", gap: "8px" }}>
-                { } Gamma:
+                { } Gamma
                 <input
                     type="range"
                     min={0.5}
@@ -311,7 +311,7 @@ const NiiVue = ({ images, segmentationUrl }) => {
                 {currentVolumeGamma}
             </label>
             <label style={{ display: "flex", alignItems: "center", gap: "8px" }}>
-                { } Draw opacity:
+                { } Draw opacity
                 <input
                     type="range"
                     min={0.0}
@@ -345,7 +345,7 @@ const NiiVue = ({ images, segmentationUrl }) => {
                     Fill mode
                 </label>
                 <label>
-                   { } Pen Type:
+                   { } Pen Type
                     <select value={currentPenType} onChange={handlePenTypeChange}>
                         {AVAILABLE_PEN_TYPES.map((penType) => (
                                 <option key={penType} value={penType}>{getPenTypeName(penType)}</option>
@@ -353,7 +353,7 @@ const NiiVue = ({ images, segmentationUrl }) => {
                     </select>
                 </label>
                 <label style={{ display: "flex", alignItems: "center", gap: "8px" }}>
-                    { } Pen Size:
+                    { } Pen Size
                     <input
                         type="range"
                         min={1}
