@@ -44,3 +44,14 @@ export const getPenTypeName = (penType) => {
             return "Unknown";
     }
 }
+
+export const parseSegmentationStats = (stats) => {
+    let result = ""
+    result += "Volume (mL): " + stats.volumeML.toFixed(2) + "\n";
+    result += "Volume (mm3): " + stats.volumeMM3.toFixed(2) + "\n";
+    result += "Intensity (max): " + stats.max.toFixed(2) + "\n";
+    result += "Intensity (min) " + stats.min.toFixed(2) + "\n";
+    result += "Intensity (mean): " + stats.mean.toFixed(2) + "\n";
+    result += "Intensity (stdev): " + stats.stdev.toFixed(2) + "\n";
+    return result;
+}

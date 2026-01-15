@@ -13,11 +13,15 @@ import {
     AVAILABLE_PEN_TYPES,
     AVAILABLE_VIEWS,
     CROSSHAIR,
-    SEGMENTATION,
     PEN
 } from "./constants.js";
 
-import { getSliceName, getDragModeName, getPenTypeName } from "./helpers.js";
+import { 
+    getSliceName, 
+    getDragModeName, 
+    getPenTypeName, 
+    parseSegmentationStats 
+} from "./helpers.js";
 
 const NiiVue = ({ images, segmentationUrl }) => {
     const canvas = useRef(null);
@@ -46,6 +50,8 @@ const NiiVue = ({ images, segmentationUrl }) => {
 
     const[currentVolumeGamma, setCurrentVolumeGamma] = useState(1.0);
     const[currentDrawOpacity, setCurrentDrawOpacity] = useState(1.0);
+
+    const [segmentationStats, setSegmentationStats] = useState("");
 
     useEffect(() => {
 
@@ -126,7 +132,6 @@ const NiiVue = ({ images, segmentationUrl }) => {
 
     const handleDrawOpacityChange = (event) => {
         const newOpacity = parseFloat(event.target.value);
-        console.log("Setting draw opacity to:", newOpacity);
         if (nvRef.current) {
             nvRef.current.setDrawOpacity(newOpacity);
             setCurrentDrawOpacity(newOpacity);
@@ -231,10 +236,22 @@ const NiiVue = ({ images, segmentationUrl }) => {
             setCurrentVolumeGamma(newGamma);
         }
     }
+
+    const updateSegmentationStats = () => {
+        if (nvRef.current) {
+            const stats = nvRef.current.getDescriptives({
+                layer: 0,
+                drawingIsMask: true,
+            });
+            
+            setSegmentationStats(parseSegmentationStats(stats));
+        }
+    }
     
     return (
         <>  
         <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
+            <button onClick={updateSegmentationStats}>Update Segmentation Stats</button>
             <label>
                 cmap
                 <select value={currentColormap} onChange={handleColormapChange}>
@@ -381,6 +398,16 @@ const NiiVue = ({ images, segmentationUrl }) => {
         <div>
             <strong>{`X: ${currentSlice.x}, Y: ${currentSlice.y}, Z: ${currentSlice.z}`}</strong>
         </div>
+        {segmentationStats && (
+        <div>
+            
+            <pre>
+                <strong>Segmentation Stats (does not include per-label info)</strong>
+                <br />
+                {segmentationStats}
+            </pre>
+        </div>
+    )}
         </>
     )
 };
