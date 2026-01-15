@@ -26,7 +26,6 @@ const NiiVue = ({ images, segmentationUrl }) => {
     const [currentVolume, setCurrentVolume] = useState(images[0]);
 
     const [isCrosshairChecked, setIsCrosshairChecked] = useState(false);
-    const [isDrawOpacityChecked, setIsDrawOpacityChecked] = useState(false);
 
     const [availableColormaps, setAvailableColormaps] = useState([]); 
     const [currentColormap, setCurrentColormap] = useState(DEFAULT_VOLUME_OPTIONS.colormap);
@@ -46,6 +45,7 @@ const NiiVue = ({ images, segmentationUrl }) => {
     const [currentSlice, setCurrentSlice] = useState({ x: 0, y: 0, z: 0 });
 
     const[currentVolumeGamma, setCurrentVolumeGamma] = useState(1.0);
+    const[currentDrawOpacity, setCurrentDrawOpacity] = useState(1.0);
 
     useEffect(() => {
 
@@ -125,10 +125,11 @@ const NiiVue = ({ images, segmentationUrl }) => {
     }
 
     const handleDrawOpacityChange = (event) => {
-        const isChecked = event.target.checked;
+        const newOpacity = parseFloat(event.target.value);
+        console.log("Setting draw opacity to:", newOpacity);
         if (nvRef.current) {
-            isChecked ? nvRef.current.setDrawOpacity(SEGMENTATION.HIDDEN) : nvRef.current.setDrawOpacity(SEGMENTATION.VISIBLE); 
-            setIsDrawOpacityChecked(isChecked);
+            nvRef.current.setDrawOpacity(newOpacity);
+            setCurrentDrawOpacity(newOpacity);
         }
     }
 
@@ -281,16 +282,6 @@ const NiiVue = ({ images, segmentationUrl }) => {
 
             <label>
                 <input
-                type="checkbox"
-                checked={isDrawOpacityChecked}
-                onChange={handleDrawOpacityChange}
-                />
-                Hide Segmentation
-            </label>
-            <button onClick={handleSaveDrawing}>Save Segmentation</button>
-
-            <label>
-                <input
                     type="checkbox"
                     onChange={handleHideMeasurementFont}
                 />
@@ -306,7 +297,7 @@ const NiiVue = ({ images, segmentationUrl }) => {
                 Draw Mode
             </label>
         </div>
-        <div>
+        <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
             <label style={{ display: "flex", alignItems: "center", gap: "8px" }}>
                 { } Gamma:
                 <input
@@ -318,6 +309,18 @@ const NiiVue = ({ images, segmentationUrl }) => {
                     onChange={handleVolumeGammaChange}
                 />
                 {currentVolumeGamma}
+            </label>
+            <label style={{ display: "flex", alignItems: "center", gap: "8px" }}>
+                { } Draw opacity:
+                <input
+                    type="range"
+                    min={0.0}
+                    max={1.0}
+                    step={0.01}
+                    value={currentDrawOpacity}
+                    onChange={handleDrawOpacityChange}
+                />
+                {parseInt(currentDrawOpacity * 100)}%
             </label>
         </div>
         <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
