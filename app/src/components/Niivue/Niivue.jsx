@@ -90,8 +90,8 @@ const NiiVue = ({ images, segmentationUrl }) => {
                 const labelColor = nv.drawLut.lut.slice((i+1)*4, (i+2)*4);
                 nv.addLabel(label, {textScale: 1.0, bulletColor: labelColor, bulletScale: 1})
             })
-            nv.drawScene();
-
+            
+            nv.setDrawOpacity(currentDrawOpacity);
 
             const initialVox = nv.frac2vox(nv.scene.crosshairPos);
             setCurrentSlice({
