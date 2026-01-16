@@ -23,6 +23,8 @@ import {
     parseSegmentationStats 
 } from "./helpers.js";
 
+const labels = ["Label 1", "Label 2", "Label 3"];
+
 const NiiVue = ({ images, segmentationUrl }) => {
     const canvas = useRef(null);
     const nvRef = useRef(null);
@@ -83,6 +85,13 @@ const NiiVue = ({ images, segmentationUrl }) => {
             await nv.loadDrawing(await NVImage.loadFromFile({file: segmentationUrl.file, opacity: 0.6}));
             // await nv.loadDrawingFromUrl(segmentationUrl); //this will be used when fetching the segmentation from the server
             nvRef.current = nv
+            
+            labels.forEach((label, i) => {
+                const labelColor = nv.drawLut.lut.slice((i+1)*4, (i+2)*4);
+                nv.addLabel(label, {textScale: 1.0, bulletColor: labelColor, bulletScale: 1})
+            })
+            nv.drawScene();
+
 
             const initialVox = nv.frac2vox(nv.scene.crosshairPos);
             setCurrentSlice({
