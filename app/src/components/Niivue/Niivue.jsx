@@ -49,7 +49,7 @@ const NiiVue = ({ images, segmentationUrl }) => {
     const [currentSlice, setCurrentSlice] = useState({ x: 0, y: 0, z: 0 });
 
     const[currentVolumeGamma, setCurrentVolumeGamma] = useState(1.0);
-    const[currentDrawOpacity, setCurrentDrawOpacity] = useState(1.0);
+    const[currentDrawOpacity, setCurrentDrawOpacity] = useState(0.6);
 
     const [segmentationStats, setSegmentationStats] = useState("");
 
@@ -80,7 +80,7 @@ const NiiVue = ({ images, segmentationUrl }) => {
             });
             await nv.addVolume(current);
 
-            await nv.loadDrawing(await NVImage.loadFromFile({file: segmentationUrl.file}));
+            await nv.loadDrawing(await NVImage.loadFromFile({file: segmentationUrl.file, opacity: 0.6}));
             // await nv.loadDrawingFromUrl(segmentationUrl); //this will be used when fetching the segmentation from the server
             nvRef.current = nv
 
@@ -243,7 +243,6 @@ const NiiVue = ({ images, segmentationUrl }) => {
                 layer: 0,
                 drawingIsMask: true,
             });
-            
             setSegmentationStats(parseSegmentationStats(stats));
         }
     }
@@ -391,9 +390,10 @@ const NiiVue = ({ images, segmentationUrl }) => {
                 display: "flex", 
                 justifyContent: "center", 
                 marginTop: "10px",
-                width: "100%" 
+                width: "100%", 
+                height: 700
             }}>
-            <canvas ref={canvas} height={700} width={2000} />
+            <canvas ref={canvas} style={{ width: "100%", height: "100%" }} />
         </div>
         <div>
             <strong>{`X: ${currentSlice.x}, Y: ${currentSlice.y}, Z: ${currentSlice.z}`}</strong>

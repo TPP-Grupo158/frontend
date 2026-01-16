@@ -35,11 +35,6 @@ export const CROSSHAIR = {
     VISIBLE: 1,
 }
 
-export const SEGMENTATION = {
-    HIDDEN: 0.0,
-    VISIBLE: 0.9,
-}
-
 export const PEN = {
     ERASER: 0,
     RED: 1,
