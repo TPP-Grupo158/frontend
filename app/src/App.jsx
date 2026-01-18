@@ -1,6 +1,8 @@
 import NiiVue from './components/Niivue/Niivue.jsx'
 import { useState } from 'react';
 
+const labels = ["Label 1", "Label 2", "Label 3"];
+
 function App() {
 
   const [images, setImages] = useState([]);
@@ -37,7 +39,7 @@ function App() {
       </form>
       }
       {  formSubmitted &&
-        <NiiVue images={images} segmentationUrl={segmentationUrl} />
+        <NiiVue images={images} segmentationUrl={segmentationUrl} labels={labels}/>
       }
     </>
   )

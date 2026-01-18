@@ -23,9 +23,8 @@ import {
     parseSegmentationStats 
 } from "./helpers.js";
 
-const labels = ["Label 1", "Label 2", "Label 3"];
 
-const NiiVue = ({ images, segmentationUrl }) => {
+const NiiVue = ({ images, segmentationUrl, labels }) => {
     const canvas = useRef(null);
     const nvRef = useRef(null);
 
@@ -82,7 +81,7 @@ const NiiVue = ({ images, segmentationUrl }) => {
             });
             await nv.addVolume(current);
 
-            await nv.loadDrawing(await NVImage.loadFromFile({file: segmentationUrl.file, opacity: 0.6}));
+            await nv.loadDrawing(await NVImage.loadFromFile({file: segmentationUrl.file}));
             // await nv.loadDrawingFromUrl(segmentationUrl); //this will be used when fetching the segmentation from the server
             nvRef.current = nv
             
