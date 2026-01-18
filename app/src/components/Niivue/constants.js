@@ -1,4 +1,4 @@
-import { DRAG_MODE, SHOW_RENDER, SLICE_TYPE, PEN_TYPE } from "@niivue/niivue"
+import { DRAG_MODE, SHOW_RENDER, SLICE_TYPE, PEN_TYPE, MULTIPLANAR_TYPE } from "@niivue/niivue"
 
 export const DEFAULT_NIIVUE_OPTIONS = {
     logLevel: "debug",
@@ -6,6 +6,7 @@ export const DEFAULT_NIIVUE_OPTIONS = {
     crosshairWidth: 1,
     crosshairWidthUnit: "mm",
     sliceType: SLICE_TYPE.MULTIPLANAR,
+    multiplanarLayout: MULTIPLANAR_TYPE.ROW,
     multiplanarShowRender: SHOW_RENDER.NEVER,
     multiplanarEqualSize: true,
     dragMode: DRAG_MODE.none,
@@ -62,4 +63,10 @@ export const AVAILABLE_PEN_TYPES = [
     PEN_TYPE.PEN,
     PEN_TYPE.ELLIPSE,
     PEN_TYPE.RECTANGLE
+];
+
+export const AVAILABLE_MULTIPLANAR_LAYOUTS = [
+    MULTIPLANAR_TYPE.COLUMN,
+    MULTIPLANAR_TYPE.ROW,
+    MULTIPLANAR_TYPE.GRID,
 ];

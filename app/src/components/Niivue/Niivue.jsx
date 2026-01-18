@@ -3,7 +3,6 @@ import { useRef, useEffect, useState } from "react";
 import { 
     Niivue, 
     NVImage, 
-    MULTIPLANAR_TYPE, 
 } from "@niivue/niivue";
 
 import {
@@ -12,6 +11,7 @@ import {
     AVAILABLE_DRAG_MODES,
     AVAILABLE_PEN_TYPES,
     AVAILABLE_VIEWS,
+    AVAILABLE_MULTIPLANAR_LAYOUTS,
     CROSSHAIR,
     PEN
 } from "./constants.js";
@@ -20,7 +20,8 @@ import {
     getSliceName, 
     getDragModeName, 
     getPenTypeName, 
-    parseSegmentationStats 
+    parseSegmentationStats, 
+    getMultiplanarLayoutName
 } from "./helpers.js";
 
 
@@ -36,6 +37,7 @@ const NiiVue = ({ images, segmentationUrl, labels }) => {
     const [currentColormap, setCurrentColormap] = useState(DEFAULT_VOLUME_OPTIONS.colormap);
     
     const [currentSliceView, setCurrentSliceView] = useState(DEFAULT_NIIVUE_OPTIONS.sliceType);
+    const [currentMultiplanarLayout, setCurrentMultiplanarLayout] = useState(DEFAULT_NIIVUE_OPTIONS.multiplanarLayout);
 
     const [isDrawModeActive, setIsDrawModeActive] = useState(false);
     const [penValue, setPenValue] = useState(PEN.RED);
@@ -63,7 +65,6 @@ const NiiVue = ({ images, segmentationUrl, labels }) => {
             //nv.opts.mouseEventConfig = defaultMouseConfig;
             const availableColormaps = nv.colormaps();
             setAvailableColormaps(availableColormaps);
-            nv.setMultiplanarLayout(MULTIPLANAR_TYPE.ROW); 
             nv.attachToCanvas(canvas.current);
 
             nv.onLocationChange = (location) => {
@@ -254,6 +255,13 @@ const NiiVue = ({ images, segmentationUrl, labels }) => {
             setSegmentationStats(parseSegmentationStats(stats));
         }
     }
+    const handleMultiplanarLayoutChange = (event) => {
+        const newLayout = parseInt(event.target.value);
+        if (nvRef.current) {
+            nvRef.current.setMultiplanarLayout(newLayout);
+            setCurrentMultiplanarLayout(newLayout);
+        }
+    }
     
     return (
         <>  
@@ -269,10 +277,19 @@ const NiiVue = ({ images, segmentationUrl, labels }) => {
             </label>
 
             <label>
-                Slice view
+                Slice view { }
                 <select value={currentSliceView} onChange={handleSliceViewChange}>
                     {AVAILABLE_VIEWS.map((sliceView) => (
                         <option key={sliceView} value={sliceView}>{getSliceName(sliceView)}</option>
+                    ))}
+                </select>
+            </label>
+
+            <label>
+                Multiplanar layout { }
+                <select value={currentMultiplanarLayout} onChange={handleMultiplanarLayoutChange}>
+                    {AVAILABLE_MULTIPLANAR_LAYOUTS.map((layout) => (
+                        <option key={layout} value={layout}>{getMultiplanarLayoutName(layout)}</option>
                     ))}
                 </select>
             </label>
