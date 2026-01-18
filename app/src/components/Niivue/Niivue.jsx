@@ -56,6 +56,8 @@ const NiiVue = ({ images, segmentationUrl, labels }) => {
 
     const [segmentationStats, setSegmentationStats] = useState("");
 
+    const [worldspace, setWorldspace] = useState(false);
+
     useEffect(() => {
 
         async function setupAndLoad() {
@@ -262,6 +264,14 @@ const NiiVue = ({ images, segmentationUrl, labels }) => {
             setCurrentMultiplanarLayout(newLayout);
         }
     }
+
+    const handleWorldspaceChange = (event) => {
+        const isChecked = event.target.checked;
+        if (nvRef.current) {
+            nvRef.current.setSliceMM(isChecked);
+            setWorldspace(isChecked);
+        }
+    }
     
     return (
         <>  
@@ -327,6 +337,15 @@ const NiiVue = ({ images, segmentationUrl, labels }) => {
                     onChange={handleHideMeasurementFont}
                 />
                 Hide Text
+            </label>
+
+            <label>
+                <input
+                type="checkbox"
+                checked={worldspace}
+                onChange={handleWorldspaceChange}
+                />
+                Worldspace
             </label>
 
             <label>
