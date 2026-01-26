@@ -1,4 +1,4 @@
-import { SLICE_TYPE, DRAG_MODE, PEN_TYPE, MULTIPLANAR_TYPE } from "@niivue/niivue"
+import { SLICE_TYPE, DRAG_MODE, MULTIPLANAR_TYPE } from "@niivue/niivue"
 
 export const getSliceName = (sliceType) => {
     switch (sliceType) {
@@ -32,18 +32,6 @@ export const getDragModeName = (dragMode) => {
     }
 }
 
-export const getPenTypeName = (penType) => {
-    switch (penType) {
-        case PEN_TYPE.PEN:
-            return "Pen";
-        case PEN_TYPE.RECTANGLE:
-            return "Rectangle";
-        case PEN_TYPE.ELLIPSE:
-            return "Ellipse";
-        default:
-            return "Unknown";
-    }
-}
 
 export const getMultiplanarLayoutName = (layoutType) => {
     switch (layoutType) {

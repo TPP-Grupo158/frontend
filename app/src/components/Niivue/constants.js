@@ -1,4 +1,4 @@
-import { DRAG_MODE, SHOW_RENDER, SLICE_TYPE, PEN_TYPE, MULTIPLANAR_TYPE } from "@niivue/niivue"
+import { DRAG_MODE, SHOW_RENDER, SLICE_TYPE, MULTIPLANAR_TYPE } from "@niivue/niivue"
 
 export const DEFAULT_NIIVUE_OPTIONS = {
     logLevel: "debug",
@@ -36,14 +36,6 @@ export const CROSSHAIR = {
     VISIBLE: 1,
 }
 
-export const PEN = {
-    ERASER: 0,
-    RED: 1,
-    GREEN: 2,
-    BLUE: 3,
-    YELLOW: 4
-};
-
 export const AVAILABLE_VIEWS = [
     SLICE_TYPE.MULTIPLANAR,
     SLICE_TYPE.AXIAL,
@@ -57,12 +49,6 @@ export const AVAILABLE_DRAG_MODES = [
     DRAG_MODE.measurement,
     DRAG_MODE.angle,
     DRAG_MODE.pan
-];
-
-export const AVAILABLE_PEN_TYPES = [
-    PEN_TYPE.PEN,
-    PEN_TYPE.ELLIPSE,
-    PEN_TYPE.RECTANGLE
 ];
 
 export const AVAILABLE_MULTIPLANAR_LAYOUTS = [

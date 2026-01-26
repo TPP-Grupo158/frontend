@@ -9,17 +9,14 @@ import {
     DEFAULT_NIIVUE_OPTIONS, 
     DEFAULT_VOLUME_OPTIONS,
     AVAILABLE_DRAG_MODES,
-    AVAILABLE_PEN_TYPES,
     AVAILABLE_VIEWS,
     AVAILABLE_MULTIPLANAR_LAYOUTS,
     CROSSHAIR,
-    PEN
 } from "./constants.js";
 
 import { 
     getSliceName, 
     getDragModeName, 
-    getPenTypeName, 
     parseSegmentationStats, 
     getMultiplanarLayoutName
 } from "./helpers.js";
@@ -39,15 +36,7 @@ const NiiVue = ({ images, segmentationUrl, labels }) => {
     const [currentSliceView, setCurrentSliceView] = useState(DEFAULT_NIIVUE_OPTIONS.sliceType);
     const [currentMultiplanarLayout, setCurrentMultiplanarLayout] = useState(DEFAULT_NIIVUE_OPTIONS.multiplanarLayout);
 
-    const [isDrawModeActive, setIsDrawModeActive] = useState(false);
-    const [penValue, setPenValue] = useState(PEN.RED);
-    const [isFillerModeActive, setIsFillerModeActive] = useState(false);
-
     const [currentDragMode, setCurrentDragMode] = useState(DEFAULT_NIIVUE_OPTIONS.dragMode);
-
-    const [currentPenType, setCurrentPenType] = useState(PEN.RED);
-
-    const [currentPenSize, setCurrentPenSize] = useState(1);
 
     const [currentSlice, setCurrentSlice] = useState({ x: 0, y: 0, z: 0 });
 
@@ -157,7 +146,6 @@ const NiiVue = ({ images, segmentationUrl, labels }) => {
         if (nvRef.current) {
 
             nvRef.current.setDrawingEnabled(false);
-            setIsDrawModeActive(false)
 
             await nvRef.current.removeVolumeByIndex(0);
             console.log(nvRef.current.volumes)
@@ -178,34 +166,6 @@ const NiiVue = ({ images, segmentationUrl, labels }) => {
             nvRef.current.saveImage({filename: 'segmentation.nii.gz', isSaveDrawing: true});
     }
 
-    const handleDrawingActivation = (event) => {
-        const isChecked = event.target.checked;
-        if (nvRef.current) {
-            nvRef.current.setDrawingEnabled(isChecked);
-            setIsDrawModeActive(isChecked);
-        }
-    }
-
-    const handlePenColorChange = (event) => {
-        const newPenValue = parseInt(event.target.value);
-        if (nvRef.current) {
-            nvRef.current.setPenValue(newPenValue, isFillerModeActive);
-            setPenValue(newPenValue);
-        }
-    }
-
-    const handleFillerModeChange = (event) => {
-        const isChecked = event.target.checked;
-        if (nvRef.current) {
-            nvRef.current.setPenValue(penValue, isChecked);
-            setIsFillerModeActive(isChecked);
-        }
-    }
-
-    const handleDrawingUndo = () => {
-        if (nvRef.current) { nvRef.current.drawUndo(); }
-    }
-
     const handleDragModeChange = (event) => {
         const newDragMode = parseInt(event.target.value)
         if (nvRef.current) {
@@ -219,24 +179,6 @@ const NiiVue = ({ images, segmentationUrl, labels }) => {
         if (nvRef.current) {
             nvRef.current.opts.measureTextHeight = isChecked ? 0.0 : DEFAULT_NIIVUE_OPTIONS.measureTextHeight;
             nvRef.current.drawScene();
-        }
-    }
-
-    const handlePenTypeChange = (event) => {
-        const newPenType = parseInt(event.target.value);
-        if (nvRef.current) {
-            nvRef.current.opts.penType = newPenType;
-            nvRef.current.drawScene();
-            setCurrentPenType(newPenType);
-        }
-    }
-
-    const handlePenSizeChange = (event) => {
-        const newPenSize = parseInt(event.target.value);
-        if (nvRef.current) {
-            nvRef.current.opts.penSize = newPenSize;
-            nvRef.current.drawScene();
-            setCurrentPenSize(newPenSize);
         }
     }
 
@@ -347,15 +289,6 @@ const NiiVue = ({ images, segmentationUrl, labels }) => {
                 />
                 Worldspace
             </label>
-
-            <label>
-                <input
-                type="checkbox"
-                checked={isDrawModeActive}
-                onChange={handleDrawingActivation}
-                />
-                Draw Mode
-            </label>
         </div>
         <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
             <label style={{ display: "flex", alignItems: "center", gap: "8px" }}>
@@ -383,52 +316,6 @@ const NiiVue = ({ images, segmentationUrl, labels }) => {
                 {parseInt(currentDrawOpacity * 100)}%
             </label>
         </div>
-        <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
-            {isDrawModeActive && (
-                <>
-                <label>
-                    Pen Color:
-                    <select value={penValue} onChange={handlePenColorChange}>
-                        <option value={PEN.ERASER}>Eraser</option>
-                        <option value={PEN.RED}>Red</option>
-                        <option value={PEN.GREEN}>Green</option>
-                        <option value={PEN.BLUE}>Blue</option>
-                        <option value={PEN.YELLOW}>Yellow</option>
-                    </select>
-                </label>
-                <label>
-                <input
-                    type="checkbox"
-                    checked={isFillerModeActive}
-                    onChange={handleFillerModeChange}
-                    />
-                    Fill mode
-                </label>
-                <label>
-                   { } Pen Type
-                    <select value={currentPenType} onChange={handlePenTypeChange}>
-                        {AVAILABLE_PEN_TYPES.map((penType) => (
-                                <option key={penType} value={penType}>{getPenTypeName(penType)}</option>
-                            ))}
-                    </select>
-                </label>
-                <label style={{ display: "flex", alignItems: "center", gap: "8px" }}>
-                    { } Pen Size
-                    <input
-                        type="range"
-                        min={1}
-                        max={20}
-                        step={1}
-                        value={currentPenSize}
-                        onChange={handlePenSizeChange}
-                    />
-                    {currentPenSize}
-                </label>
-
-                <button onClick={handleDrawingUndo}>Undo</button>
-                </>
-            )}
-        </div>  
         <div style={{ 
                 border: "1px solid black", 
                 display: "flex", 
