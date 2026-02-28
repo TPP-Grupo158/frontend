@@ -1,10 +1,11 @@
 import NiiVue from './components/Niivue/Niivue.jsx'
+import Login from './components/Login.jsx'
 import { useState } from 'react';
 
 const labels = ["Label 1", "Label 2", "Label 3"];
 
 function App() {
-
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [images, setImages] = useState([]);
   const [segmentationUrl, setSegmentationUrl] = useState(null);
 
@@ -15,6 +16,9 @@ function App() {
     e.preventDefault();
     setSegmentationUrl({ file: segmentationFile });
     setFormSubmitted(true);
+  }
+  if (!isLoggedIn) {
+    return <Login onLoginSuccess={() => setIsLoggedIn(true)} />;
   }
 
   return (
