@@ -18,6 +18,7 @@ function Login({ onLoginSuccess }) {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({ email, password }),
+        credentials: 'include'
       });
 
       const data = await response.json();
@@ -34,36 +35,43 @@ function Login({ onLoginSuccess }) {
       setLoading(false);
     }
   };
-
-  return (
-    <div className="login-form">
-      <form onSubmit={handleSubmit}>
-        <h2>System Login</h2>
-        {error && <p style={{ color: 'red' }}>{error}</p>}
+return (
+    <div style={styles.container}>
+      <form onSubmit={handleSubmit} style={styles.form}>
+        <h2>Medical Image Processor</h2>
+        <p>Please sign in to continue</p>
         
         <input 
           type="email" 
-          value={email} 
-          onChange={(e) => setEmail(e.target.value)} 
           placeholder="Email" 
+          value={email}
+          onChange={(e) => setEmail(e.target.value)}
+          style={styles.input}
           required 
-          disabled={loading}
-        />
-        <input 
-          type="password" 
-          value={password} 
-          onChange={(e) => setPassword(e.target.value)} 
-          placeholder="Password" 
-          required 
-          disabled={loading}
         />
         
-        <button type="submit" disabled={loading}>
-          {loading ? 'Authenticating...' : 'Login'}
-        </button>
+        <input 
+          type="password" 
+          placeholder="Password" 
+          value={password}
+          onChange={(e) => setPassword(e.target.value)}
+          style={styles.input}
+          required 
+        />
+        
+        <button type="submit" style={styles.button}>Login</button>
       </form>
     </div>
   );
 }
+
+const styles = {
+  container: { display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh', backgroundColor: '#f0f2f5' },
+  form: { padding: '2rem', background: 'white', borderRadius: '8px', boxShadow: '0 4px 6px rgba(0,0,0,0.1)', display: 'flex', flexDirection: 'column', width: '300px' },
+  input: { marginBottom: '1rem', padding: '0.5rem', borderRadius: '4px', border: '1px solid #ccc' },
+  button: { padding: '0.7rem', backgroundColor: '#007bff', color: 'white', border: 'none', borderRadius: '4px', cursor: 'pointer' }
+};
+
+
 
 export default Login;
