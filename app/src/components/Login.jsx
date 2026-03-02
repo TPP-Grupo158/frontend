@@ -1,11 +1,12 @@
 import { useState } from 'react';
 import styles from './styles.js'
+import PropTypes from 'prop-types';
 
 function Login({ onLoginSuccess }) {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const [error, setError] = useState('');
-  const [loading, setLoading] = useState(false);
+  const [_error, setError] = useState('');
+  const [_loading, setLoading] = useState(false);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -30,7 +31,7 @@ function Login({ onLoginSuccess }) {
       } else {
         setError(data.message || 'Invalid credentials');
       }
-    } catch (err) {
+    } catch {
       setError('Could not connect to the server.');
     } finally {
       setLoading(false);
@@ -66,5 +67,9 @@ return (
   );
 }
 
+
+Login.propTypes = {
+  onLoginSuccess: PropTypes.func.isRequired,
+}
 
 export default Login;
