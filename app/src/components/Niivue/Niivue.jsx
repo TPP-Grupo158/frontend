@@ -1,5 +1,6 @@
 import { useRef, useEffect, useState } from "react";
 import styles from '../styles.js'
+import PropTypes from 'prop-types';
 
 import { 
     Niivue, 
@@ -343,6 +344,17 @@ const NiiVue = ({ images, segmentationUrl, labels }) => {
         </>
     )
 };
+
+NiiVue.propTypes = {
+    images: PropTypes.arrayOf(PropTypes.shape({
+        file: PropTypes.instanceOf(File).isRequired,
+        name: PropTypes.string.isRequired,
+    })).isRequired,
+    segmentationUrl: PropTypes.shape({
+        file: PropTypes.instanceOf(File).isRequired,
+    }).isRequired,
+    labels: PropTypes.arrayOf(PropTypes.string).isRequired,
+}
 
 
 export default NiiVue;
