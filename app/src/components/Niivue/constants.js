@@ -7,7 +7,7 @@ export const DEFAULT_NIIVUE_OPTIONS = {
     crosshairWidthUnit: "mm",
     sliceType: SLICE_TYPE.MULTIPLANAR,
     multiplanarLayout: MULTIPLANAR_TYPE.ROW,
-    multiplanarShowRender: SHOW_RENDER.ALWAYS,
+    multiplanarShowRender: SHOW_RENDER.NEVER,
     multiplanarEqualSize: true,
     dragMode: DRAG_MODE.none,
     measureTextJustify: "center",
