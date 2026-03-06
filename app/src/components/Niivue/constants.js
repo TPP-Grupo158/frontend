@@ -7,7 +7,7 @@ export const DEFAULT_NIIVUE_OPTIONS = {
     crosshairWidthUnit: "mm",
     sliceType: SLICE_TYPE.MULTIPLANAR,
     multiplanarLayout: MULTIPLANAR_TYPE.ROW,
-    multiplanarShowRender: SHOW_RENDER.NEVER,
+    multiplanarShowRender: SHOW_RENDER.ALWAYS,
     multiplanarEqualSize: true,
     dragMode: DRAG_MODE.none,
     measureTextJustify: "center",
@@ -46,13 +46,10 @@ export const AVAILABLE_VIEWS = [
 
 export const AVAILABLE_DRAG_MODES = [
     DRAG_MODE.none,
-    DRAG_MODE.measurement,
-    DRAG_MODE.angle,
     DRAG_MODE.pan
 ];
 
 export const AVAILABLE_MULTIPLANAR_LAYOUTS = [
-    MULTIPLANAR_TYPE.COLUMN,
     MULTIPLANAR_TYPE.ROW,
     MULTIPLANAR_TYPE.GRID,
 ];
