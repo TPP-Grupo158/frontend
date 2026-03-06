@@ -2,11 +2,15 @@ import { useState } from 'react';
 import styles from './styles.js'
 import PropTypes from 'prop-types';
 
+import { useNavigate } from 'react-router-dom';
+
 function Login({ onLoginSuccess }) {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [_error, setError] = useState('');
   const [_loading, setLoading] = useState(false);
+
+  const navigate = useNavigate();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -28,6 +32,8 @@ function Login({ onLoginSuccess }) {
       if (response.ok) {
         console.log('Login successful:');
         onLoginSuccess(); // Pass the token up to App.jsx if needed
+        
+        navigate('/upload');
       } else {
         setError(data.message || 'Invalid credentials');
       }

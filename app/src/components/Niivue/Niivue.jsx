@@ -23,8 +23,12 @@ import {
     getMultiplanarLayoutName
 } from "./helpers.js";
 
+import { useLocation } from 'react-router-dom';
 
-const NiiVue = ({ images, segmentationUrl, labels }) => {
+
+const NiiVue = () => {
+    const location = useLocation();
+    const { images, segmentationUrl, labels } = location.state || {};
     const canvas = useRef(null);
     const nvRef = useRef(null);
 
