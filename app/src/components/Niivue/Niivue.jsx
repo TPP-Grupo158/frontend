@@ -217,8 +217,8 @@ const NiiVue = ({ images, segmentationUrl, labels }) => {
         }
     }
     
-    return (
-        <>  
+    return (  
+    <div style={{display: "flex", flexDirection: "column", justifyContent: "center", alignItems: "center",  gap: "8px" }}>
         <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
             <button onClick={updateSegmentationStats} style={styles.button}>Update Segmentation Stats</button>
             <label>
@@ -340,8 +340,8 @@ const NiiVue = ({ images, segmentationUrl, labels }) => {
                 {segmentationStats}
             </pre>
         </div>
-    )}
-        </>
+        )}
+    </div>
     )
 };
 
