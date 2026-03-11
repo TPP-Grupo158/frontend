@@ -176,14 +176,6 @@ const NiiVue = ({ images, segmentationUrl, labels }) => {
         }
     }
 
-    const handleHideMeasurementFont = (event) => {
-        const isChecked = event.target.checked;
-        if (nvRef.current) {
-            nvRef.current.opts.measureTextHeight = isChecked ? 0.0 : DEFAULT_NIIVUE_OPTIONS.measureTextHeight;
-            nvRef.current.drawScene();
-        }
-    }
-
     const handleVolumeGammaChange = (event) => {
         const newGamma = parseFloat(event.target.value);
         if (nvRef.current) {
@@ -273,14 +265,6 @@ const NiiVue = ({ images, segmentationUrl, labels }) => {
                 onChange={handleCrosshairChange}
                 />
                 Hide Crosshair
-            </label>
-
-            <label>
-                <input
-                    type="checkbox"
-                    onChange={handleHideMeasurementFont}
-                />
-                Hide Text
             </label>
 
             <label>
