@@ -1,52 +1,24 @@
 import NiiVue from './components/Niivue/Niivue.jsx'
 import Login from './components/Login.jsx'
-import styles from './components/styles.js'
+import ImageUploadForm from './components/ImageUploadForm.jsx'
 import { useState } from 'react';
+import {
+  BrowserRouter as Router,
+  Routes, Route
+} from 'react-router-dom'
 
-const labels = ["Label 1", "Label 2", "Label 3"];
 
 function App() {
-  const [isLoggedIn, setIsLoggedIn] = useState(false);
-  const [images, setImages] = useState([]);
-  const [segmentationUrl, setSegmentationUrl] = useState(null);
-
-  const [segmentationFile, setSegmentationFile] = useState(null);
-  const [formSubmitted, setFormSubmitted] = useState(false);
-
-  const onFormSubmit = (e) => {
-    e.preventDefault();
-    setSegmentationUrl({ file: segmentationFile });
-    setFormSubmitted(true);
-  }
-  if (!isLoggedIn) {
-    return <Login onLoginSuccess={() => setIsLoggedIn(true)} />;
-  }
+  const [_isLoggedIn, setIsLoggedIn] = useState(false);
 
   return (
-    <div style={styles.container}>
-      { !formSubmitted &&
-      <form onSubmit={onFormSubmit} style={styles.form}>
-        <h2>Niivue file upload</h2>
-        <label>
-          upload files
-          <input type="file" accept=".nii,.nii.gz" multiple onChange={(e) => {
-            const files = Array.from(e.target.files);
-            setImages(files.map(file => ({ file, name: file.name })));
-          }} />
-        </label>
-        <br />
-        <label>
-          Upload Segmentation:
-          <input type="file" accept=".nii,.nii.gz" onChange={(e) => setSegmentationFile(e.target.files[0])} />
-        </label>
-        <br />
-        <button type="submit"  style={styles.button}>Load Files</button>
-      </form>
-      }
-      {  formSubmitted &&
-        <NiiVue images={images} segmentationUrl={segmentationUrl} labels={labels}/>
-      }
-    </div>
+    <Router>
+      <Routes>
+        <Route path="/upload" element={<ImageUploadForm />} />
+        <Route path="/viewer" element={<NiiVue />} />
+        <Route path="/" element={<Login onLoginSuccess={() => setIsLoggedIn(true)} />} />
+      </Routes>
+    </Router>
   )
 }
 
