@@ -18,7 +18,7 @@ function Login({ onLoginSuccess }) {
     setLoading(true);
 
     try {
-      const response = await fetch(import.meta.env.VITE_GATEWAY_API, {
+      const response = await fetch(import.meta.env.VITE_GATEWAY_API + "login", {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
