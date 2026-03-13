@@ -1,20 +1,14 @@
 import { useEffect, useState } from 'react';
 import { usePatients } from '../hooks/usePatients';
+import { useDebounce } from '../hooks/useDebounce';
+
+const DELAY = 500; // ms
 
 const PatientListPage = () => {
 
-    const [dniFilter, setDniFilter] = useState(''); //For now, only search by DNI
-    const [debouncedDniFilter, setDebouncedDniFilter] = useState('');
-    const { patients, error: _error, loading: _loading, fetchPatients } = usePatients();
-
-  // Added debounce so it doesn't call the API on every keystroke
-  useEffect(() => {
-    const id = setTimeout(() => {
-      setDebouncedDniFilter(dniFilter.trim());
-    }, 500); // 500ms debounce
-
-    return () => clearTimeout(id);
-  }, [dniFilter]);
+  const [dniFilter, setDniFilter] = useState(''); //For now, only search by DNI
+  const debouncedDniFilter = useDebounce(dniFilter, DELAY);
+  const { patients, error: _error, loading: _loading, fetchPatients } = usePatients();
 
   useEffect(() => {
     fetchPatients(debouncedDniFilter);
