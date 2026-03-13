@@ -34,24 +34,27 @@ const PatientListPage = () => {
                 value={dniFilter}
                 onChange={handleDniFilterChange}
             />
-            <table>
-                <thead>
-                    <tr>
-                        <th>DNI</th>
-                        <th>Full Name</th>
-                        <th>Date of Birth</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {patients.map(patient => (
-                        <tr key={patient.id}>
-                            <td>{patient.dni}</td>
-                            <td>{patient.fullname}</td>
-                            <td>{patient.date_of_birth}</td>
-                        </tr>
-                    ))}
-                </tbody>
-            </table>
+            {patients.length !== 0 && 
+              <table>
+                  <thead>
+                      <tr>
+                          <th>DNI</th>
+                          <th>Full Name</th>
+                          <th>Date of Birth</th>
+                      </tr>
+                  </thead>
+                  <tbody>
+                      {patients.map(patient => (
+                          <tr key={patient.id}>
+                              <td>{patient.dni}</td>
+                              <td>{patient.fullname}</td>
+                              <td>{patient.date_of_birth}</td>
+                          </tr>
+                      ))}
+                  </tbody>
+              </table>
+            }
+            { patients.length === 0 && <p>No patients found.</p> }
         </div>
     );  
 
