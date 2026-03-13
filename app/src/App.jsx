@@ -1,5 +1,6 @@
 import NiiVue from './components/Niivue/Niivue.jsx'
 import Login from './components/Login.jsx'
+import Predict from './components/predictions.jsx'
 import ImageUploadForm from './components/ImageUploadForm.jsx'
 import { useState , useEffect} from 'react';
 import {
@@ -14,10 +15,11 @@ function App() {
     <Router>
       <Routes>
         <Route path="/login" element={<Login onLoginSuccess={() => setIsLoggedIn(true)} />} />
+        <Route path="/predict" element={<Predict />} />
         <Route element={<ProtectedRoute />}>
             <Route path="/upload" element={<ImageUploadForm />} />
             <Route path="/viewer" element={<NiiVue />} />
-             <Route path="/" />
+            <Route path="/" />
         </Route>
         
       </Routes>
