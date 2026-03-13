@@ -6,10 +6,10 @@ export const usePatients = () => {
     const [loading, setLoading] = useState(false);
 
 
-    const fetchPatients = async (dni = '') => {
+    const fetchPatients = async (dni = '', name = '') => {
       try {
         const response = await fetch(
-          import.meta.env.VITE_GATEWAY_API + 'patients' + (dni ? `?dni=${dni}` : ''),
+          import.meta.env.VITE_GATEWAY_API + 'patients' + (dni ? `?dni=${dni}` : '') + (name ? `?name=${name}` : ''),
           {
             method: 'GET',
             headers: { 'Content-Type': 'application/json' },
