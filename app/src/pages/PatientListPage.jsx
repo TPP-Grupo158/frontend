@@ -32,6 +32,11 @@ const PatientListPage = () => {
     setDniFilter(onlyDigits);
   };
 
+  const handleNameChange = (e) => {
+    const onlyLetters = e.target.value.replace(/[^\p{L}\s'-]/gu, '');
+    setNameFilter(onlyLetters);
+  }
+
     return (
       <div style={{padding: '0% 5%', display: 'flex', flexDirection: 'column'}}> 
         <h1 style={{margin: '0 0 16px 0' }}>Patient Search</h1>
@@ -51,7 +56,7 @@ const PatientListPage = () => {
                 type="text"
                 placeholder="Search by Name"
                 value={nameFilter}
-                onChange={(e) => setNameFilter(e.target.value)}
+                onChange={(e) => handleNameChange(e)}
             />
             }
             <select value={currentFilters} onChange={(e) => setCurrentFilters(e.target.value)}>
