@@ -1,17 +1,25 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-// import styles from './styles.js'
+const NIFTI_BRAVO = "Bravo"
+const NIFTI_T1 = "T1"
+const NIFTI_T2 = "T2"
+const NIFTI_FLAIR = "FLAIR"
+
 
 const PROCEDURES_CONFIG = [
-  { id: 'alzheimer', label: 'Alzheimer', files: ['Bravo', 'T1', 'T2', 'FLAIR'] },
-  { id: 'acv', label: 'ACV', files: ['T1'] },
-  { id: 'metastases', label: 'Metastases', files: ['Bravo', 'T1', 'T2', 'FLAIR'] },
-  { id: 'aneurysm', label: 'Aneurysm', files: ['Bravo', 'T1', 'T2', 'FLAIR'] },
+  { id: 'alzheimer', label: 'Alzheimer', files: [NIFTI_BRAVO, NIFTI_T1, NIFTI_T2, NIFTI_FLAIR] },
+  { id: 'acv', label: 'ACV', files: [NIFTI_T1] },
+  { id: 'metastases', label: 'Metastases', files:  [NIFTI_BRAVO, NIFTI_T1, NIFTI_T2, NIFTI_FLAIR] },
+  { id: 'aneurysm', label: 'Aneurysm', files:  [NIFTI_BRAVO, NIFTI_T1, NIFTI_T2, NIFTI_FLAIR] },
 ];
+
+
 
 const PredictionRequestForm = () => {
   const [selectedProcs, setSelectedProcs] = useState([]);
   const [files, setFiles] = useState({}); // { T1: File, T2: File ... }
+  const [status, setStatus] = useState('idle'); // 'idle', 'loading', 'success', 'error'
+  const [responseData, setResponseData] = useState(null);
 
   const handleCheckboxChange = (id) => {
     setSelectedProcs(prev => 
@@ -19,7 +27,6 @@ const PredictionRequestForm = () => {
     );
   };
 
-  // 1. Determine the UNIQUE set of files required by current selections
   const requiredFiles = Array.from(new Set(
     PROCEDURES_CONFIG
       .filter(p => selectedProcs.includes(p.id))
@@ -30,7 +37,43 @@ const PredictionRequestForm = () => {
     setFiles(prev => ({ ...prev, [fileType]: file }));
   };
 
-  // 2. Validation: Check if all required unique files are uploaded
+  const handleSendFiles = async () => {
+  setStatus('loading'); // Trigger that right-side animation
+  
+  const formData = new FormData();
+
+  // 1. Add the Booleans (PredictionRequest)
+  // Even though they are booleans, FormData sends them as strings "true"/"false"
+  PROCEDURES_CONFIG.forEach(proc => {
+    const isSelected = selectedProcs.includes(proc.id);
+    formData.append(proc.id, isSelected); 
+  });
+
+  // 2. Add the Files
+  // Mapping your internal names to the backend's expected keys
+  if (files[NIFTI_T1]) formData.append('file_t1', files[NIFTI_T1]);
+  if (files[NIFTI_BRAVO]) formData.append('file_t1ce', files[NIFTI_BRAVO]); // Bravo -> t1ce
+  if (files[NIFTI_T2]) formData.append('file_t2', files[NIFTI_T2]);
+  if (files[NIFTI_FLAIR]) formData.append('file_flair', files[NIFTI_FLAIR]);
+
+  try {
+    const response = await fetch(import.meta.env.VITE_GATEWAY_API+"predict", {
+      method: 'POST',
+      body: formData,
+      credentials: 'include'
+    });
+
+    if (!response.ok) throw new Error('Prediction failed');
+
+    const result = await response.json();
+    setResponseData(result.data); // Save results for the right panel
+    setStatus('success');
+  } catch (error) {
+    console.error("Error uploading:", error);
+    setStatus('error');
+  }
+};
+
   const isReady = selectedProcs.length > 0 && 
                   requiredFiles.every(f => files[f]);
 
@@ -72,10 +115,21 @@ const PredictionRequestForm = () => {
         )}
 
         <button 
-          disabled={!isReady} 
-          style={{ marginTop: '20px', width: '100%', padding: '10px', backgroundColor: isReady ? '#007bff' : '#ccc', color: 'white', border: 'none', borderRadius: '5px' }}
+          disabled={!isReady || status === 'loading'} 
+          onClick={handleSendFiles}
+          style={{ 
+            marginTop: '20px', 
+            width: '100%', 
+            padding: '12px', 
+            backgroundColor: isReady ? '#2ecc71' : '#ccc', 
+            color: 'white', 
+            border: 'none', 
+            borderRadius: '8px',
+            cursor: isReady ? 'pointer' : 'not-allowed',
+            fontWeight: 'bold'
+          }}
         >
-          Run Analysis
+          {status === 'loading' ? 'Analyzing...' : 'Run Analysis'}
         </button>
       </div>
 
