@@ -27,6 +27,10 @@ const PatientListPage = () => {
     fetchPatients('', debouncedNameFilter );
   }, [debouncedNameFilter]);
 
+  const handleDniChange = (e) => {
+    const onlyDigits = e.target.value.replace(/\D/g, '');
+    setDniFilter(onlyDigits);
+  };
 
     return (
       <div style={{padding: '0% 5%', display: 'flex', flexDirection: 'column'}}> 
@@ -36,9 +40,10 @@ const PatientListPage = () => {
             {currentFilters === 'dni' && 
               <input 
                 type="text"
+                inputMode="numeric"
                 placeholder="Search by DNI"
                 value={dniFilter}
-                onChange={(e) => setDniFilter(e.target.value)}
+                onChange={(e) => handleDniChange(e)}
             />
             }
             {currentFilters === 'name' && 
