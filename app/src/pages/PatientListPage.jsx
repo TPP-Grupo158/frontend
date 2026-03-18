@@ -7,7 +7,6 @@ import styles from '../components/styles';
 
 const DEBOUNCE_DELAY = 500; // ms
 
-
 const PatientListPage = () => {
 
   const [dniFilter, setDniFilter] = useState('');
@@ -22,13 +21,12 @@ const PatientListPage = () => {
   const { patients, error: _error, loading: _loading, fetchPatients } = usePatients();
 
   useEffect(() => {
-    fetchPatients(debouncedDniFilter, '');
-  }, [debouncedDniFilter]);
-  
-  useEffect(() => {
-    if (isComposingName) return;
-    fetchPatients('', debouncedNameFilter );
-  }, [debouncedNameFilter]);
+    if (currentFilters === 'dni') {
+      fetchPatients(debouncedDniFilter, '');
+    } else if (currentFilters === 'name' && !isComposingName) {
+      fetchPatients('', debouncedNameFilter);
+    }
+  }, [debouncedDniFilter, debouncedNameFilter]);
 
   const handleDniChange = (e) => {
     const onlyDigits = e.target.value.replace(/\D/g, '');

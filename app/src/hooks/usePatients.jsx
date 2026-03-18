@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 
 export const usePatients = () => {
     const [patients, setPatients] = useState([]);
@@ -29,11 +29,6 @@ export const usePatients = () => {
         setLoading(false);
       }
     };
-
-
-    useEffect(() => {
-        fetchPatients();
-    }, []);
 
     return { patients, error, loading, fetchPatients };
 
