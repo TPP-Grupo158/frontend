@@ -16,6 +16,8 @@ const PatientListPage = () => {
   const debouncedDniFilter = useDebounce(dniFilter, DEBOUNCE_DELAY);
   const debouncedNameFilter = useDebounce(nameFilter, DEBOUNCE_DELAY);
   const [currentFilters, setCurrentFilters] = useState('dni'); // 'dni' or 'name'
+
+  const [isComposingName, setIsComposingName] = useState(false);
   
   const { patients, error: _error, loading: _loading, fetchPatients } = usePatients();
 
@@ -24,6 +26,7 @@ const PatientListPage = () => {
   }, [debouncedDniFilter]);
   
   useEffect(() => {
+    if (isComposingName) return;
     fetchPatients('', debouncedNameFilter );
   }, [debouncedNameFilter]);
 
@@ -32,9 +35,16 @@ const PatientListPage = () => {
     setDniFilter(onlyDigits);
   };
 
+  const sanitizeNameInput = (name) => {
+    return name.replace(/[^\p{L}\s'-]/gu, '');
+  };
+
   const handleNameChange = (e) => {
-    const onlyLetters = e.target.value.replace(/[^\p{L}\s'-]/gu, '');
-    setNameFilter(onlyLetters);
+    if (isComposingName) {
+      setNameFilter(e.target.value);
+      return;
+    }
+    setNameFilter(sanitizeNameInput(e.target.value));
   }
 
     return (
@@ -57,6 +67,11 @@ const PatientListPage = () => {
                 placeholder="Search by Name"
                 value={nameFilter}
                 onChange={(e) => handleNameChange(e)}
+                onCompositionStart={() => setIsComposingName(true)}
+                onCompositionEnd={() => {
+                  setIsComposingName(false);
+                  setNameFilter(sanitizeNameInput(nameFilter));
+                }}
             />
             }
             <select value={currentFilters} onChange={(e) => setCurrentFilters(e.target.value)}>
