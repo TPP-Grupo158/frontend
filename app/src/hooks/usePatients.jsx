@@ -2,14 +2,15 @@ import { useState } from 'react';
 
 export const usePatients = () => {
     const [patients, setPatients] = useState([]);
+    const [hasMorePages, setHasMorePages] = useState(false);
     const [error, setError] = useState('');
     const [loading, setLoading] = useState(false);
 
+    const fetchPatients = async (dni = '', name = '', offset = 0, limit = 10) => {
 
-    const fetchPatients = async (dni = '', name = '') => {
       try {
         const response = await fetch(
-          import.meta.env.VITE_GATEWAY_API + 'patients' + (dni ? `?dni=${dni}` : '') + (name ? `?name=${name}` : ''),
+          import.meta.env.VITE_GATEWAY_API + 'patients'  + `?offset=${offset}&limit=${limit}` + (dni ? `&dni=${dni}` : '') + (name ? `&name=${name}` : ''),
           {
             method: 'GET',
             headers: { 'Content-Type': 'application/json' },
@@ -19,7 +20,8 @@ export const usePatients = () => {
         const data = await response.json();
 
         if (response.ok) {
-          setPatients(data);
+          setPatients(data.patients);
+          setHasMorePages(data.hasMore);
         } else {
           setError(data.message || 'Invalid credentials');
         }
@@ -30,6 +32,6 @@ export const usePatients = () => {
       }
     };
 
-    return { patients, error, loading, fetchPatients };
+    return { patients, hasMorePages, error, loading, fetchPatients };
 
 }

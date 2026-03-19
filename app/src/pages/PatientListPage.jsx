@@ -6,6 +6,7 @@ import { useDebounce } from '../hooks/useDebounce';
 import styles from '../components/styles';
 
 const DEBOUNCE_DELAY = 500; // ms
+const ITEMS_PER_PAGE = 10;
 
 const PatientListPage = () => {
 
@@ -17,14 +18,25 @@ const PatientListPage = () => {
   const [currentFilters, setCurrentFilters] = useState('dni'); // 'dni' or 'name'
 
   const [isComposingName, setIsComposingName] = useState(false);
+  const [currentPageNumber, setCurrentPageNumber] = useState(1);
   
-  const { patients, error: _error, loading: _loading, fetchPatients } = usePatients();
+  const { patients, hasMorePages, error: _error, loading: _loading, fetchPatients } = usePatients();
 
   useEffect(() => {
+    setCurrentPageNumber(1);
+    if (currentFilters === 'dni') {
+      setNameFilter('');
+    } else if (currentFilters === 'name') {
+      setDniFilter('');
+    }
+  }, [currentFilters]);
+
+  useEffect(() => {
+    setCurrentPageNumber(1);
     if (currentFilters === 'dni') {
       fetchPatients(debouncedDniFilter, '');
     } else if (currentFilters === 'name' && !isComposingName) {
-      fetchPatients('', debouncedNameFilter);
+      fetchPatients('', debouncedNameFilter, 0, ITEMS_PER_PAGE);
     }
   }, [debouncedDniFilter, debouncedNameFilter]);
 
@@ -43,6 +55,12 @@ const PatientListPage = () => {
       return;
     }
     setNameFilter(sanitizeNameInput(e.target.value));
+  }
+
+  const handlePageChange = async (newPageNumber) => {
+    const offset = (newPageNumber - 1) * ITEMS_PER_PAGE;
+    await fetchPatients('', debouncedNameFilter, offset, ITEMS_PER_PAGE);
+    setCurrentPageNumber(newPageNumber);
   }
 
     return (
@@ -105,8 +123,32 @@ const PatientListPage = () => {
                 <td></td>
               </tr>
               }
+              {
+                Array( patients.length !== 0 ? ITEMS_PER_PAGE - patients.length : ITEMS_PER_PAGE-1).fill().map((_, index) => (
+                  <tr key={`empty-${index}`} style={{...styles.table.row, backgroundColor: 'white'}}>
+                    <td>&nbsp;</td>
+                    <td>&nbsp;</td>
+                    <td>&nbsp;</td>
+                  </tr>
+                ))
+              }
             </tbody>
           </table>
+          <div style={{alignItems: 'center', display: 'flex', justifyContent: 'center', marginTop: '16px'}}>
+            <button 
+              onClick={() => handlePageChange(currentPageNumber - 1)}
+              disabled={currentPageNumber <= 1}
+            >
+              &lt;
+            </button>
+            <span style={{ margin: '0 8px' }}> {currentPageNumber}</span>
+            <button 
+              onClick={() => handlePageChange(currentPageNumber + 1)}
+              disabled={!hasMorePages}
+            >
+              &gt;
+            </button>
+          </div>
         </div>
       </div>
     );  
