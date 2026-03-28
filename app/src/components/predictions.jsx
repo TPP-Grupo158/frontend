@@ -20,7 +20,7 @@ const PredictionRequestForm = () => {
   const [files, setFiles] = useState({}); // { T1: File, T2: File ... }
   const [status, setStatus] = useState('idle'); // 'idle', 'loading', 'success', 'error'
   const [responseData, setResponseData] = useState(null);
-
+  const navigate = useNavigate();
   const handleCheckboxChange = (id) => {
     setSelectedProcs(prev => 
       prev.includes(id) ? prev.filter(p => p !== id) : [...prev, id]
@@ -55,6 +55,7 @@ const PredictionRequestForm = () => {
   if (files[NIFTI_BRAVO]) formData.append('file_t1ce', files[NIFTI_BRAVO]); // Bravo -> t1ce
   if (files[NIFTI_T2]) formData.append('file_t2', files[NIFTI_T2]);
   if (files[NIFTI_FLAIR]) formData.append('file_flair', files[NIFTI_FLAIR]);
+  const labels = ["Label 1", "Label 2", "Label 3"];
 
   try {
     const response = await fetch(import.meta.env.VITE_GATEWAY_API+"predict", {
@@ -68,6 +69,14 @@ const PredictionRequestForm = () => {
     const result = await response.json();
     setResponseData(result.data); // Save results for the right panel
     setStatus('success');
+    console.log(result.data[0].original_image);
+    navigate('/viewer', { 
+      state: { 
+        "images":[{url: result.data[0].original_image, name: "test"}], 
+        "segmentationUrl": result.data[0].prediction_image , 
+        labels 
+      } 
+    })
   } catch (error) {
     console.error("Error uploading:", error);
     setStatus('error');

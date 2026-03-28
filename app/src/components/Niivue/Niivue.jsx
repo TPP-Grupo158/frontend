@@ -71,17 +71,30 @@ const NiiVue = () => {
                     z: location.vox[2]
                 });
             };
+            if (currentVolume.file instanceof File) {
+                const current = await NVImage.loadFromFile({
+                    file: currentVolume.file,
+                    name: currentVolume.name,
+                    ...DEFAULT_VOLUME_OPTIONS
+                })
+                await nv.addVolume(current);
+            }else{
+                await nv.addVolumeFromUrl({
+                    url: currentVolume.url || currentVolume.file, 
+                    name: currentVolume.name,
+                    ...DEFAULT_VOLUME_OPTIONS
+                });
+            }
             
-            const current = await NVImage.loadFromFile({
-                file: currentVolume.file,
-                name: currentVolume.name,
-                ...DEFAULT_VOLUME_OPTIONS
-            });
-            await nv.addVolume(current);
+            if (segmentationUrl.file instanceof File) {
+                    const drawing = await NVImage.loadFromFile({ file: segmentationUrl.file });
+                    await nv.loadDrawing(drawing);
+                } else {
+                    const url = typeof segmentationUrl === 'string' ? segmentationUrl : segmentationUrl.url;
+                    await nv.loadDrawingFromUrl(url);
+                }
 
-            await nv.loadDrawing(await NVImage.loadFromFile({file: segmentationUrl.file}));
-            // await nv.loadDrawingFromUrl(segmentationUrl); //this will be used when fetching the segmentation from the server
-            nvRef.current = nv
+            nvRef.current = nv;
             
             labels.forEach((label, i) => {
                 const labelColor = nv.drawLut.lut.slice((i+1)*4, (i+2)*4);
