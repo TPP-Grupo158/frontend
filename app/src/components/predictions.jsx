@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import NiiVue_comp from './Niivue/Niivue_comp';
 const NIFTI_BRAVO = "Bravo"
 const NIFTI_T1 = "T1"
 const NIFTI_T2 = "T2"
@@ -70,13 +71,6 @@ const PredictionRequestForm = () => {
     setResponseData(result.data); // Save results for the right panel
     setStatus('success');
     console.log(result.data[0].original_image);
-    navigate('/viewer', { 
-      state: { 
-        "images":[{url: result.data[0].original_image, name: "test"}], 
-        "segmentationUrl": result.data[0].prediction_image , 
-        labels 
-      } 
-    })
   } catch (error) {
     console.error("Error uploading:", error);
     setStatus('error');
@@ -89,7 +83,7 @@ const PredictionRequestForm = () => {
   return (
     <div style={{ display: 'flex', gap: '40px', padding: '20px' }}>
       {/* LEFT BLOCK */}
-      <div style={{ flex: 1 }}>
+      <div style={{ flex: 1,  minWidth: '250px' }}>
         <h3>1. Select Procedures</h3>
         <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '10px' }}>
           {PROCEDURES_CONFIG.map(proc => (
@@ -143,11 +137,42 @@ const PredictionRequestForm = () => {
       </div>
 
       {/* RIGHT BLOCK */}
-      <div style={{ flex: 1, borderLeft: '1px solid #eee', paddingLeft: '40px' }}>
-         {/* Animation goes here */}
-         <h3>Analysis Status</h3>
-         <div style={{ height: '300px', display: 'flex', alignItems: 'center', justifyContent: 'center', border: '2px dashed #eee' }}>
-            <p>Waiting for selection...</p>
+      <div style={{ 
+        flex: 4, 
+        borderLeft: '1px solid #eee', 
+        paddingLeft: '40px',
+        display: 'flex', 
+        flexDirection: 'column' 
+      }}>
+         <h3>Análisis y Visualización</h3>
+         
+         <div style={{ 
+            flex:1,
+            height: '700px', 
+            background: '#fff', // Fondo negro para mejor contraste médico
+            display: 'flex', 
+            alignItems: 'center', 
+            justifyContent: 'center', 
+            borderRadius: '12px',
+            overflow: 'hidden' 
+         }}>
+            {/* ESTADO 1: Esperando */}
+            {status === 'idle' && <p style={{color: '#fff'}}>Seleccione los estudios y presione "Run Analysis"</p>}
+
+            {/* ESTADO 2: Cargando */}
+            {status === 'loading' && <p style={{color: '#fff'}}>Procesando imágenes en el servidor...</p>}
+
+            {/* ESTADO 3: Éxito (Aquí renderizamos NiiVue) */}
+            {status === 'success' && responseData && (
+                <NiiVue_comp 
+                    images={[{ url: responseData[0].original_image, name: "test" }]}
+                    segmentationUrl={responseData[0].prediction_image}
+                    labels={selectedProcs} 
+                />
+            )}
+
+            {/* ESTADO 4: Error */}
+            {status === 'error' && <p style={{color: '#ff4d4d'}}>Error en la predicción o conexión con MinIO</p>}
          </div>
       </div>
     </div>
