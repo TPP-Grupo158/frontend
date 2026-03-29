@@ -3,11 +3,12 @@ import { useState } from 'react';
 export const usePatients = () => {
     const [patients, setPatients] = useState([]);
     const [hasMorePages, setHasMorePages] = useState(false);
-    const [error, setError] = useState('');
+    const [error, setError] = useState({'message': '', status_code: null});
     const [loading, setLoading] = useState(false);
 
     const fetchPatients = async (dni = '', name = '', offset = 0, limit = 10) => {
 
+      setLoading(true);
       try {
         const response = await fetch(
           import.meta.env.VITE_GATEWAY_API + 'patients'  + `?offset=${offset}&limit=${limit}` + (dni ? `&dni=${dni}` : '') + (name ? `&name=${name}` : ''),
@@ -22,11 +23,12 @@ export const usePatients = () => {
         if (response.ok) {
           setPatients(data.patients);
           setHasMorePages(data.hasMore);
+          setError({ 'message': '', 'status_code': null });
         } else {
-          setError(data.message || 'Invalid credentials');
+          setError({ 'message': data.message, 'status_code': response.status });
         }
       } catch {
-        setError('Could not connect to the server.');
+        setError({ 'message': 'There was a problem communicating with the server.', 'status_code': 500 });
       } finally {
         setLoading(false);
       }

@@ -1,14 +1,17 @@
 import { useEffect, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 
 import { usePatients } from '../hooks/usePatients'
 import { useDebounce } from '../hooks/useDebounce';
 
+import Overlay from '../components/Overlay';
 import styles from '../components/styles';
 
 const DEBOUNCE_DELAY = 500; // ms
 const ITEMS_PER_PAGE = 10;
 
 const PatientListPage = () => {
+  const navigate = useNavigate();
 
   const [dniFilter, setDniFilter] = useState('');
   const [nameFilter, setNameFilter] = useState('');
@@ -20,7 +23,7 @@ const PatientListPage = () => {
   const [isComposingName, setIsComposingName] = useState(false);
   const [currentPageNumber, setCurrentPageNumber] = useState(1);
   
-  const { patients, hasMorePages, error: _error, loading: _loading, fetchPatients } = usePatients();
+  const { patients, hasMorePages, error, loading: _loading, fetchPatients } = usePatients();
 
   useEffect(() => {
     setCurrentPageNumber(1);
@@ -150,6 +153,27 @@ const PatientListPage = () => {
             </button>
           </div>
         </div>
+        { error?.status_code === 401 && (
+          <Overlay>
+            <div
+              style={{
+                background: '#fff',
+                borderRadius: '8px',
+                padding: '20px',
+                width: 'min(420px, 80vw)',
+                boxShadow: '0 8px 24px rgba(0,0,0,0.2)'
+              }}
+            >
+              <h2 style={{ marginTop: 0 }}>Session expired</h2>
+              <p>Your session has expired. Please log in again.</p>
+              <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '8px' }}>
+                <button onClick={() => navigate('/login')}>
+                  Go to Login
+                </button>
+              </div>
+            </div>
+          </Overlay>
+        )}
       </div>
     );  
 
