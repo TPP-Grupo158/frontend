@@ -20,7 +20,8 @@ const PredictionRequestForm = () => {
   const [selectedProcs, setSelectedProcs] = useState([]);
   const [files, setFiles] = useState({}); // { T1: File, T2: File ... }
   const [status, setStatus] = useState('idle'); // 'idle', 'loading', 'success', 'error'
-  const [responseData, setResponseData] = useState(null);
+  const [task, setTask] =useState('idle')
+  const [responseData, setResponseData] = useState({});
   const navigate = useNavigate();
   const handleCheckboxChange = (id) => {
     setSelectedProcs(prev => 
@@ -68,9 +69,10 @@ const PredictionRequestForm = () => {
     if (!response.ok) throw new Error('Prediction failed');
 
     const result = await response.json();
-    setResponseData(result.data); // Save results for the right panel
+    await setResponseData(result.data);
+    setTask(Object.keys(responseData)[0])
+    console.log(task);
     setStatus('success');
-    console.log(result.data[0].original_image);
   } catch (error) {
     console.error("Error uploading:", error);
     setStatus('error');
@@ -95,7 +97,7 @@ const PredictionRequestForm = () => {
               />
               {proc.label}
             </label>
-          ))}
+          ))}           
         </div>
 
         {requiredFiles.length > 0 && (
@@ -134,6 +136,34 @@ const PredictionRequestForm = () => {
         >
           {status === 'loading' ? 'Analyzing...' : 'Run Analysis'}
         </button>
+             {/*Botones para cambiar que resultado se quiere ver*/}
+       {status === 'success' && responseData && (
+        <div style={{ marginTop: '20px' }}>
+          <h4 style={{ marginBottom: '10px' }}>Resultados Disponibles:</h4>
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '10px' }}>
+            {Object.keys(responseData)
+              .filter(key => responseData[key] !== null && key !== 'status') 
+              .map(res => (
+                <button 
+                  key={res} 
+                  onClick={() => setTask(res)} 
+                  style={{ 
+                    padding: '10px', 
+                    borderRadius: '8px', 
+                    cursor: 'pointer',
+                    backgroundColor: task === res ? '#2ecc71' : '#f8f9fa',
+                    color: task === res ? 'white' : 'black',
+                    border: '1px solid #ddd',
+                    fontWeight: 'bold',
+                    textTransform: 'uppercase'
+                  }}
+                >
+                  {res}
+                </button>
+            ))}
+          </div>
+        </div>
+      )}
       </div>
 
       {/* RIGHT BLOCK */}
@@ -164,9 +194,10 @@ const PredictionRequestForm = () => {
 
             {/* ESTADO 3: Éxito (Aquí renderizamos NiiVue) */}
             {status === 'success' && responseData && (
-                <NiiVue_comp 
-                    images={[{ url: responseData[0].original_image, name: "test" }]}
-                    segmentationUrl={responseData[0].prediction_image}
+                <NiiVue_comp
+                    key={task} 
+                    images={[{ url: responseData[task].original_image, name: "test" }]}
+                    segmentationUrl={responseData[task].prediction_image}
                     labels={selectedProcs} 
                 />
             )}
