@@ -34,6 +34,31 @@ export const usePatients = () => {
       }
     };
 
-    return { patients, hasMorePages, error, loading, fetchPatients };
+    const createPatient = async (fullname, dni, email, dateOfBirth) => {
+      try {
+        const response = await fetch(
+          import.meta.env.VITE_GATEWAY_API + 'patients/',
+          {
+            method: 'POST',
+            body: JSON.stringify({ fullname, dni, email, date_of_birth: dateOfBirth }),
+            headers: { 'Content-Type': 'application/json' },
+            credentials: 'include',
+          }
+        );
+        const data = await response.json();
+
+        console.log('Create patient response:', data);
+
+        if (response.ok) {
+          setError({ 'message': '', 'status_code': null });
+        } else {
+          setError({ 'message': data.message, 'status_code': response.status });
+        }
+      } catch {
+        setError({ 'message': 'There was a problem communicating with the server.', 'status_code': 500 });
+      }
+    }
+
+    return { patients, hasMorePages, error, loading, fetchPatients, createPatient };
 
 }
