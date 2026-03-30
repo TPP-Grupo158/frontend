@@ -1,5 +1,4 @@
 import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
 import NiiVue_comp from './Niivue/Niivue_comp';
 const NIFTI_BRAVO = "Bravo"
 const NIFTI_T1 = "T1"
@@ -22,7 +21,6 @@ const PredictionRequestForm = () => {
   const [status, setStatus] = useState('idle'); // 'idle', 'loading', 'success', 'error'
   const [task, setTask] =useState('idle')
   const [responseData, setResponseData] = useState({});
-  const navigate = useNavigate();
   const handleCheckboxChange = (id) => {
     setSelectedProcs(prev => 
       prev.includes(id) ? prev.filter(p => p !== id) : [...prev, id]
@@ -57,7 +55,6 @@ const PredictionRequestForm = () => {
   if (files[NIFTI_BRAVO]) formData.append('file_t1ce', files[NIFTI_BRAVO]); // Bravo -> t1ce
   if (files[NIFTI_T2]) formData.append('file_t2', files[NIFTI_T2]);
   if (files[NIFTI_FLAIR]) formData.append('file_flair', files[NIFTI_FLAIR]);
-  const labels = ["Label 1", "Label 2", "Label 3"];
 
   try {
     const response = await fetch(import.meta.env.VITE_GATEWAY_API+"predict", {
@@ -174,12 +171,12 @@ const PredictionRequestForm = () => {
         display: 'flex', 
         flexDirection: 'column' 
       }}>
-         <h3>Análisis y Visualización</h3>
+         <h3>Analysis results</h3>
          
          <div style={{ 
             flex:1,
             height: '700px', 
-            background: '#fff', // Fondo negro para mejor contraste médico
+            background: '#fff',
             display: 'flex', 
             alignItems: 'center', 
             justifyContent: 'center', 
@@ -187,13 +184,13 @@ const PredictionRequestForm = () => {
             overflow: 'hidden' 
          }}>
             {/* ESTADO 1: Esperando */}
-            {status === 'idle' && <p style={{color: '#fff'}}>Seleccione los estudios y presione "Run Analysis"</p>}
+            {status === 'idle' && <p style={{color: '#000'}}>Select Studies and press Run Analysis</p>}
 
             {/* ESTADO 2: Cargando */}
-            {status === 'loading' && <p style={{color: '#fff'}}>Procesando imágenes en el servidor...</p>}
+            {status === 'loading' && <p style={{color: '#000'}}>Processing studies please wait...</p>}
 
             {/* ESTADO 3: Éxito (Aquí renderizamos NiiVue) */}
-            {status === 'success' && responseData && (
+            {status === 'success' && responseData &&task && responseData[task] &&(
                 <NiiVue_comp
                     key={task} 
                     images={[{ url: responseData[task].original_image, name: "test" }]}
@@ -203,7 +200,7 @@ const PredictionRequestForm = () => {
             )}
 
             {/* ESTADO 4: Error */}
-            {status === 'error' && <p style={{color: '#ff4d4d'}}>Error en la predicción o conexión con MinIO</p>}
+            {status === 'error' && <p style={{color: '#ff4d4d'}}>Error while precessing images</p>}
          </div>
       </div>
     </div>
