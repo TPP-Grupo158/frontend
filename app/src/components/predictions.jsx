@@ -136,7 +136,7 @@ const PredictionRequestForm = () => {
              {/*Botones para cambiar que resultado se quiere ver*/}
        {status === 'success' && responseData && (
         <div style={{ marginTop: '20px' }}>
-          <h4 style={{ marginBottom: '10px' }}>Resultados Disponibles:</h4>
+          <h4 style={{ marginBottom: '10px' }}>Available Results:</h4>
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '10px' }}>
             {Object.keys(responseData)
               .filter(key => responseData[key] !== null && key !== 'status') 
