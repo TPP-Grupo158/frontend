@@ -47,8 +47,6 @@ export const usePatients = () => {
         );
         const data = await response.json();
 
-        console.log('Create patient response:', data);
-
         if (response.ok) {
           setError({ 'message': '', 'status_code': null });
         } else {
