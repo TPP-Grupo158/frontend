@@ -111,7 +111,9 @@ const PatientListPage = () => {
               <option value="dni">DNI</option>
               <option value="name">Name</option>
             </select>
-            <button style={{ marginLeft: 'auto'}} onClick={() => setCreatePatientShowForm(true)}>
+            <button style={{ marginLeft: 'auto', padding: '8px 16px', cursor: 'pointer', borderRadius: '4px', border: '1px solid #a4a3a3' }} 
+              onClick={() => setCreatePatientShowForm(true)}
+            >
               New Patient
             </button>
           </div>
