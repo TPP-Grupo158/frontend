@@ -6,6 +6,7 @@ import { useDebounce } from '../hooks/useDebounce';
 
 import Overlay from '../components/Overlay';
 import styles from '../components/styles';
+import PatientForm from '../components/PatientForm';
 
 const DEBOUNCE_DELAY = 500; // ms
 const ITEMS_PER_PAGE = 10;
@@ -22,8 +23,16 @@ const PatientListPage = () => {
 
   const [isComposingName, setIsComposingName] = useState(false);
   const [currentPageNumber, setCurrentPageNumber] = useState(1);
+
+  const [createPatientShowForm, setCreatePatientShowForm] = useState(false);
   
-  const { patients, hasMorePages, error, loading: _loading, fetchPatients } = usePatients();
+  const { 
+    patients, 
+    hasMorePages, 
+    error, 
+    fetchPatients, 
+    createPatient 
+  } = usePatients();
 
   useEffect(() => {
     setCurrentPageNumber(1);
@@ -66,6 +75,11 @@ const PatientListPage = () => {
     setCurrentPageNumber(newPageNumber);
   }
 
+  const handlePatientCreation = async ({ email, fullname, dni, dateOfBirth }) => {
+    await createPatient(fullname, dni, email, dateOfBirth);
+    setCreatePatientShowForm(false);
+  }
+
     return (
       <div style={{padding: '0% 5%', display: 'flex', flexDirection: 'column'}}> 
         <h1 style={{margin: '0 0 16px 0' }}>Patient Search</h1>
@@ -97,6 +111,11 @@ const PatientListPage = () => {
               <option value="dni">DNI</option>
               <option value="name">Name</option>
             </select>
+            <button style={{ marginLeft: 'auto', padding: '8px 16px', cursor: 'pointer', borderRadius: '4px', border: '1px solid #a4a3a3' }} 
+              onClick={() => setCreatePatientShowForm(true)}
+            >
+              New Patient
+            </button>
           </div>
           <table style={styles.table.container}>
             <colgroup>
@@ -153,6 +172,24 @@ const PatientListPage = () => {
             </button>
           </div>
         </div>
+        { createPatientShowForm && (
+          <Overlay>
+            <div style={{
+                background: '#fff',
+                borderRadius: '8px',
+                padding: '20px',
+                width: 'min(420px, 80vw)',
+                boxShadow: '0 8px 24px rgba(0,0,0,0.2)'
+              }}
+            > 
+            <h2 style={{ marginTop: 0 }}>Create new patient</h2>
+            <PatientForm
+              onSubmit={({ email, fullname, dni, dateOfBirth }) => handlePatientCreation({ email, fullname, dni, dateOfBirth })}
+              onCancel={() => setCreatePatientShowForm(false)}
+            />
+            </div>
+          </Overlay>
+        )}
         { error?.status_code === 401 && (
           <Overlay>
             <div
