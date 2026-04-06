@@ -33,7 +33,7 @@ function Login({ onLoginSuccess }) {
         console.log('Login successful:');
         onLoginSuccess(); // Pass the token up to App.jsx if needed
         
-        navigate('/upload');
+        navigate('/patients');
       } else {
         setError(data.message || 'Invalid credentials');
       }

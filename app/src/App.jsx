@@ -2,7 +2,10 @@ import NiiVue from './components/Niivue/Niivue.jsx'
 import Login from './components/Login.jsx'
 import Predict from './components/predictions.jsx'
 import ImageUploadForm from './components/ImageUploadForm.jsx'
+
 import { useState , useEffect} from 'react';
+import PatientListPage from './pages/PatientListPage.jsx'
+
 import {
   BrowserRouter as Router,
   Routes, Route, Navigate, Outlet
@@ -19,9 +22,9 @@ function App() {
             <Route path="/upload" element={<ImageUploadForm />} />
             <Route path="/predict" element={<Predict />} />
             <Route path="/viewer" element={<NiiVue />} />
+            <Route path="/patients" element={<PatientListPage />} />
             <Route path="/" />
         </Route>
-        
       </Routes>
     </Router>
   )
