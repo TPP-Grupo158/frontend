@@ -9,6 +9,8 @@ import styles from '../components/styles';
 import PatientForm from '../components/PatientForm';
 import Message from '../components/Message';
 
+import { sanitizeNameInput } from '../helpers';
+
 const DEBOUNCE_DELAY = 500; // ms
 const ITEMS_PER_PAGE = 10;
 
@@ -62,10 +64,6 @@ const PatientListPage = () => {
     setDniFilter(onlyDigits);
   };
 
-  const sanitizeNameInput = (name) => {
-    return name.replace(/[^\p{L}\s'-]/gu, '');
-  };
-
   const handleNameChange = (e) => {
     if (isComposingName) {
       setNameFilter(e.target.value);
@@ -82,7 +80,9 @@ const PatientListPage = () => {
   }
 
   const handlePatientCreation = async ({ email, fullname, dni, dateOfBirth }) => {
-    const response = await createPatient(fullname, dni, email, dateOfBirth);
+
+    const sanitizedFullname = sanitizeNameInput(fullname);
+    const response = await createPatient(sanitizedFullname, dni, email, dateOfBirth);
     setIsMessageVisible(true);
     if (response.error?.status_code === 409) {
       return;
