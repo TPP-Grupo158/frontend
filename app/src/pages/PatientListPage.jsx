@@ -7,6 +7,7 @@ import { useDebounce } from '../hooks/useDebounce';
 import Overlay from '../components/Overlay';
 import styles from '../components/styles';
 import PatientForm from '../components/PatientForm';
+import Message from '../components/Message';
 
 const DEBOUNCE_DELAY = 500; // ms
 const ITEMS_PER_PAGE = 10;
@@ -26,6 +27,8 @@ const PatientListPage = () => {
 
   const [createPatientShowForm, setCreatePatientShowForm] = useState(false);
   
+  const [isMessageVisible, setIsMessageVisible] = useState(true);
+
   const { 
     patients, 
     hasMorePages, 
@@ -76,8 +79,16 @@ const PatientListPage = () => {
   }
 
   const handlePatientCreation = async ({ email, fullname, dni, dateOfBirth }) => {
-    await createPatient(fullname, dni, email, dateOfBirth);
+    const response = await createPatient(fullname, dni, email, dateOfBirth);
+    setIsMessageVisible(true);
+    if (response.error?.status_code === 409) {
+      return;
+    }
     setCreatePatientShowForm(false);
+  }
+
+  const handleMessageClose = () => {
+    setIsMessageVisible(false);
   }
 
     return (
@@ -183,6 +194,13 @@ const PatientListPage = () => {
               }}
             > 
             <h2 style={{ marginTop: 0 }}>Create new patient</h2>
+            {error && error.status_code === 409 && (
+              <Message isError 
+              message="A patient with the same DNI has already been registered." 
+              visible={isMessageVisible}
+              onClick={handleMessageClose}
+              />
+            )}
             <PatientForm
               onSubmit={({ email, fullname, dni, dateOfBirth }) => handlePatientCreation({ email, fullname, dni, dateOfBirth })}
               onCancel={() => setCreatePatientShowForm(false)}

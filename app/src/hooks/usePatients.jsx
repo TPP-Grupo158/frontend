@@ -49,12 +49,17 @@ export const usePatients = () => {
 
         if (response.ok) {
           setError({ 'message': '', 'status_code': null });
+          return { 'data': data, error: {} };
         } else {
           setError({ 'message': data.message, 'status_code': response.status });
+          return { 'data': data, error: { 'message': data.message, 'status_code': response.status } };
         }
+        
       } catch {
         setError({ 'message': 'There was a problem communicating with the server.', 'status_code': 500 });
+        return { 'data': null, error: { 'message': 'There was a problem communicating with the server.', 'status_code': 500 } };
       }
+      
     }
 
     return { patients, hasMorePages, error, loading, fetchPatients, createPatient };
