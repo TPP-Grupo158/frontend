@@ -8,6 +8,7 @@ export const usePatients = () => {
 
     const fetchPatients = async (dni = '', name = '', offset = 0, limit = 10) => {
 
+      if (loading) return;
       setLoading(true);
       try {
         const response = await fetch(
@@ -35,6 +36,8 @@ export const usePatients = () => {
     };
 
     const createPatient = async (fullname, dni, email, dateOfBirth) => {
+      if (loading) return;
+      setLoading(true);
       try {
         const response = await fetch(
           import.meta.env.VITE_GATEWAY_API + 'patients/',
@@ -58,6 +61,8 @@ export const usePatients = () => {
       } catch {
         setError({ 'message': 'There was a problem communicating with the server.', 'status_code': 500 });
         return { 'data': null, error: { 'message': 'There was a problem communicating with the server.', 'status_code': 500 } };
+      } finally {
+        setLoading(false);
       }
       
     }

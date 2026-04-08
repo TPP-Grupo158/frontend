@@ -39,7 +39,7 @@ const PatientListPage = () => {
     fetchPatients, 
     createPatient 
   } = usePatients();
-
+  
   useEffect(() => {
     setCurrentPageNumber(1);
     if (currentFilters === 'dni') {
@@ -51,6 +51,7 @@ const PatientListPage = () => {
 
   useEffect(() => {
     setCurrentPageNumber(1);
+    setSuccessMessage('');
     setIsMessageVisible(true);
     if (currentFilters === 'dni') {
       fetchPatients(debouncedDniFilter, '');
@@ -74,6 +75,7 @@ const PatientListPage = () => {
 
   const handlePageChange = async (newPageNumber) => {
     const offset = (newPageNumber - 1) * ITEMS_PER_PAGE;
+    setSuccessMessage('');
     await fetchPatients('', debouncedNameFilter, offset, ITEMS_PER_PAGE);
     setCurrentPageNumber(newPageNumber);
     setIsMessageVisible(true);
