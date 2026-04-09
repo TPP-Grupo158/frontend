@@ -23,12 +23,7 @@ import {
     getMultiplanarLayoutName
 } from "./helpers.js";
 
-import { useLocation } from 'react-router-dom';
-
-
-const NiiVue = () => {
-    const location = useLocation();
-    const { images, segmentationUrl, labels } = location.state || {};
+const NiiVue_comp = ({ images, segmentationUrl = { url: '' }, labels }) => {
     const canvas = useRef(null);
     const nvRef = useRef(null);
 
@@ -346,7 +341,7 @@ const NiiVue = () => {
     )
 };
 
-NiiVue.propTypes = {
+NiiVue_comp.propTypes = {
     images: PropTypes.arrayOf(PropTypes.shape({
         file: PropTypes.instanceOf(File).isRequired,
         name: PropTypes.string.isRequired,
@@ -358,4 +353,4 @@ NiiVue.propTypes = {
 }
 
 
-export default NiiVue;
+export default NiiVue_comp;
