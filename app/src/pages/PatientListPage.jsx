@@ -7,6 +7,9 @@ import { useDebounce } from '../hooks/useDebounce';
 import Overlay from '../components/Overlay';
 import styles from '../components/styles';
 import PatientForm from '../components/PatientForm';
+import Message from '../components/Message';
+
+import { sanitizeNameInput } from '../helpers';
 
 const DEBOUNCE_DELAY = 500; // ms
 const ITEMS_PER_PAGE = 10;
@@ -26,6 +29,9 @@ const PatientListPage = () => {
 
   const [createPatientShowForm, setCreatePatientShowForm] = useState(false);
   
+  const [isMessageVisible, setIsMessageVisible] = useState(true);
+  const [successMessage, setSuccessMessage] = useState('');
+
   const { 
     patients, 
     hasMorePages, 
@@ -33,7 +39,7 @@ const PatientListPage = () => {
     fetchPatients, 
     createPatient 
   } = usePatients();
-
+  
   useEffect(() => {
     setCurrentPageNumber(1);
     if (currentFilters === 'dni') {
@@ -45,6 +51,8 @@ const PatientListPage = () => {
 
   useEffect(() => {
     setCurrentPageNumber(1);
+    setSuccessMessage('');
+    setIsMessageVisible(true);
     if (currentFilters === 'dni') {
       fetchPatients(debouncedDniFilter, '');
     } else if (currentFilters === 'name' && !isComposingName) {
@@ -57,10 +65,6 @@ const PatientListPage = () => {
     setDniFilter(onlyDigits);
   };
 
-  const sanitizeNameInput = (name) => {
-    return name.replace(/[^\p{L}\s'-]/gu, '');
-  };
-
   const handleNameChange = (e) => {
     if (isComposingName) {
       setNameFilter(e.target.value);
@@ -71,19 +75,42 @@ const PatientListPage = () => {
 
   const handlePageChange = async (newPageNumber) => {
     const offset = (newPageNumber - 1) * ITEMS_PER_PAGE;
+    setSuccessMessage('');
     await fetchPatients('', debouncedNameFilter, offset, ITEMS_PER_PAGE);
     setCurrentPageNumber(newPageNumber);
+    setIsMessageVisible(true);
   }
 
   const handlePatientCreation = async ({ email, fullname, dni, dateOfBirth }) => {
-    await createPatient(fullname, dni, email, dateOfBirth);
+
+    const sanitizedFullname = sanitizeNameInput(fullname);
+    const response = await createPatient(sanitizedFullname, dni, email, dateOfBirth);
+    setIsMessageVisible(true);
+    if (response.error?.status_code === 409) {
+      return;
+    }
+
+    if (!response.error?.status_code) {
+      setSuccessMessage('Patient created successfully.');
+    }
     setCreatePatientShowForm(false);
+  }
+
+  const handleMessageClose = () => {
+    setIsMessageVisible(false);
+    setSuccessMessage('');
   }
 
     return (
       <div style={{padding: '0% 5%', display: 'flex', flexDirection: 'column'}}> 
         <h1 style={{margin: '0 0 16px 0' }}>Patient Search</h1>
         <div>
+          <Message
+            isError={!!error?.status_code}
+            message={error?.message || successMessage}
+            visible={isMessageVisible && !!error}
+            onClick={handleMessageClose}
+          />
           <div style={{display: 'flex', gap: '0.5rem', marginBottom: '4px'}}>
             {currentFilters === 'dni' && 
               <input 
@@ -183,6 +210,13 @@ const PatientListPage = () => {
               }}
             > 
             <h2 style={{ marginTop: 0 }}>Create new patient</h2>
+            {error && error.status_code === 409 && (
+              <Message isError 
+              message="A patient with the same DNI has already been registered." 
+              visible={isMessageVisible}
+              onClick={handleMessageClose}
+              />
+            )}
             <PatientForm
               onSubmit={({ email, fullname, dni, dateOfBirth }) => handlePatientCreation({ email, fullname, dni, dateOfBirth })}
               onCancel={() => setCreatePatientShowForm(false)}

@@ -2,15 +2,8 @@ import { useState } from "react";
 import styles from './styles';
 import PropTypes from "prop-types";
 import { object, string, date } from 'yup';
+import { sanitizeNameInput, getTimeFromToday } from '../helpers';
 
-const getTimeFromToday = (yearsOffset = 0) => {
-  const d = new Date();
-  d.setDate(d.getDate());
-  const yyyy = d.getFullYear() + yearsOffset;
-  const mm = String(d.getMonth() + 1).padStart(2, '0');
-  const dd = String(d.getDate()).padStart(2, '0');
-  return `${yyyy}-${mm}-${dd}`;
-};
 const MIN_BIRTH_DATE = getTimeFromToday(-120);
 const MAX_BIRTH_DATE = getTimeFromToday();
 
@@ -34,6 +27,15 @@ const PatientForm = ({ onSubmit, onCancel, initialData }) => {
   const [dateOfBirth, setDateOfBirth] = useState(initialData?.dateOfBirth || '');
 
   const [validationErrors, setValidationErrors] = useState({});
+  const [isComposingName, setIsComposingName] = useState(false);
+
+   const handleNameChange = (e) => {
+    if (isComposingName) {
+      setFullname(e.target.value);
+      return;
+    }
+    setFullname(sanitizeNameInput(e.target.value));
+  }
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -61,7 +63,12 @@ const PatientForm = ({ onSubmit, onCancel, initialData }) => {
             type="text" 
             placeholder="Fullname" 
             value={fullname}
-            onChange={(e) => setFullname(e.target.value)}
+             onChange={(e) => handleNameChange(e)}
+              onCompositionStart={() => setIsComposingName(true)}
+              onCompositionEnd={() => {
+                setIsComposingName(false);
+                setFullname(sanitizeNameInput(fullname));
+              }}
           />
           {validationErrors.fullname && <span style={{color: 'red', fontSize: '12px', margin: 0, paddingLeft: '2px'}}>{validationErrors.fullname}</span>}
         </div>
