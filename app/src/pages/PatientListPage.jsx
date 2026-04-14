@@ -153,12 +153,14 @@ const PatientListPage = () => {
               <col style={{ width: '20%' }} />{/* DNI */}
               <col style={{ width: '50%' }} />{/* Full Name */}
               <col style={{ width: '20%' }} />{/* Date of Birth */}
+              <col style={{ width: '10%' }} />{/* Actions - reserved for future use */}
             </colgroup>
             <thead style={styles.table.header}>
               <tr>
                 <th>DNI</th>
                 <th>Full Name</th>
                 <th>Date of Birth</th>
+                <th>Actions</th>
               </tr>
             </thead>
             <tbody>
@@ -167,6 +169,14 @@ const PatientListPage = () => {
                   <td>{patient.dni}</td>
                   <td>{patient.fullname}</td>
                   <td>{patient.date_of_birth}</td>
+                  <td>
+                    <button 
+                      style={{ padding: '4px 8px', cursor: 'pointer', borderRadius: '4px', border: '1px solid #a4a3a3' }}
+                      onClick={() => navigate(`/patients/${patient.dni}`)}
+                    >
+                      View
+                    </button>
+                  </td>
                 </tr>
               ))}
               { patients.length === 0 && 

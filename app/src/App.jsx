@@ -5,6 +5,7 @@ import ImageUploadForm from './components/ImageUploadForm.jsx'
 
 import { useState , useEffect} from 'react';
 import PatientListPage from './pages/PatientListPage.jsx'
+import PatientPage from './pages/PatientPage.jsx';
 
 import {
   BrowserRouter as Router,
@@ -23,6 +24,7 @@ function App() {
             <Route path="/predict" element={<Predict />} />
             <Route path="/viewer" element={<NiiVue />} />
             <Route path="/patients" element={<PatientListPage />} />
+            <Route path="/patients/:dni" element={<PatientPage />} />
             <Route path="/" />
         </Route>
       </Routes>
