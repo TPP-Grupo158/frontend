@@ -181,9 +181,7 @@ const PatientListPage = () => {
               ))}
               { patients.length === 0 && 
               <tr>
-                <td></td>
-                <td style={{textAlign: 'center'}}>No patients found.</td>
-                <td></td>
+                <td colSpan="4" style={{ textAlign: 'center', padding: '16px' }}>No patients found.</td>
               </tr>
               }
               {

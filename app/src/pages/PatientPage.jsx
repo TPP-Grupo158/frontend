@@ -13,10 +13,11 @@ const PatientPage = () => {
   const [patientHistory, _setPatientHistory] = useState([
     {
       'id': '69de9439332f0f7ad216736f',
-      'date': '2023-01-15',
+      'created_at': '2023-01-15T14:32:10.123Z',
       'task': 'metastasis',
-      'original_image': 'http://localhost:9000/medical-images/gateway_user_001/metastasis/6c96c645-9a85-4d76-9e34-aa0b13e30ce1/input_t1.nii.gz', 
+      'original_images': [{url: 'http://localhost:9000/medical-images/gateway_user_001/metastasis/6c96c645-9a85-4d76-9e34-aa0b13e30ce1/input_t1.nii.gz', name: 'T1'}], 
       'prediction_image': 'http://localhost:9000/medical-images/gateway_user_001/metastasis/6c96c645-9a85-4d76-9e34-aa0b13e30ce1/prediction.nii.gz',
+      'labels': ['Label 1']
     }
   ]);
 
@@ -74,15 +75,20 @@ const PatientPage = () => {
   const onViewPrediction = (prediction) => {
     navigate(`/patients/${dni}/predictions/${prediction.id}`, {
       state: { 
-        images: [{ url: prediction.original_image, name: "Placeholder" }],
+        images: prediction.original_images,
         segmentationUrl: prediction.prediction_image,
-        labels: ["Label 1"] // Placeholder labels, replace with actual labels from the backend when available
+        labels: prediction.labels
       }
     });
   }
 
   const getAge = (dateOfBirth) => {
     return Math.floor((new Date() - new Date(dateOfBirth)) / (1000 * 60 * 60 * 24 * 365.25));
+  }
+
+  const formatTimestamp = (timestamp) => {
+    const date = new Date(timestamp);
+    return date.toLocaleString('es-ar', { day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit' });
   }
 
   if (isLoading) {
@@ -112,9 +118,9 @@ const PatientPage = () => {
         <h2>Patient History</h2>
         <table style={styles.table.container}>
           <colgroup>
-            <col style={{ width: '10%' }} />{/* DNI */}
-            <col style={{ width: '10%' }} />{/* Full Name */}
-            <col style={{ width: '10%' }} />{/* Date of Birth */}
+            <col style={{ width: '15%' }} />{/* Date */}
+            <col style={{ width: '10%' }} />{/* Prediction task */}
+            <col style={{ width: '10%' }} />{/* Actions */}
             <col style={{ width: '50%' }} />{/* Empty space for now */}
           </colgroup>
           <thead style={styles.table.header}>
@@ -125,9 +131,15 @@ const PatientPage = () => {
             </tr>
           </thead>
           <tbody>
-            {patientHistory.map((prediction, index) => (
+            {patientHistory.length === 0 && (
+              <tr>
+                <td colSpan="3" style={{ textAlign: 'center', padding: '16px' }}>No history available</td>
+              </tr>
+            )}
+            {patientHistory.length !== 0 &&  (
+              patientHistory.map((prediction, index) => (
               <tr key={prediction.id} style={{...styles.table.row, backgroundColor: index % 2 === 0 ? '#f9f9f9' : 'white'}}>
-                <td>{prediction.date}</td>
+                <td>{formatTimestamp(prediction.created_at)}</td>
                 <td>{prediction.task}</td>
                 <td>
                   <button style={{ padding: '4px 8px', cursor: 'pointer', borderRadius: '4px', border: '1px solid #a4a3a3' }}
@@ -137,6 +149,7 @@ const PatientPage = () => {
                   </button>
                 </td>
               </tr>
+              )
             ))}
           </tbody>
         </table>
