@@ -3,9 +3,12 @@ import { useParams } from "react-router-dom";
 import styles from "../components/styles";
 import Message from "../components/Message";
 
+import { useNavigate } from "react-router-dom";
+
 const PatientPage = () => {
   const { dni } = useParams();
-  
+  const navigate = useNavigate();
+
   const [patientInfo, setPatientInfo] = useState(null);
   const [patientHistory, _setPatientHistory] = useState([
     {
@@ -16,7 +19,7 @@ const PatientPage = () => {
       'prediction_image': 'http://localhost:9000/medical-images/gateway_user_001/metastasis/6c96c645-9a85-4d76-9e34-aa0b13e30ce1/prediction.nii.gz',
     }
   ]);
-  
+
   const [isLoading, setIsLoading] = useState(false);
   const [fetchPatientError, setFetchPatientError] = useState(null);
 
@@ -68,6 +71,16 @@ const PatientPage = () => {
     fetchPatientData();
   }, [])
 
+  const onViewPrediction = (prediction) => {
+    navigate(`/patients/${dni}/predictions/${prediction.id}`, {
+      state: { 
+        images: [{ url: prediction.original_image, name: "Placeholder" }],
+        segmentationUrl: prediction.prediction_image,
+        labels: ["Label 1"] // Placeholder labels, replace with actual labels from the backend when available
+      }
+    });
+  }
+
   const getAge = (dateOfBirth) => {
     return Math.floor((new Date() - new Date(dateOfBirth)) / (1000 * 60 * 60 * 24 * 365.25));
   }
@@ -116,7 +129,13 @@ const PatientPage = () => {
               <tr key={prediction.id} style={{...styles.table.row, backgroundColor: index % 2 === 0 ? '#f9f9f9' : 'white'}}>
                 <td>{prediction.date}</td>
                 <td>{prediction.task}</td>
-                <td><button>View</button></td>
+                <td>
+                  <button style={{ padding: '4px 8px', cursor: 'pointer', borderRadius: '4px', border: '1px solid #a4a3a3' }}
+                  onClick={() => onViewPrediction(prediction)}
+                  >
+                    View
+                  </button>
+                </td>
               </tr>
             ))}
           </tbody>
