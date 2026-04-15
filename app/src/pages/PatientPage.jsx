@@ -17,7 +17,8 @@ const PatientPage = () => {
       'task': 'metastasis',
       'original_images': [{url: 'http://localhost:9000/medical-images/gateway_user_001/metastasis/6c96c645-9a85-4d76-9e34-aa0b13e30ce1/input_t1.nii.gz', name: 'T1'}], 
       'prediction_image': 'http://localhost:9000/medical-images/gateway_user_001/metastasis/6c96c645-9a85-4d76-9e34-aa0b13e30ce1/prediction.nii.gz',
-      'labels': ['Label 1']
+      'labels': ['Label 1'],
+      'solicited_by': 'Dr. Smith'
     }
   ]);
 
@@ -120,13 +121,15 @@ const PatientPage = () => {
           <colgroup>
             <col style={{ width: '15%' }} />{/* Date */}
             <col style={{ width: '10%' }} />{/* Prediction task */}
+            <col style={{ width: '20%' }} />{/* Solicited By */}
             <col style={{ width: '10%' }} />{/* Actions */}
-            <col style={{ width: '50%' }} />{/* Empty space for now */}
+            <col style={{ width: '30%' }} />{/* Empty space for now */}
           </colgroup>
           <thead style={styles.table.header}>
             <tr>
               <th>Date</th>
               <th>Task</th>
+              <th>Solicited By</th>
               <th>Actions</th>
             </tr>
           </thead>
@@ -141,6 +144,7 @@ const PatientPage = () => {
               <tr key={prediction.id} style={{...styles.table.row, backgroundColor: index % 2 === 0 ? '#f9f9f9' : 'white'}}>
                 <td>{formatTimestamp(prediction.created_at)}</td>
                 <td>{prediction.task}</td>
+                <td>{prediction.solicited_by}</td>
                 <td>
                   <button style={{ padding: '4px 8px', cursor: 'pointer', borderRadius: '4px', border: '1px solid #a4a3a3' }}
                   onClick={() => onViewPrediction(prediction)}
