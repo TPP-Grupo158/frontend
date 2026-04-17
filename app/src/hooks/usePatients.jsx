@@ -1,5 +1,11 @@
 import { useState } from 'react';
 
+const getErrorMessage = (data, response) => {
+  if (data && data.message) return data.message;
+  if (response.status >= 500) return 'There was a problem communicating with the server.';
+  return `An unknown error occurred (${response.status}).`;
+}
+  
 export const usePatients = () => {
     const [patients, setPatients] = useState([]);
     const [hasMorePages, setHasMorePages] = useState(false);
@@ -47,7 +53,10 @@ export const usePatients = () => {
         };
 
         const onResponseFailure = (data, response) => {
-          setError({ 'message': data.message, 'status_code': response.status });
+          setError({
+            message: getErrorMessage(data, response),
+            status_code: response.status,
+          });
         };
 
         await internalFetch('GET', PATH, null, onResponseSuccess, onResponseFailure);
@@ -72,8 +81,11 @@ export const usePatients = () => {
         }
 
         const onResponseFailure = (data, response) => {
-          setError({ 'message': data.message, 'status_code': response.status });
-        }
+          setError({
+            message: getErrorMessage(data, response),
+            status_code: response.status,
+          });
+        };
 
         const { data, response } = await internalFetch(
           'POST', 
