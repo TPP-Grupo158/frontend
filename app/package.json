@@ -9,7 +9,7 @@
     "lint": "eslint .",
     "lint:fix": "eslint . --fix",
     "preview": "vite preview",
-    "test:": "npx playwright test tests/e2e-mocked",
+    "test": "npx playwright test tests/e2e-mocked",
     "test:ui": "npx playwright test tests/e2e-mocked --ui"
   },
   "dependencies": {
