@@ -194,7 +194,7 @@ const PatientListPage = () => {
             >
               &lt;
             </button>
-            <span style={{ margin: '0 8px' }}> {currentPageNumber}</span>
+            <span data-testid="patient-pagination-page-num" style={{ margin: '0 8px' }}> {currentPageNumber}</span>
             <button 
               onClick={() => handlePageChange(currentPageNumber + 1)}
               disabled={!hasMorePages}

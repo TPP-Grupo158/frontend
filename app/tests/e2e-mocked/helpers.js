@@ -27,7 +27,6 @@ export const mockResponse = async (page, url, status, body) => {
   });
 }
 
-
 export const waitForResponseWithUrl = async (page, url, method) => {
   const filteredResponse = page.waitForResponse((res) =>
     res.url().includes(url) &&
@@ -35,3 +34,12 @@ export const waitForResponseWithUrl = async (page, url, method) => {
   );
   return filteredResponse;
 }
+
+export const getMockPatients = (count, letterToRepeat) => {
+  return Array.from({ length: count }, (_, i) => ({
+    'fullname': `Patient ${letterToRepeat.repeat(i)}`,
+    'dni': `123456${(i + 1).toString().padStart(2, '0')}`,
+    'email': `${letterToRepeat}${i + 1}@example.com`,
+    'date_of_birth': new Date(1980, 0, i + 1).toISOString().split('T')[0]
+  }));
+};
