@@ -6,7 +6,6 @@ const BASE_URL = process.env.TEST_BASE_URL || 'http://localhost:5173';
 
 test('Patients are shown on the table in PatientList', async ({ page }) => {
 
-  //user is autenticated and can access the patient search page
   await userIsAuthenticated(page);
 
   await mockResponse(page, `${API_URL}/patients?offset=0&limit=10`, 200, {

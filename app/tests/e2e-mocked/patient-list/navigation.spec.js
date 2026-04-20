@@ -6,15 +6,12 @@ const BASE_URL = process.env.TEST_BASE_URL || 'http://localhost:5173';
 
 
 test('When user token expires its shown message to log in again', async ({ page }) => {
-  //user is autenticated and can access the patient search page
   await userIsAuthenticated(page);
 
-  // First load the page with some patients
   await mockResponse(page, `${API_URL}/patients?offset=0&limit=10`, 200, { patients: [], hasMore: true });
 
   const dniFilterContent = '12345670';
 
-  // Simulate token expiration by returning a 401 for the patients API
   await mockResponse(page, `${API_URL}/patients?offset=0&limit=10&dni=${dniFilterContent}`, 401, { message: 'Token expired' });
 
   await page.goto(`${BASE_URL}/patients`);
@@ -29,10 +26,8 @@ test('When user token expires its shown message to log in again', async ({ page 
 });
 
 test('When user token expires user can select button to go to login page', async ({ page }) => {
-  //user is autenticated and can access the patient search page
   await userIsAuthenticated(page);
 
-  // First load the page with some patients
   await mockResponse(page, `${API_URL}/patients?offset=0&limit=10`, 200, { patients: [], hasMore: true });
 
   const dniFilterContent = '12345670';

@@ -9,10 +9,7 @@ test('New patient button opens new patient form', async ({ page }) => {
 
   const patients = getMockPatients(5, 'a')
 
-  //user is autenticated and can access the patient search page
   await userIsAuthenticated(page);
-
-  // First load the page with some patients
   await mockResponse(page, `${API_URL}/patients?offset=0&limit=10`, 200, { patients, hasMore: false })
 
   await page.goto(`${BASE_URL}/patients`);
@@ -41,10 +38,8 @@ test('Cancel button on new patient form closes the form', async ({ page }) => {
 
   const patients = getMockPatients(5, 'a')
 
-  //user is autenticated and can access the patient search page
   await userIsAuthenticated(page);
 
-  // First load the page with some patients
   await mockResponse(page, `${API_URL}/patients?offset=0&limit=10`, 200, { patients, hasMore: false })
 
   await page.goto(`${BASE_URL}/patients`);
@@ -64,10 +59,7 @@ test('Creating new valid patient', async ({ page }) => {
 
   const patients = getMockPatients(5, 'a')
 
-  //user is autenticated and can access the patient search page
   await userIsAuthenticated(page);
-
-  // First load the page with some patients
   await mockResponse(page, `${API_URL}/patients?offset=0&limit=10`, 200, { patients, hasMore: false })
 
   await mockResponse(page, `${API_URL}/patients/`, 201, {})
@@ -96,10 +88,8 @@ test('Creating new valid patient', async ({ page }) => {
 test('Creating new patient with existing DNI', async ({ page }) => {
 
   const patients = getMockPatients(5, 'a')
-  //user is autenticated and can access the patient search page
   await userIsAuthenticated(page);
 
-  // First load the page with some patients
   await mockResponse(page, `${API_URL}/patients?offset=0&limit=10`, 200, { patients, hasMore: false })
 
   await mockResponse(page, `${API_URL}/patients/`, 409, {})

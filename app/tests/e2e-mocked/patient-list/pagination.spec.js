@@ -9,7 +9,6 @@ test('When the page is not full, next page button is disabled', async ({ page })
 
   await userIsAuthenticated(page);
 
-  // First load the page with some patients
   await mockResponse(page, `${API_URL}/patients?offset=0&limit=10`, 200, { patients: getMockPatients(1, 'a'), hasMore: false });
 
   await page.goto(`${BASE_URL}/patients`);
@@ -32,7 +31,6 @@ test('Previous page button is disabled on the first page', async ({ page }) => {
 
 test('When the page is full and there are more patients, next page button is enabled', async ({ page }) => {
 
-  //user is autenticated and can access the patient search page
   await userIsAuthenticated(page);
 
   await mockResponse(page, `${API_URL}/patients?offset=0&limit=10`, 200, { patients: getMockPatients(10, 'a'), hasMore: true });
@@ -50,7 +48,6 @@ test('When changing pages from patient list, different patients are shown', asyn
 
   const patients = getMockPatients(10, 'a')
 
-  //user is autenticated and can access the patient search page
   await userIsAuthenticated(page);
 
   await mockResponse(page, `${API_URL}/patients?offset=0&limit=10`, 200, { patients, hasMore: true });
@@ -80,7 +77,6 @@ test('Can change pages multiple times', async ({ page }) => {
   const patients = getMockPatients(10, 'a')
   const patientsPage2 = getMockPatients(10, 'b')
 
-  //user is autenticated and can access the patient search page
   await userIsAuthenticated(page);
 
   await mockResponse(page, `${API_URL}/patients?offset=0&limit=10`, 200, { patients, hasMore: true });
@@ -112,7 +108,6 @@ test('When changing pages from patient list, can go to prev page', async ({ page
 
   const patients = getMockPatients(10, 'a')
 
-  //user is autenticated and can access the patient search page
   await userIsAuthenticated(page);
 
   await mockResponse(page, `${API_URL}/patients?offset=0&limit=10`, 200, { patients, hasMore: true });
