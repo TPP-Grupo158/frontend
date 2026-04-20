@@ -76,7 +76,11 @@ const PatientListPage = () => {
   const handlePageChange = async (newPageNumber) => {
     const offset = (newPageNumber - 1) * ITEMS_PER_PAGE;
     setSuccessMessage('');
-    await fetchPatients('', debouncedNameFilter, offset, ITEMS_PER_PAGE);
+    if (currentFilters === 'dni') {
+      await fetchPatients(debouncedDniFilter, '', offset, ITEMS_PER_PAGE);
+    } else if (currentFilters === 'name') {
+      await fetchPatients('', debouncedNameFilter, offset, ITEMS_PER_PAGE);
+    }
     setCurrentPageNumber(newPageNumber);
     setIsMessageVisible(true);
   }
@@ -159,7 +163,7 @@ const PatientListPage = () => {
             </thead>
             <tbody>
               {patients.length !== 0 && patients.map((patient, index) => (
-                <tr key={patient.id} style={{...styles.table.row, backgroundColor: index % 2 === 0 ? '#f9f9f9' : 'white'}}>
+                <tr key={patient.dni} style={{...styles.table.row, backgroundColor: index % 2 === 0 ? '#f9f9f9' : 'white'}}>
                   <td>{patient.dni}</td>
                   <td>{patient.fullname}</td>
                   <td>{patient.date_of_birth}</td>
