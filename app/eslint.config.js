@@ -4,6 +4,12 @@ import pluginReact from "eslint-plugin-react";
 import { defineConfig } from "eslint/config";
 
 export default defineConfig([
+  {
+    ignores: [
+      "**/test-results/**",
+      "**/playwright-report/**",
+    ],
+  },
   js.configs.recommended,
   pluginReact.configs.flat.recommended,
   pluginReact.configs.flat["jsx-runtime"],
