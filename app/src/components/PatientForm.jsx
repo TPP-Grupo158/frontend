@@ -54,7 +54,7 @@ const PatientForm = ({ onSubmit, onCancel, initialData }) => {
 
   return (
     <div> 
-      <form
+      <form data-testid="patient-form"
         style={{ display: 'flex', flexDirection: 'column', gap: '4px'}}
         onSubmit={handleSubmit}
       >
@@ -94,6 +94,7 @@ const PatientForm = ({ onSubmit, onCancel, initialData }) => {
         <div style={{ display: 'flex', flexDirection: 'column'}}>
           <input style={{ ...styles.input, marginBottom: validationErrors.dateOfBirth ? '0.25rem' : styles.input.marginBottom }}
             type="date" 
+            placeholder='Date of Birth'
             value={dateOfBirth}
             onChange={(e) => setDateOfBirth(e.target.value)}
             min={MIN_BIRTH_DATE}
