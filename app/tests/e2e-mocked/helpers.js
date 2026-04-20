@@ -27,3 +27,11 @@ export const mockResponse = async (page, url, status, body) => {
   });
 }
 
+
+export const waitForResponseWithUrl = async (page, url, method) => {
+  const filteredResponse = page.waitForResponse((res) =>
+    res.url().includes(url) &&
+    res.request().method() === method
+  );
+  return filteredResponse;
+}
