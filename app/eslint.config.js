@@ -10,7 +10,10 @@ export default defineConfig([
   { 
     files: ["**/*.{js,mjs,cjs,jsx}"], 
     languageOptions: { 
-      globals: globals.browser 
+      globals: {
+        ...globals.browser,
+        process: "readonly",
+      },  
     },
     settings: {
       react: { version: "detect" },

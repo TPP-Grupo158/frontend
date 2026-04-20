@@ -8,7 +8,9 @@
     "build": "vite build",
     "lint": "eslint .",
     "lint:fix": "eslint . --fix",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "test:": "npx playwright test tests/e2e-mocked",
+    "test:ui": "npx playwright test tests/e2e-mocked --ui"
   },
   "dependencies": {
     "@niivue/niivue": "^0.66.0",
@@ -19,9 +21,12 @@
   },
   "devDependencies": {
     "@eslint/js": "^9.39.3",
+    "@playwright/test": "^1.59.1",
+    "@types/node": "^25.6.0",
     "@types/react": "^19.2.5",
     "@types/react-dom": "^19.2.3",
     "@vitejs/plugin-react": "^5.1.1",
+    "dotenv": "^17.4.2",
     "eslint": "^9.39.3",
     "eslint-plugin-react": "^7.37.5",
     "eslint-plugin-react-hooks": "^7.0.1",
