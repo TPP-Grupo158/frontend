@@ -57,7 +57,7 @@ const PatientForm = ({ onSubmit, onCancel, initialData }) => {
   return (
     <div> 
       <form data-testid="patient-form"
-        noValidate //validate using yup later
+        noValidate //validate using yup
         style={{ display: 'flex', flexDirection: 'column', gap: '4px'}}
         onSubmit={handleSubmit}
       >
