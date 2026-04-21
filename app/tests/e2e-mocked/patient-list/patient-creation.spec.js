@@ -74,6 +74,9 @@ test('Creating new valid patient', async ({ page }) => {
   await newPatientForm.getByPlaceholder('Fullname').fill('Roberto Gonzales');
   await newPatientForm.getByPlaceholder('DNI').fill('12345678');
   await newPatientForm.getByPlaceholder('Email').fill('test@email.com');
+
+  // Date input shows placeholder first and date picker when on focus.
+  await newPatientForm.getByPlaceholder('Date of Birth').focus();
   await newPatientForm.getByPlaceholder('Date of Birth').fill('1980-01-01');
 
   const submitButton = newPatientForm.getByRole('button', { name: 'Create' });
@@ -101,15 +104,13 @@ test('Creating new patient with existing DNI', async ({ page }) => {
 
   const newPatientForm = page.getByTestId('patient-form');
 
-  const fullnameInput = newPatientForm.getByPlaceholder('Fullname');
-  const dniInput = newPatientForm.getByPlaceholder('DNI');
-  const emailInput = newPatientForm.getByPlaceholder('Email');
-  const dateOfBirthInput = newPatientForm.getByPlaceholder('Date of Birth');
+  await newPatientForm.getByPlaceholder('Fullname').fill('Patient Test'); 
+  await newPatientForm.getByPlaceholder('DNI').fill('12345670');
+  await newPatientForm.getByPlaceholder('Email').fill('test@email.com');
 
-  await fullnameInput.fill('Patient Test'); 
-  await dniInput.fill('12345670');
-  await emailInput.fill('test@email.com');
-  await dateOfBirthInput.fill('1980-01-01');
+  // Date input shows placeholder first and date picker when on focus.
+  await newPatientForm.getByPlaceholder('Date of Birth').focus();
+  await newPatientForm.getByPlaceholder('Date of Birth').fill('1980-01-01');
 
   const submitButton = newPatientForm.getByRole('button', { name: 'Create' });
   await submitButton.click();
