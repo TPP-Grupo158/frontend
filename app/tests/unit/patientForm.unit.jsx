@@ -188,6 +188,88 @@ describe('Patient Form', () => {
       expect(dniInput.value).toBe("abcd");
     })
   });
+  
+  describe('Patient Form Validation for DNI', () => {
+    it('should not allow empty DNI', async () => {
+      const onSubmit = vi.fn();
+      const onCancel = vi.fn();
+      const user = userEvent.setup();
+      
+      const { getByText, getByRole } = render(<PatientForm onSubmit={onSubmit} onCancel={onCancel} />);
 
+      const submitButton = getByRole('button', { name: /create/i });
+      await user.click(submitButton);
+
+      const errorMessage = getByText("DNI is required");
+      expect(errorMessage).toBeInTheDocument();
+      expect(onSubmit).not.toHaveBeenCalled();
+    });
+
+    it('should only accept numbers', async () => {
+      const onSubmit = vi.fn();
+      const onCancel = vi.fn();
+      const user = userEvent.setup();
+      
+      const { getByPlaceholderText } = render(<PatientForm onSubmit={onSubmit} onCancel={onCancel} />);
+
+      const dniInput = getByPlaceholderText("DNI");
+      await user.type(dniInput, "1234abcd");
+      
+      expect(dniInput.value).toBe("1234");
+      expect(onSubmit).not.toHaveBeenCalled();
+    })
+
+    it('should not allow DNI shorter than 7 characters', async () => {
+      const onSubmit = vi.fn();
+      const onCancel = vi.fn();
+      const user = userEvent.setup();
+      
+      const { getByText, getByRole, getByPlaceholderText } = render(<PatientForm onSubmit={onSubmit} onCancel={onCancel} />);
+
+      const dniInput = getByPlaceholderText("DNI");
+      await user.type(dniInput, "123456");
+      const submitButton = getByRole('button', { name: /create/i });
+      await user.click(submitButton);
+
+      const errorMessage = getByText("DNI must be at least 7 characters");
+      expect(errorMessage).toBeInTheDocument();
+      expect(onSubmit).not.toHaveBeenCalled();
+    });
+
+    it('should not allow DNI longer than 8 characters', async () => {
+      const onSubmit = vi.fn();
+      const onCancel = vi.fn();
+      const user = userEvent.setup();
+      
+      const { getByText, getByRole, getByPlaceholderText } = render(<PatientForm onSubmit={onSubmit} onCancel={onCancel} />);
+
+      const dniInput = getByPlaceholderText("DNI");
+      await user.type(dniInput, "123456789");
+      const submitButton = getByRole('button', { name: /create/i });
+      await user.click(submitButton);
+
+      const errorMessage = getByText('DNI cannot exceed 8 characters');
+      expect(errorMessage).toBeInTheDocument();
+      expect(onSubmit).not.toHaveBeenCalled();
+    });
+
+    it('should not show error for a valid DNI', async () => {
+      const onSubmit = vi.fn();
+      const onCancel = vi.fn();
+      const user = userEvent.setup();
+      
+      const { queryByText, getByRole, getByPlaceholderText } = render(<PatientForm onSubmit={onSubmit} onCancel={onCancel} />);
+
+      const dniInput = getByPlaceholderText("DNI");
+      await user.type(dniInput, "12345678");
+      const submitButton = getByRole('button', { name: /create/i });
+      await user.click(submitButton);
+
+      const errorMessage1 = queryByText("DNI must be at least 7 characters");
+      const errorMessage2 = queryByText('DNI cannot exceed 8 characters');
+      expect(errorMessage1).not.toBeInTheDocument();
+      expect(errorMessage2).not.toBeInTheDocument();
+    });
+  });
 
 });
