@@ -3,6 +3,18 @@ import { render } from '@testing-library/react';
 import PatientForm  from "../../src/components/PatientForm";
 import userEvent from "@testing-library/user-event";
 import { fireEvent } from '@testing-library/react';
+import { getTimeFromToday } from "../../src/helpers";
+
+const dateDayOffset = (isoDate, daysOffset) => {
+  const [y, m, d] = isoDate.split("-").map(Number);
+  const date = new Date(y, m - 1, d);
+  date.setDate(date.getDate() + daysOffset);
+
+  const yyyy = date.getFullYear();
+  const mm = String(date.getMonth() + 1).padStart(2, "0");
+  const dd = String(date.getDate()).padStart(2, "0");
+  return `${yyyy}-${mm}-${dd}`;
+};
 
 describe('Patient Form', () => {
   it('it should have name input field', async () => {
@@ -320,6 +332,88 @@ describe('Patient Form', () => {
 
       const errorMessage = getByText("Email cannot exceed 150 characters");
       expect(errorMessage).toBeInTheDocument();
+      expect(onSubmit).not.toHaveBeenCalled();
+    });
+  });
+
+  describe('Patient Form Validation for Date of Birth', () => {
+    it('should not allow empty date of birth', async () => {
+      const onSubmit = vi.fn();
+      const onCancel = vi.fn();
+      const user = userEvent.setup();
+      
+      const { getByText, getByRole } = render(<PatientForm onSubmit={onSubmit} onCancel={onCancel} />);
+
+      const submitButton = getByRole('button', { name: /create/i });
+      await user.click(submitButton);
+
+      const errorMessage = getByText("Date of Birth is required");
+      expect(errorMessage).toBeInTheDocument();
+      expect(onSubmit).not.toHaveBeenCalled();
+    });
+
+    it('rejects date of birth older than 120 years', async () => {
+      const onSubmit = vi.fn();
+      const onCancel = vi.fn();
+      const user = userEvent.setup();
+      
+      const { getByRole, getByPlaceholderText, findByText } = render(<PatientForm onSubmit={onSubmit} onCancel={onCancel} />); 
+
+      const minDate = getTimeFromToday(-120);
+      const tooOldDate = dateDayOffset(minDate, -1);
+
+      const dobInput = getByPlaceholderText("Date of Birth");
+      fireEvent.change(dobInput, { target: { value: tooOldDate } });
+
+      const submitButton = getByRole('button', { name: /create/i });
+      await user.click(submitButton);
+      
+      const errorMessage = await findByText(`Date of Birth cannot be before ${minDate}`)
+      expect(errorMessage).toBeInTheDocument();
+      
+      expect(onSubmit).not.toHaveBeenCalled();
+    });
+
+    it('rejects date of birth in the future', async () => {
+      const onSubmit = vi.fn();
+      const onCancel = vi.fn();
+      const user = userEvent.setup();
+      
+      const { getByRole, getByPlaceholderText, findByText } = render(<PatientForm onSubmit={onSubmit} onCancel={onCancel} />);
+
+      const maxDate = getTimeFromToday();
+      const futureDate = dateDayOffset(maxDate, 1);
+
+      const dobInput = getByPlaceholderText("Date of Birth");
+      fireEvent.change(dobInput, { target: { value: futureDate } });
+
+      const submitButton = getByRole('button', { name: /create/i });
+      await user.click(submitButton);
+
+      const errorMessage = await findByText(`Date of Birth cannot be after ${maxDate}`);
+      expect(errorMessage).toBeInTheDocument();
+      
+      expect(onSubmit).not.toHaveBeenCalled();
+    });
+
+    it('allows today as date of birth', async () => {
+      const onSubmit = vi.fn();
+      const onCancel = vi.fn();
+      const user = userEvent.setup();
+      
+      const { getByRole, getByPlaceholderText, queryByText } = render(<PatientForm onSubmit={onSubmit} onCancel={onCancel} />);
+
+      const maxDate = getTimeFromToday();
+
+      const dobInput = getByPlaceholderText("Date of Birth");
+      fireEvent.change(dobInput, { target: { value: maxDate } });
+
+      const submitButton = getByRole('button', { name: /create/i });
+      await user.click(submitButton);
+
+      const errorMessage = queryByText(`Date of Birth cannot be after ${maxDate}`);
+      expect(errorMessage).not.toBeInTheDocument();
+      
       expect(onSubmit).not.toHaveBeenCalled();
     });
   });
