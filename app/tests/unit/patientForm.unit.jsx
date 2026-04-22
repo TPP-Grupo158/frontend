@@ -272,4 +272,56 @@ describe('Patient Form', () => {
     });
   });
 
+  describe('Patient Form Validation for email', () => {
+    it('should not allow empty email', async () => {
+      const onSubmit = vi.fn();
+      const onCancel = vi.fn();
+      const user = userEvent.setup();
+      
+      const { getByText, getByRole } = render(<PatientForm onSubmit={onSubmit} onCancel={onCancel} />);
+
+      const submitButton = getByRole('button', { name: /create/i });
+      await user.click(submitButton);
+
+      const errorMessage = getByText("Email is required");
+      expect(errorMessage).toBeInTheDocument();
+      expect(onSubmit).not.toHaveBeenCalled();
+    });
+
+    it('should not allow invalid email format', async () => {
+      const onSubmit = vi.fn();
+      const onCancel = vi.fn();
+      const user = userEvent.setup();
+      
+      const { getByText, getByRole, getByPlaceholderText } = render(<PatientForm onSubmit={onSubmit} onCancel={onCancel} />);
+
+      const emailInput = getByPlaceholderText("Email");
+      await user.type(emailInput, "invalid-email");
+      const submitButton = getByRole('button', { name: /create/i });
+
+      await user.click(submitButton);
+
+      const errorMessage = getByText("Invalid email format");
+      expect(errorMessage).toBeInTheDocument();
+      expect(onSubmit).not.toHaveBeenCalled();
+    });
+
+    it('should not allow email longer than 150 characters', async () => {
+      const onSubmit = vi.fn();
+      const onCancel = vi.fn();
+      const user = userEvent.setup();
+      
+      const { getByText, getByRole, getByPlaceholderText } = render(<PatientForm onSubmit={onSubmit} onCancel={onCancel} />);
+
+      const emailInput = getByPlaceholderText("Email");
+      await user.type(emailInput, "a".repeat(151) + "@example.com");
+      const submitButton = getByRole('button', { name: /create/i });
+      await user.click(submitButton);
+
+      const errorMessage = getByText("Email cannot exceed 150 characters");
+      expect(errorMessage).toBeInTheDocument();
+      expect(onSubmit).not.toHaveBeenCalled();
+    });
+  });
+
 });
