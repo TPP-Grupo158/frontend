@@ -47,3 +47,18 @@ test('When there are no patients found', async ({ page }) => {
   const patients = page.getByText('No patients found');
   await expect(patients).toBeVisible();
 });
+
+test('Error message can be closed', async ({ page }) => {
+
+  await userIsAuthenticated(page);
+
+  await mockResponse(page, `${API_URL}/patients?offset=0&limit=10`, 500, { message: 'Internal Server Error' });
+
+  await page.goto(`${BASE_URL}/patients`);
+  const closeButton = page.getByText('×');
+  const errorMessage = page.getByText('Internal Server Error');
+  
+  await expect(errorMessage).toBeVisible();
+  closeButton.click();
+  await expect(errorMessage).not.toBeVisible();
+});

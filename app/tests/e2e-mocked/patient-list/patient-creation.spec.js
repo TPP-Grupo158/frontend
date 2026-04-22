@@ -119,3 +119,39 @@ test('Creating new patient with existing DNI', async ({ page }) => {
   await expect(errorMessage).toBeVisible();
   await expect(newPatientForm).toBeVisible();
 });
+
+test('Message for creating patient with existing DNI can be closed ', async ({ page }) => {
+    const patients = getMockPatients(5, 'a')
+  await userIsAuthenticated(page);
+
+  await mockResponse(page, `${API_URL}/patients?offset=0&limit=10`, 200, { patients, hasMore: false })
+
+  await mockResponse(page, `${API_URL}/patients/`, 409, {})
+
+  await page.goto(`${BASE_URL}/patients`);
+  
+  const newPatientButton = page.getByRole('button', { name: 'New Patient' });
+  await newPatientButton.click();
+
+  const newPatientForm = page.getByTestId('patient-form');
+
+  await newPatientForm.getByPlaceholder('Fullname').fill('Patient Test'); 
+  await newPatientForm.getByPlaceholder('DNI').fill('12345670');
+  await newPatientForm.getByPlaceholder('Email').fill('test@email.com');
+
+  // Date input shows placeholder first and date picker when on focus.
+  await newPatientForm.getByPlaceholder('Date of Birth').focus();
+  await newPatientForm.getByPlaceholder('Date of Birth').fill('1980-01-01');
+
+  const submitButton = newPatientForm.getByRole('button', { name: 'Create' });
+  await submitButton.click();
+
+  const closeButton = page.getByText('×');
+  const errorMessage = page.getByText('A patient with the same DNI has already been registered.');
+
+  await expect(errorMessage).toBeVisible();
+
+  await closeButton.click();
+
+  await expect(errorMessage).not.toBeVisible();
+})
