@@ -2,7 +2,7 @@ import { expect, describe, it, vi } from "vitest";
 import { render } from '@testing-library/react';
 import PatientForm  from "../../src/components/PatientForm";
 import userEvent from "@testing-library/user-event";
-
+import { fireEvent } from '@testing-library/react';
 
 describe('Patient Form', () => {
   it('it should have name input field', async () => {
@@ -107,5 +107,87 @@ describe('Patient Form', () => {
       dateOfBirth: "1990-01-01"
     });
   });
+
+  describe('Patient Form Validation for fullname', () => {
+    it('should not allow empty fullname', async () => {
+      const onSubmit = vi.fn();
+      const onCancel = vi.fn();
+      const user = userEvent.setup();
+      
+      const { getByText, getByRole } = render(<PatientForm onSubmit={onSubmit} onCancel={onCancel} />);
+
+      const submitButton = getByRole('button', { name: /create/i });
+      await user.click(submitButton);
+
+      const errorMessage = getByText("Fullname is required");
+      expect(errorMessage).toBeInTheDocument();
+      expect(onSubmit).not.toHaveBeenCalled();
+    });
+
+    it('should not allow fullname shorter than 3 characters', async () => {
+      const onSubmit = vi.fn();
+      const onCancel = vi.fn();
+      const user = userEvent.setup();
+      
+      const { getByText, getByRole, getByPlaceholderText } = render(<PatientForm onSubmit={onSubmit} onCancel={onCancel} />);
+
+      const nameInput = getByPlaceholderText("Fullname");
+      await user.type(nameInput, "Jo");
+      const submitButton = getByRole('button', { name: /create/i });
+      await user.click(submitButton);
+
+      const errorMessage = getByText("Fullname must be at least 3 characters");
+      expect(errorMessage).toBeInTheDocument();
+      expect(onSubmit).not.toHaveBeenCalled();
+    });
+
+    it('should not allow fullname longer than 100 characters', async () => {
+      const onSubmit = vi.fn();
+      const onCancel = vi.fn();
+      const user = userEvent.setup();
+      
+      const { getByText, getByRole, getByPlaceholderText } = render(<PatientForm onSubmit={onSubmit} onCancel={onCancel} />);
+
+      const nameInput = getByPlaceholderText("Fullname");
+      await user.type(nameInput, "J".repeat(101));
+      const submitButton = getByRole('button', { name: /create/i });
+      await user.click(submitButton);
+
+      const errorMessage = getByText("Fullname cannot exceed 100 characters");
+      expect(errorMessage).toBeInTheDocument();
+      expect(onSubmit).not.toHaveBeenCalled();
+    });
+
+    it('should allow composing name input', async () => {
+      const onSubmit = vi.fn();
+      const onCancel = vi.fn();
+      
+      const { getByPlaceholderText } = render(<PatientForm onSubmit={onSubmit} onCancel={onCancel} />);
+
+      const nameInput = getByPlaceholderText("Fullname");
+      fireEvent.compositionStart(nameInput);
+      fireEvent.change(nameInput, { target: { value: "Sebastia" } });
+      expect(nameInput.value).toBe("Sebastia");
+
+      fireEvent.compositionEnd(nameInput, { data: "án" });
+      fireEvent.change(nameInput, { target: { value: "Sebastián" } });
+
+      expect(nameInput.value).toBe("Sebastián");
+    });
+
+    it('should show sanitized input', async () => {
+      const onSubmit = vi.fn();
+      const onCancel = vi.fn();
+      const user = userEvent.setup();
+      
+      const { getByPlaceholderText } = render(<PatientForm onSubmit={onSubmit} onCancel={onCancel} />);
+
+      const dniInput = getByPlaceholderText("Fullname");
+      await user.type(dniInput, "1234abcd!$");
+      
+      expect(dniInput.value).toBe("abcd");
+    })
+  });
+
 
 });
