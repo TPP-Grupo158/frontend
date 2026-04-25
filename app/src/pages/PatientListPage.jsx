@@ -109,7 +109,7 @@ const PatientListPage = () => {
       <div style={{padding: '0% 5%', display: 'flex', flexDirection: 'column'}}> 
         <h1 style={{margin: '0 0 16px 0' }}>Patient Search</h1>
         <div>
-          { error?.status_code !== 401  || error?.status_code !== 409 && (
+          { error?.status_code !== 401  && error?.status_code !== 409 && (
             <Message
             isError={!!error?.status_code}
             message={error?.message || successMessage}
