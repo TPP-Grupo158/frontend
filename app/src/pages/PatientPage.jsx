@@ -4,6 +4,7 @@ import styles from "../components/styles";
 import Message from "../components/Message";
 
 import { useNavigate } from "react-router-dom";
+import { getAge, formatTimestamp } from "../helpers";
 
 const PatientPage = () => {
   const { dni } = useParams();
@@ -83,15 +84,6 @@ const PatientPage = () => {
     });
   }
 
-  const getAge = (dateOfBirth) => {
-    return Math.floor((new Date() - new Date(dateOfBirth)) / (1000 * 60 * 60 * 24 * 365.25));
-  }
-
-  const formatTimestamp = (timestamp) => {
-    const date = new Date(timestamp);
-    return date.toLocaleString('es-ar', { day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit' });
-  }
-
   if (isLoading) {
     return <div>Loading...</div>;
   }
@@ -109,10 +101,10 @@ const PatientPage = () => {
       <section style={{ border: '1px solid #e5e7eb', borderRadius: 12, padding: 16 }}>
         <h2 style={{ marginTop: 0 }}>General Information</h2>
         <dl style={{ display: 'grid', gridTemplateColumns: '160px 1fr', rowGap: 8, margin: 0 }}>
-          <dt><b>Name</b></dt><dd>{patientInfo?.fullname || '-'}</dd>
-          <dt><b>DNI</b></dt><dd>{dni}</dd>
-          <dt><b>Age</b></dt><dd>{getAge(patientInfo?.date_of_birth)} ({patientInfo?.date_of_birth})</dd>
-          <dt><b>Email</b></dt><dd>{patientInfo?.email || '-'}</dd>
+          <dt><b>Name</b></dt><dd data-testid="patient-name">{patientInfo?.fullname || '-'}</dd>
+          <dt><b>DNI</b></dt><dd data-testid="patient-dni">{dni}</dd>
+          <dt><b>Age</b></dt><dd data-testid="patient-age">{getAge(patientInfo?.date_of_birth)} ({patientInfo?.date_of_birth})</dd>
+          <dt><b>Email</b></dt><dd data-testid="patient-email">{patientInfo?.email || '-'}</dd>
         </dl>
       </section>
       <section style={{ border: '1px solid #e5e7eb', borderRadius: 12, padding: 16 }}>
