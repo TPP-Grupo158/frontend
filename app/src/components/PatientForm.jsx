@@ -29,6 +29,8 @@ const PatientForm = ({ onSubmit, onCancel, initialData }) => {
   const [validationErrors, setValidationErrors] = useState({});
   const [isComposingName, setIsComposingName] = useState(false);
 
+  const [dobType, setDobType] = useState(dateOfBirth ? 'date' : 'text');
+
    const handleNameChange = (e) => {
     if (isComposingName) {
       setFullname(e.target.value);
@@ -54,7 +56,8 @@ const PatientForm = ({ onSubmit, onCancel, initialData }) => {
 
   return (
     <div> 
-      <form
+      <form data-testid="patient-form"
+        noValidate //validate using yup
         style={{ display: 'flex', flexDirection: 'column', gap: '4px'}}
         onSubmit={handleSubmit}
       >
@@ -92,9 +95,18 @@ const PatientForm = ({ onSubmit, onCancel, initialData }) => {
           {validationErrors.email && <span style={{color: 'red', fontSize: '12px', paddingLeft: '2px'}}>{validationErrors.email}</span>}
         </div>
         <div style={{ display: 'flex', flexDirection: 'column'}}>
-          <input style={{ ...styles.input, marginBottom: validationErrors.dateOfBirth ? '0.25rem' : styles.input.marginBottom }}
-            type="date" 
+          <input
+            style={{
+              ...styles.input,
+              marginBottom: validationErrors.dateOfBirth ? '0.25rem' : styles.input.marginBottom
+            }}
+            type={dobType}
+            placeholder="Date of Birth"
             value={dateOfBirth}
+            onFocus={() => setDobType('date')}
+            onBlur={() => {
+              if (!dateOfBirth) setDobType('text');
+            }}
             onChange={(e) => setDateOfBirth(e.target.value)}
             min={MIN_BIRTH_DATE}
             max={MAX_BIRTH_DATE}

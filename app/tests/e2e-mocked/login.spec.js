@@ -1,0 +1,34 @@
+import { test, expect } from '@playwright/test';
+import { userIsAuthenticated, mockResponse } from './helpers';
+
+const API_URL = process.env.TEST_API_URL
+const BASE_URL = process.env.TEST_BASE_URL || 'http://localhost:5173';
+
+test('When user logs in, its shown the patient search page', async ({ page }) => {
+
+  await mockResponse(page, `${API_URL}/login`, 200, { message: 'Login successful' });
+
+  await page.goto(`${BASE_URL}/login`);
+
+  await userIsAuthenticated(page);
+  await page.getByPlaceholder('Email').fill('user@example.com');
+  await page.getByPlaceholder('Password').fill('securePassword123!');
+  await page.getByRole('button', { name: 'Login' }).click();
+
+  await page.waitForURL(`${BASE_URL}/patients`);
+
+  await expect(page.getByRole('heading', { name: 'Patient Search' })).toBeVisible();
+});
+
+test('User logs in with invalid credentials', async ({ page }) => {
+
+  await mockResponse(page, `${API_URL}/login`, 401, { message: 'Invalid credentials' });
+
+  await page.goto(`${BASE_URL}/login`);
+  await page.getByPlaceholder('Email').fill('user@example.com');
+  await page.getByPlaceholder('Password').fill('wrongPassword');
+  await page.getByRole('button', { name: 'Login' }).click();
+
+  await expect(page).toHaveURL(`${BASE_URL}/login`);
+  await expect(page.getByRole('heading', { name: 'Patient Search' })).not.toBeVisible({timeout: 1000});
+});

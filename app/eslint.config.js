@@ -4,13 +4,22 @@ import pluginReact from "eslint-plugin-react";
 import { defineConfig } from "eslint/config";
 
 export default defineConfig([
+  {
+    ignores: [
+      "**/test-results/**",
+      "**/playwright-report/**",
+    ],
+  },
   js.configs.recommended,
   pluginReact.configs.flat.recommended,
   pluginReact.configs.flat["jsx-runtime"],
   { 
     files: ["**/*.{js,mjs,cjs,jsx}"], 
     languageOptions: { 
-      globals: globals.browser 
+      globals: {
+        ...globals.browser,
+        process: "readonly",
+      },  
     },
     settings: {
       react: { version: "detect" },
