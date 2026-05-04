@@ -2,6 +2,7 @@ import NiiVue from './components/Niivue/Niivue.jsx'
 import Login from './components/Login.jsx'
 import Predict from './components/predictions.jsx'
 import ImageUploadForm from './components/ImageUploadForm.jsx'
+import Header from './components/header.jsx'
 
 import { useState , useEffect} from 'react';
 import PatientListPage from './pages/PatientListPage.jsx'
@@ -19,11 +20,13 @@ function App() {
       <Routes>
         <Route path="/login" element={<Login onLoginSuccess={() => setIsLoggedIn(true)} />} />
         <Route element={<ProtectedRoute />}>
+          <Route element={<Header />}>
             <Route path="/upload" element={<ImageUploadForm />} />
             <Route path="/predict" element={<Predict />} />
             <Route path="/viewer" element={<NiiVue />} />
             <Route path="/patients" element={<PatientListPage />} />
             <Route path="/" />
+          </Route>
         </Route>
       </Routes>
     </Router>
