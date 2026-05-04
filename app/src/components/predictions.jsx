@@ -40,9 +40,9 @@ const PredictionRequestForm = () => {
       
       if (!response.ok) {
         if (response.status === 404) {
-          setDniError("Patient not found (404)");
+          setDniError("Patient not found");
         } else if (response.status === 500) {
-          setDniError("Server error. Please try again later (500)");
+          setDniError("Server error. Please try again later");
         } else {
           setDniError(`Error: ${response.status}`);
         }
