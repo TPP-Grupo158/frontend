@@ -20,9 +20,7 @@ const PredictionRequestForm = () => {
   const [files, setFiles] = useState({}); // { T1: File, T2: File ... }
   const [status, setStatus] = useState('idle'); // 'idle', 'loading', 'success', 'error'
   const [task, setTask] =useState('idle')
-  const [patient, setPatient] =useState('none')
   const [responseData, setResponseData] = useState({});
-  const [dniFilter, setDniFilter] = useState('');
   const [dniError, setDniError] = useState("");
   const [dniInput, setDniInput] = useState('');
   const [apiData, setApiData] = useState(null);
@@ -53,7 +51,6 @@ const PredictionRequestForm = () => {
         return;
       }
       setApiData(data);
-      setPatient(data.dni) 
     } catch (error) {
       console.error("Error al traer datos:", error);
       setDniError("Error while fetching patient")
