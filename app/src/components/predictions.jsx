@@ -20,11 +20,53 @@ const PredictionRequestForm = () => {
   const [files, setFiles] = useState({}); // { T1: File, T2: File ... }
   const [status, setStatus] = useState('idle'); // 'idle', 'loading', 'success', 'error'
   const [task, setTask] =useState('idle')
+  const [patient, setPatient] =useState('none')
   const [responseData, setResponseData] = useState({});
+  const [dniFilter, setDniFilter] = useState('');
+  const [dniError, setDniError] = useState("");
+  const [dniInput, setDniInput] = useState('');
+  const [apiData, setApiData] = useState(null);
   const handleCheckboxChange = (id) => {
+    console.log(apiData)
     setSelectedProcs(prev => 
       prev.includes(id) ? prev.filter(p => p !== id) : [...prev, id]
     );
+  };
+  const fetchPatientData = async (dni) => {
+    try {
+      const response = await fetch(import.meta.env.VITE_GATEWAY_API+"patients/"+ dni, {
+        method: 'GET',
+        credentials: 'include'
+      });  
+      const data = await response.json();
+      
+      if (!response.ok) {
+        if (response.status === 404) {
+          setDniError("Patient not found (404)");
+        } else if (response.status === 500) {
+          setDniError("Server error. Please try again later (500)");
+        } else {
+          setDniError(`Error: ${response.status}`);
+        }
+        
+        setApiData(null);
+        return;
+      }
+      setApiData(data);
+      setPatient(data.dni) 
+    } catch (error) {
+      console.error("Error al traer datos:", error);
+      setDniError("Error while fetching patient")
+      setApiData(null);
+  }};
+  const handleDniChange = () => {
+    const onlyDigits = dniInput.replace(/\D/g, '');
+    if (onlyDigits.length >= 7) {
+      console.log(onlyDigits.length )
+      fetchPatientData(onlyDigits);
+    }else{
+      setDniError("DNI must be 7 digits")
+    }
   };
 
   const requiredFiles = Array.from(new Set(
@@ -55,6 +97,7 @@ const PredictionRequestForm = () => {
   if (files[NIFTI_BRAVO]) formData.append('file_t1ce', files[NIFTI_BRAVO]); // Bravo -> t1ce
   if (files[NIFTI_T2]) formData.append('file_t2', files[NIFTI_T2]);
   if (files[NIFTI_FLAIR]) formData.append('file_flair', files[NIFTI_FLAIR]);
+  formData.append("patient", apiData.dni); 
 
   try {
     const response = await fetch(import.meta.env.VITE_GATEWAY_API+"predict", {
@@ -82,6 +125,30 @@ const PredictionRequestForm = () => {
   return (
     <div style={{ display: 'flex', gap: '40px', padding: '20px' }}>
       {/* LEFT BLOCK */}
+      {/* ESTADO 1: Elegir paciente*/}
+      {apiData === null &&(
+        <div style={{ flex: 1, minWidth: '250px' }}>
+        <h3>1. Select Patient</h3>
+        <div style={{ display: 'flex', gap: '8px' }}>
+          <input 
+            type="text"
+            inputMode="numeric"
+            placeholder="Search by DNI"
+            value={dniInput} // Usamos el estado temporal
+            onChange={(e) => setDniInput(e.target.value)}
+            onKeyDown={(e) => {
+              if (e.key === 'Enter') handleDniChange();
+            }} // Opcional: buscar al presionar Enter
+          />
+          <button onClick={handleDniChange}>
+            Search
+          </button>
+        </div>
+        {dniError && <p style={{ color: 'red', fontSize: '12px' }}>{dniError}</p>}
+      </div>)
+      }
+      {/* ESTADO 2: Agregar files */}
+      {apiData !== null &&
       <div style={{ flex: 1,  minWidth: '250px' }}>
         <h3>1. Select Procedures</h3>
         <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '10px' }}>
@@ -162,6 +229,7 @@ const PredictionRequestForm = () => {
         </div>
       )}
       </div>
+      }
 
       {/* RIGHT BLOCK */}
       <div style={{ 
