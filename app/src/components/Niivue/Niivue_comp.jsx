@@ -25,6 +25,7 @@ import {
 
 import SegmentationStatsDisplay from "./SegmentationStatsDisplay.jsx";
 import LabelsDisplay from "./LabelsDisplay.jsx";
+import CoordinatesDisplay from "./CoordinatesDispay.jsx";
 
 const NiiVue_comp = ({ images, segmentationUrl = { url: '' }, labels }) => {
     const canvas = useRef(null);
@@ -338,17 +339,7 @@ const NiiVue_comp = ({ images, segmentationUrl = { url: '' }, labels }) => {
                 boxSizing: "border-box",
             }}>
                 <LabelsDisplay coloredLabels={coloredLabels} />
-                <div style={{
-                display: 'inline-flex', 
-                gap: '12px',
-                marginLeft: "auto",
-                whiteSpace: "nowrap",
-                paddingRight: "12px",
-                }}>
-                    <strong style={{color: "#ffffff"}}>{`X: ${currentSlice.x}`}</strong>
-                    <strong style={{color: "#ffffff"}}>{`Y: ${currentSlice.y}`}</strong>
-                    <strong style={{color: "#ffffff"}}>{`Z: ${currentSlice.z}`}</strong>
-                </div>
+                <CoordinatesDisplay coordinates={currentSlice} />
             </div>
         </div>
         
