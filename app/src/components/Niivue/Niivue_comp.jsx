@@ -24,6 +24,7 @@ import {
 } from "./helpers.js";
 
 import SegmentationStatsDisplay from "./SegmentationStatsDisplay.jsx";
+import LabelsDisplay from "./LabelsDisplay.jsx";
 
 const NiiVue_comp = ({ images, segmentationUrl = { url: '' }, labels }) => {
     const canvas = useRef(null);
@@ -47,6 +48,7 @@ const NiiVue_comp = ({ images, segmentationUrl = { url: '' }, labels }) => {
     const[currentDrawOpacity, setCurrentDrawOpacity] = useState(0.6);
 
     const [segmentationStats, setSegmentationStats] = useState(null);
+    const [coloredLabels, setColoredLabels] = useState({});
 
     const [worldspace, setWorldspace] = useState(false);
 
@@ -100,10 +102,13 @@ const NiiVue_comp = ({ images, segmentationUrl = { url: '' }, labels }) => {
             });
             setSegmentationStats(parseSegmentationStats(stats));
             
+            // Get segmentation colors and map to labels
+            const labelsWithColors = {};
             labels.forEach((label, i) => {
                 const labelColor = nv.drawLut.lut.slice((i+1)*4, (i+2)*4);
-                nv.addLabel(label, {textScale: 1.0, bulletColor: labelColor, bulletScale: 1})
-            })
+                labelsWithColors[label] = labelColor;
+            });
+            setColoredLabels(labelsWithColors);
             
             nv.setDrawOpacity(currentDrawOpacity);
 
@@ -222,7 +227,11 @@ const NiiVue_comp = ({ images, segmentationUrl = { url: '' }, labels }) => {
     }
     
     return (  
-    <div style={{display: "flex", flexDirection: "column", justifyContent: "center", alignItems: "center",  gap: "8px" }}>
+    <div style={{ 
+        display: "flex",
+        flexDirection: "column",
+        gap: "8px"
+        }}>
         <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
             <label>
                 cmap
@@ -314,18 +323,35 @@ const NiiVue_comp = ({ images, segmentationUrl = { url: '' }, labels }) => {
             </label>
         </div>
         <div style={{ 
-                border: "1px solid black", 
-                display: "flex", 
-                justifyContent: "center", 
+                display: "flex",
+                flexDirection: "column",
                 marginTop: "10px",
-                width: "100%", 
-                height: 700
+                height: 700,
+                borderBottom: "1px solid #e5e7eb",
             }}>
             <canvas ref={canvas} style={{ width: "100%", height: "100%" }} />
+             <div style={{
+                display: 'flex',
+                gap: '12px',
+                padding: "4px 0 4px 12px",
+                backgroundColor: "#1e1e1e",
+                boxSizing: "border-box",
+            }}>
+                <LabelsDisplay coloredLabels={coloredLabels} />
+                <div style={{
+                display: 'inline-flex', 
+                gap: '12px',
+                marginLeft: "auto",
+                whiteSpace: "nowrap",
+                paddingRight: "12px",
+                }}>
+                    <strong style={{color: "#ffffff"}}>{`X: ${currentSlice.x}`}</strong>
+                    <strong style={{color: "#ffffff"}}>{`Y: ${currentSlice.y}`}</strong>
+                    <strong style={{color: "#ffffff"}}>{`Z: ${currentSlice.z}`}</strong>
+                </div>
+            </div>
         </div>
-        <div>
-            <strong>{`X: ${currentSlice.x}, Y: ${currentSlice.y}, Z: ${currentSlice.z}`}</strong>
-        </div>
+        
         <div style={{marginTop: '1rem'}}>
             <SegmentationStatsDisplay stats={segmentationStats} />
         </div>
