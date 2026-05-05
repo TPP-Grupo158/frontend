@@ -43,6 +43,7 @@ const NiiVue_comp = ({ images, segmentationUrl = { url: '' }, labels }) => {
 
     const [availableColormaps, setAvailableColormaps] = useState([]); 
     const [currentColormap, setCurrentColormap] = useState(DEFAULT_VOLUME_OPTIONS.colormap);
+    const [colormapFilter, setColormapFilter] = useState('')
     
     const [currentSliceView, setCurrentSliceView] = useState(DEFAULT_NIIVUE_OPTIONS.sliceType);
     const [currentMultiplanarLayout, setCurrentMultiplanarLayout] = useState(DEFAULT_NIIVUE_OPTIONS.multiplanarLayout);
@@ -63,7 +64,6 @@ const NiiVue_comp = ({ images, segmentationUrl = { url: '' }, labels }) => {
             console.log("Setting up Niivue instance...");
             const nv = new Niivue(DEFAULT_NIIVUE_OPTIONS);
 
-            //nv.opts.mouseEventConfig = defaultMouseConfig;
             const availableColormaps = nv.colormaps();
             setAvailableColormaps(availableColormaps);
             nv.attachToCanvas(canvas.current);
@@ -98,9 +98,7 @@ const NiiVue_comp = ({ images, segmentationUrl = { url: '' }, labels }) => {
                     await nv.loadDrawingFromUrl(url);
                 }
 
-            nvRef.current = nv;
-
-            // Get initial segmentation stats
+            // Get segmentation stats
             const stats = nv.getDescriptives({
                 layer: 0,
                 drawingIsMask: true,
@@ -123,6 +121,8 @@ const NiiVue_comp = ({ images, segmentationUrl = { url: '' }, labels }) => {
                 y: initialVox[1],
                 z: initialVox[2]
             });
+
+            nvRef.current = nv;
         }
 
         if (!nvRef.current) {
@@ -248,14 +248,32 @@ const NiiVue_comp = ({ images, segmentationUrl = { url: '' }, labels }) => {
                     cursor: 'pointer',
                     maxHeight: '200px',
                     overflowY: 'auto',
-                    paddingRight: 18,
+                    paddingRight: 6,
                 }}
                 label="Colormap"
-            >
+            >   
+                <input 
+                    style={{
+                    fontSize: 13,
+                    lineHeight: "20px",
+                    padding: "6px 6px",
+                    borderRadius: 6,
+                    border: "1px solid #cbd5e1",
+                    backgroundColor: "#f8fafc",
+                    width: "100%",
+                    boxSizing: "border-box",
+                }}
+                    placeholder="Filter"
+                    value={colormapFilter}
+                    onChange={({target}) => setColormapFilter(target.value)}
+                />
+                <MenuBar.Separator style={{ height: '1px', backgroundColor: '#ccc', margin: '4px 0' }} />
                 <MenuBarRadioGroup
                     value={currentColormap}
                     onValueChange={handleColormapChange}
-                    items={availableColormaps.map(colormap => ({
+                    items={availableColormaps
+                        .filter((colormap) => colormap.includes(colormapFilter.toLowerCase()))
+                        .map(colormap => ({
                         value: colormap,
                         label: colormap
                     }))}

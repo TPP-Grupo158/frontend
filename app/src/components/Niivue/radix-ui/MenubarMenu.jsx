@@ -19,9 +19,10 @@ const MenubarMenu = ({ children, label, style }) => {
       backgroundColor: 'white', 
       border: '1px solid #ccc',
       borderRadius: '4px', 
-      padding: '8px',
+      padding: '4px',
       width: "max-content",
       maxWidth: "90vw",
+      overflowX: "hidden",
       ...style
     }
   };
