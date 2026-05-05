@@ -190,8 +190,7 @@ const NiiVue_comp = ({ images, segmentationUrl = { url: '' }, labels }) => {
             nvRef.current.saveImage({filename: 'segmentation.nii.gz', isSaveDrawing: true});
     }
 
-    const handleDragModeChange = (event) => {
-        const newDragMode = parseInt(event.target.value)
+    const handleDragModeChange = (newDragMode) => {
         if (nvRef.current) {
             nvRef.current.setDragMode(newDragMode);
             setCurrentDragMode(newDragMode);
@@ -292,19 +291,19 @@ const NiiVue_comp = ({ images, segmentationUrl = { url: '' }, labels }) => {
                 />
             </MenubarMenu>
 
+            <MenubarMenu label="Mode">
+                <MenuBarRadioGroup
+                    value={currentDragMode}
+                    onValueChange={handleDragModeChange}
+                    items={AVAILABLE_DRAG_MODES.map(mode => ({
+                        value: mode,
+                        label: getDragModeName(mode)
+                    }))}
+                />
+            </MenubarMenu>
+
         </MenuBar.Root>
 
-        <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
-
-             <label>
-                Drag Mode
-                <select value={currentDragMode} onChange={handleDragModeChange}>
-                    {AVAILABLE_DRAG_MODES.map((dragMode) => (
-                            <option key={dragMode} value={dragMode}>{getDragModeName(dragMode)}</option>
-                        ))}
-                </select>
-            </label>
-        </div>
         <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
             <label style={{ display: "flex", alignItems: "center", gap: "8px" }}>
                 { } Gamma
