@@ -25,7 +25,7 @@ import {
 
 import SegmentationStatsDisplay from "./SegmentationStatsDisplay.jsx";
 import LabelsDisplay from "./LabelsDisplay.jsx";
-import CoordinatesDisplay from "./CoordinatesDispay.jsx";
+import CoordinatesDisplay from "./CoordinatesDisplay.jsx";
 
 const NiiVue_comp = ({ images, segmentationUrl = { url: '' }, labels }) => {
     const canvas = useRef(null);
@@ -170,22 +170,17 @@ const NiiVue_comp = ({ images, segmentationUrl = { url: '' }, labels }) => {
     const handleVolumeChange = async (event) => {
         const newVolumeName = event.target.value;
         const newVolume = images.find(v => v.name === newVolumeName);
-        
-        console.debug("Changing volume to:", newVolume.name);
+
         if (nvRef.current) {
 
             nvRef.current.setDrawingEnabled(false);
 
             await nvRef.current.removeVolumeByIndex(0);
-            console.log(nvRef.current.volumes)
-            console.log(newVolume)
-            const current = await NVImage.loadFromFile({
-                file: newVolume.file,
-                name: newVolume.name,
-                ...DEFAULT_VOLUME_OPTIONS, 
-                colormap: currentColormap
+            await nvRef.current.addVolumeFromUrl({
+                url: currentVolume.url || currentVolume.file,
+                name: currentVolume.name,
+                ...DEFAULT_VOLUME_OPTIONS
             });
-            await nvRef.current.addVolume(current);
             setCurrentVolume(newVolume);
         }
     }
