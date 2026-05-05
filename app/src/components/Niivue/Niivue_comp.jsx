@@ -23,6 +23,11 @@ import {
     getMultiplanarLayoutName
 } from "./helpers.js";
 
+
+import * as MenuBar from "@radix-ui/react-menubar";
+import MenubarMenu from "./radix-ui/MenubarMenu.jsx";
+import MenuBarRadioGroup from "./radix-ui/MenubarRadioGroup.jsx";
+
 import SegmentationStatsDisplay from "./SegmentationStatsDisplay.jsx";
 import LabelsDisplay from "./LabelsDisplay.jsx";
 import CoordinatesDisplay from "./CoordinatesDisplay.jsx";
@@ -165,8 +170,7 @@ const NiiVue_comp = ({ images, segmentationUrl = { url: '' }, labels }) => {
         }
     }
 
-    const handleVolumeChange = async (event) => {
-        const newVolumeName = event.target.value;
+    const handleVolumeChange = async (newVolumeName) => {
         const newVolume = images.find(v => v.name === newVolumeName);
 
         if (nvRef.current) {
@@ -219,6 +223,27 @@ const NiiVue_comp = ({ images, segmentationUrl = { url: '' }, labels }) => {
         flexDirection: "column",
         gap: "8px"
         }}>
+        
+        <MenuBar.Root style={{
+            display: "flex",
+            width: "fit-content",
+            backgroundColor: "white",
+            padding: "3px",
+            borderRadius: "6px",
+            border: "1px solid #ccc",
+        }}>
+            <MenubarMenu label="File">
+                <MenuBarRadioGroup
+                    value={currentVolume.name}
+                    onValueChange={handleVolumeChange}
+                    items={images.map(volume => ({
+                        value: volume.name,
+                        label: volume.name
+                    }))}
+                />
+            </MenubarMenu>
+        </MenuBar.Root>
+
         <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
             <label>
                 cmap
@@ -244,15 +269,6 @@ const NiiVue_comp = ({ images, segmentationUrl = { url: '' }, labels }) => {
                     {AVAILABLE_MULTIPLANAR_LAYOUTS.map((layout) => (
                         <option key={layout} value={layout}>{getMultiplanarLayoutName(layout)}</option>
                     ))}
-                </select>
-            </label>
-
-            <label>
-                Volume shown
-                <select value={currentVolume.name} onChange={handleVolumeChange}>
-                    {images.map((volume) => (
-                            <option key={volume.name} value={volume.name}>{volume.name}</option>
-                        ))}
                 </select>
             </label>
 
