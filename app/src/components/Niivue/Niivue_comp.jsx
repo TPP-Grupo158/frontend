@@ -13,6 +13,8 @@ import {
     AVAILABLE_VIEWS,
     AVAILABLE_MULTIPLANAR_LAYOUTS,
     CROSSHAIR,
+    SHOW_RENDER_ENUM,
+    MULTIPLANAR_LAYOUTS_ENUM
 } from "./constants.js";
 
 import { 
@@ -209,6 +211,12 @@ const NiiVue_comp = ({ images, segmentationUrl = { url: '' }, labels }) => {
 
     const handleMultiplanarLayoutChange = (newLayout) => {
         if (nvRef.current) {
+            if (newLayout === MULTIPLANAR_LAYOUTS_ENUM.GRID ) {
+                nvRef.current.opts.multiplanarShowRender = SHOW_RENDER_ENUM.ALWAYS
+            } else if (currentMultiplanarLayout === MULTIPLANAR_LAYOUTS_ENUM.GRID) {
+                nvRef.current.opts.multiplanarShowRender = SHOW_RENDER_ENUM.NEVER
+            }
+            
             nvRef.current.setMultiplanarLayout(newLayout);
             setCurrentMultiplanarLayout(newLayout);
         }

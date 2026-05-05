@@ -1,7 +1,7 @@
 import { expect, describe, it} from "vitest";
 import { render } from '@testing-library/react';
 
-import CoordinatesDisplay from "@components/Niivue/CoordinatesDispay";
+import CoordinatesDisplay from "@components/Niivue/CoordinatesDisplay";
 
 describe('CoordinatesDisplay component', () => {
   it('renders coordinates when they are provided', () => {

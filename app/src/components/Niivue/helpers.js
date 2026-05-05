@@ -11,7 +11,7 @@ export const getSliceName = (sliceType) => {
         case SLICE_TYPE.SAGITTAL:
             return "Sagittal";
         case SLICE_TYPE.RENDER:
-            return "Render";
+            return "Render 3D";
         default:
             return "Unknown";
     }
