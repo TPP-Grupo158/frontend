@@ -206,8 +206,7 @@ const NiiVue_comp = ({ images, segmentationUrl = { url: '' }, labels }) => {
         }
     }
 
-    const handleMultiplanarLayoutChange = (event) => {
-        const newLayout = parseInt(event.target.value);
+    const handleMultiplanarLayoutChange = (newLayout) => {
         if (nvRef.current) {
             nvRef.current.setMultiplanarLayout(newLayout);
             setCurrentMultiplanarLayout(newLayout);
@@ -282,17 +281,20 @@ const NiiVue_comp = ({ images, segmentationUrl = { url: '' }, labels }) => {
                 />
             </MenubarMenu>
 
+            <MenubarMenu label="Layout">
+                <MenuBarRadioGroup
+                    value={currentMultiplanarLayout}
+                    onValueChange={handleMultiplanarLayoutChange}
+                    items={AVAILABLE_MULTIPLANAR_LAYOUTS.map(layout => ({
+                        value: layout,
+                        label: getMultiplanarLayoutName(layout)
+                    }))}
+                />
+            </MenubarMenu>
+
         </MenuBar.Root>
 
         <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
-            <label>
-                Multiplanar layout { }
-                <select value={currentMultiplanarLayout} onChange={handleMultiplanarLayoutChange}>
-                    {AVAILABLE_MULTIPLANAR_LAYOUTS.map((layout) => (
-                        <option key={layout} value={layout}>{getMultiplanarLayoutName(layout)}</option>
-                    ))}
-                </select>
-            </label>
 
              <label>
                 Drag Mode
