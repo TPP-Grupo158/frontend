@@ -10,6 +10,7 @@ import PatientForm from '../components/PatientForm';
 import Message from '../components/Message';
 
 import { sanitizeNameInput } from '../helpers';
+import PaginationControls from '../components/PaginationControls';
 
 const DEBOUNCE_DELAY = 500; // ms
 const ITEMS_PER_PAGE = 10;
@@ -198,21 +199,12 @@ const PatientListPage = () => {
               }
             </tbody>
           </table>
-          <div style={{alignItems: 'center', display: 'flex', justifyContent: 'center', marginTop: '16px'}}>
-            <button 
-              onClick={() => handlePageChange(currentPageNumber - 1)}
-              disabled={currentPageNumber <= 1}
-            >
-              &lt;
-            </button>
-            <span data-testid="patient-pagination-page-num" style={{ margin: '0 8px' }}> {currentPageNumber}</span>
-            <button 
-              onClick={() => handlePageChange(currentPageNumber + 1)}
-              disabled={!hasMorePages}
-            >
-              &gt;
-            </button>
-          </div>
+          <PaginationControls 
+            handleNext={handlePageChange}
+            handlePrevious={handlePageChange}
+            hasMorePages={hasMorePages}
+            currentPageNumber={currentPageNumber}
+          />
         </div>
         { createPatientShowForm && (
           <Overlay>
