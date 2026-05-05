@@ -65,7 +65,10 @@ const NiiVue_comp = ({ images, segmentationUrl = { url: '' }, labels }) => {
             const nv = new Niivue(DEFAULT_NIIVUE_OPTIONS);
 
             const availableColormaps = nv.colormaps();
-            setAvailableColormaps(availableColormaps);
+            setAvailableColormaps(availableColormaps.map(colormap => ({
+                value: colormap,
+                label: colormap
+            })))
             nv.attachToCanvas(canvas.current);
 
             nv.onLocationChange = (location) => {
@@ -271,12 +274,9 @@ const NiiVue_comp = ({ images, segmentationUrl = { url: '' }, labels }) => {
                 <MenuBarRadioGroup
                     value={currentColormap}
                     onValueChange={handleColormapChange}
-                    items={availableColormaps
-                        .filter((colormap) => colormap.includes(colormapFilter.toLowerCase()))
-                        .map(colormap => ({
-                        value: colormap,
-                        label: colormap
-                    }))}
+                    items={availableColormaps.filter(
+                        (colormap) => colormap.label.includes(colormapFilter.toLowerCase()))
+                    }
                 />
             </MenubarMenu>
 
