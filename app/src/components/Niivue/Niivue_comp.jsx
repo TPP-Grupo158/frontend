@@ -23,6 +23,8 @@ import {
     getMultiplanarLayoutName
 } from "./helpers.js";
 
+import SegmentationStatsDisplay from "./SegmentationStatsDisplay.jsx";
+
 const NiiVue_comp = ({ images, segmentationUrl = { url: '' }, labels }) => {
     const canvas = useRef(null);
     const nvRef = useRef(null);
@@ -44,7 +46,7 @@ const NiiVue_comp = ({ images, segmentationUrl = { url: '' }, labels }) => {
     const[currentVolumeGamma, setCurrentVolumeGamma] = useState(1.0);
     const[currentDrawOpacity, setCurrentDrawOpacity] = useState(0.6);
 
-    const [segmentationStats, setSegmentationStats] = useState("");
+    const [segmentationStats, setSegmentationStats] = useState(null);
 
     const [worldspace, setWorldspace] = useState(false);
 
@@ -90,6 +92,13 @@ const NiiVue_comp = ({ images, segmentationUrl = { url: '' }, labels }) => {
                 }
 
             nvRef.current = nv;
+
+            // Get initial segmentation stats
+            const stats = nv.getDescriptives({
+                layer: 0,
+                drawingIsMask: true,
+            });
+            setSegmentationStats(parseSegmentationStats(stats));
             
             labels.forEach((label, i) => {
                 const labelColor = nv.drawLut.lut.slice((i+1)*4, (i+2)*4);
@@ -196,15 +205,6 @@ const NiiVue_comp = ({ images, segmentationUrl = { url: '' }, labels }) => {
         }
     }
 
-    const updateSegmentationStats = () => {
-        if (nvRef.current) {
-            const stats = nvRef.current.getDescriptives({
-                layer: 0,
-                drawingIsMask: true,
-            });
-            setSegmentationStats(parseSegmentationStats(stats));
-        }
-    }
     const handleMultiplanarLayoutChange = (event) => {
         const newLayout = parseInt(event.target.value);
         if (nvRef.current) {
@@ -224,7 +224,6 @@ const NiiVue_comp = ({ images, segmentationUrl = { url: '' }, labels }) => {
     return (  
     <div style={{display: "flex", flexDirection: "column", justifyContent: "center", alignItems: "center",  gap: "8px" }}>
         <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
-            <button onClick={updateSegmentationStats} style={styles.button}>Update Segmentation Stats</button>
             <label>
                 cmap
                 <select value={currentColormap} onChange={handleColormapChange}>
@@ -327,16 +326,9 @@ const NiiVue_comp = ({ images, segmentationUrl = { url: '' }, labels }) => {
         <div>
             <strong>{`X: ${currentSlice.x}, Y: ${currentSlice.y}, Z: ${currentSlice.z}`}</strong>
         </div>
-        {segmentationStats && (
-        <div>
-            
-            <pre>
-                <strong>Segmentation Stats (does not include per-label info)</strong>
-                <br />
-                {segmentationStats}
-            </pre>
+        <div style={{marginTop: '1rem'}}>
+            <SegmentationStatsDisplay stats={segmentationStats} />
         </div>
-        )}
     </div>
     )
 };
