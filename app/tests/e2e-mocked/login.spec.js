@@ -1,5 +1,5 @@
 import { test, expect } from '@playwright/test';
-import { userIsAuthenticated, mockResponse } from './helpers';
+import { userIsAuthenticated, mockResponse, mockNetworkError } from './helpers';
 
 const API_URL = process.env.TEST_API_URL
 const BASE_URL = process.env.TEST_BASE_URL || 'http://localhost:5173';
@@ -31,4 +31,19 @@ test('User logs in with invalid credentials', async ({ page }) => {
 
   await expect(page).toHaveURL(`${BASE_URL}/login`);
   await expect(page.getByRole('heading', { name: 'Patient Search' })).not.toBeVisible({timeout: 1000});
+  await expect(page.getByText('Invalid credentials')).toBeVisible();
+});
+
+test('User logs in when server is unavailable', async ({ page }) => {
+
+  await mockNetworkError(page, `${API_URL}/login`, 'POST');
+
+  await page.goto(`${BASE_URL}/login`);
+  await page.getByPlaceholder('Email').fill('user@example.com');
+  await page.getByPlaceholder('Password').fill('wrongPassword');
+  await page.getByRole('button', { name: 'Login' }).click();
+
+  await expect(page).toHaveURL(`${BASE_URL}/login`);
+  await expect(page.getByRole('heading', { name: 'Patient Search' })).not.toBeVisible({timeout: 1000});
+  await expect(page.getByText('Could not connect to the server.')).toBeVisible();
 });

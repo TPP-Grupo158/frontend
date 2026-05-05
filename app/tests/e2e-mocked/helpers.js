@@ -43,3 +43,13 @@ export const getMockPatients = (count, letterToRepeat) => {
     'date_of_birth': new Date(1980, 0, i + 1).toISOString().split('T')[0]
   }));
 };
+
+export const mockNetworkError = async (page, url, method) => {
+    await page.route(url, async (route) => {
+    if (route.request().method() === method) {
+      await route.abort('connectionrefused');
+      return;
+    }
+    await route.continue();
+  });
+}
