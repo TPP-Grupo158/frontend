@@ -27,6 +27,7 @@ import * as MenuBar from "@radix-ui/react-menubar";
 import MenubarMenu from "./radix-ui/MenubarMenu.jsx";
 import MenuBarRadioGroup from "./radix-ui/MenubarRadioGroup.jsx";
 import MenubarCheckboxItem from "./radix-ui/MenubarCheckbox.jsx";
+import MenubarSlider from "./radix-ui/MenubarSlider.jsx";
 
 import SegmentationStatsDisplay from "./SegmentationStatsDisplay.jsx";
 import LabelsDisplay from "./LabelsDisplay.jsx";
@@ -160,8 +161,7 @@ const NiiVue_comp = ({ images, segmentationUrl = { url: '' }, labels }) => {
         }
     }
 
-    const handleDrawOpacityChange = (event) => {
-        const newOpacity = parseFloat(event.target.value);
+    const handleDrawOpacityChange = (newOpacity) => {
         if (nvRef.current) {
             nvRef.current.setDrawOpacity(newOpacity);
             setCurrentDrawOpacity(newOpacity);
@@ -197,8 +197,7 @@ const NiiVue_comp = ({ images, segmentationUrl = { url: '' }, labels }) => {
         }
     }
 
-    const handleVolumeGammaChange = (event) => {
-        const newGamma = parseFloat(event.target.value);
+    const handleVolumeGammaChange = (newGamma) => {
         if (nvRef.current) {
             nvRef.current.setGamma(newGamma);
             setCurrentVolumeGamma(newGamma);
@@ -302,34 +301,27 @@ const NiiVue_comp = ({ images, segmentationUrl = { url: '' }, labels }) => {
                 />
             </MenubarMenu>
 
-        </MenuBar.Root>
-
-        <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
-            <label style={{ display: "flex", alignItems: "center", gap: "8px" }}>
-                { } Gamma
-                <input
-                    type="range"
-                    min={0.5}
-                    max={2.0}
-                    step={0.1}
+             <MenubarMenu label="Display">
+                <MenuBar.Label style={{ padding: '4px 8px', fontWeight: 'bold' }}>Volume Gamma</MenuBar.Label>
+                <MenubarSlider
                     value={currentVolumeGamma}
                     onChange={handleVolumeGammaChange}
+                    min={0.5}
+                    max={1.5}
+                    step={0.1}
                 />
-                {currentVolumeGamma}
-            </label>
-            <label style={{ display: "flex", alignItems: "center", gap: "8px" }}>
-                { } Draw opacity
-                <input
-                    type="range"
+                <MenuBar.Label style={{ padding: '4px 8px', fontWeight: 'bold' }}>Segmentation Opacity</MenuBar.Label>
+                <MenubarSlider
+                    value={currentDrawOpacity}
+                    onChange={handleDrawOpacityChange}
                     min={0.0}
                     max={1.0}
                     step={0.01}
-                    value={currentDrawOpacity}
-                    onChange={handleDrawOpacityChange}
                 />
-                {parseInt(currentDrawOpacity * 100)}%
-            </label>
-        </div>
+            </MenubarMenu>
+
+        </MenuBar.Root>
+
         <div style={{ 
                 display: "flex",
                 flexDirection: "column",
