@@ -1,5 +1,4 @@
 import { useRef, useEffect, useState } from "react";
-import styles from '../styles.js'
 import PropTypes from 'prop-types';
 
 import { 
@@ -135,8 +134,7 @@ const NiiVue_comp = ({ images, segmentationUrl = { url: '' }, labels }) => {
 
     }, []);
 
-    const handleColormapChange = (event) => {
-        const newColormap = event.target.value;
+    const handleColormapChange = (newColormap) => {
         if (nvRef.current && nvRef.current.volumes.length > 0) {
             const volumeId = nvRef.current.volumes[0].id;
             nvRef.current.setColormap(volumeId, newColormap);
@@ -241,19 +239,35 @@ const NiiVue_comp = ({ images, segmentationUrl = { url: '' }, labels }) => {
                         label: volume.name
                     }))}
                 />
+                <MenuBar.Separator style={{ height: '1px', backgroundColor: '#ccc', margin: '4px 0' }} />
+                <MenuBar.Item onSelect={handleSaveDrawing} style={{ padding: '4px 8px', cursor: 'pointer' }}>
+                    Save Segmentation
+                </MenuBar.Item>
             </MenubarMenu>
+            
+            <MenubarMenu
+                style={{
+                    padding: '4px 8px',
+                    cursor: 'pointer',
+                    maxHeight: '200px',
+                    overflowY: 'auto',
+                    paddingRight: 18,
+                }}
+                label="Colormap"
+            >
+                <MenuBarRadioGroup
+                    value={currentColormap}
+                    onValueChange={handleColormapChange}
+                    items={availableColormaps.map(colormap => ({
+                        value: colormap,
+                        label: colormap
+                    }))}
+                />
+            </MenubarMenu>
+
         </MenuBar.Root>
 
         <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
-            <label>
-                cmap
-                <select value={currentColormap} onChange={handleColormapChange}>
-                    {availableColormaps.map((colormap) => (
-                            <option key={colormap} value={colormap}>{colormap}</option>
-                        ))}
-                </select>
-            </label>
-
             <label>
                 Slice view { }
                 <select value={currentSliceView} onChange={handleSliceViewChange}>
@@ -280,7 +294,6 @@ const NiiVue_comp = ({ images, segmentationUrl = { url: '' }, labels }) => {
                         ))}
                 </select>
             </label>
-            <button onClick={handleSaveDrawing} style={styles.button}>Save Segmentation</button>
             <label>
                 <input
                 type="checkbox"
