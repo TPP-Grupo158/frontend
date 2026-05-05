@@ -26,6 +26,7 @@ import {
 import * as MenuBar from "@radix-ui/react-menubar";
 import MenubarMenu from "./radix-ui/MenubarMenu.jsx";
 import MenuBarRadioGroup from "./radix-ui/MenubarRadioGroup.jsx";
+import MenubarCheckboxItem from "./radix-ui/MenubarCheckbox.jsx";
 
 import SegmentationStatsDisplay from "./SegmentationStatsDisplay.jsx";
 import LabelsDisplay from "./LabelsDisplay.jsx";
@@ -37,7 +38,7 @@ const NiiVue_comp = ({ images, segmentationUrl = { url: '' }, labels }) => {
 
     const [currentVolume, setCurrentVolume] = useState(images[0]);
 
-    const [isCrosshairChecked, setIsCrosshairChecked] = useState(false);
+    const [isCrosshairChecked, setIsCrosshairChecked] = useState(true);
 
     const [availableColormaps, setAvailableColormaps] = useState([]); 
     const [currentColormap, setCurrentColormap] = useState(DEFAULT_VOLUME_OPTIONS.colormap);
@@ -150,13 +151,12 @@ const NiiVue_comp = ({ images, segmentationUrl = { url: '' }, labels }) => {
     };
 
 
-    const handleCrosshairChange = (event) => {
-        const isChecked = event.target.checked;
+    const handleCrosshairChange = (checked) => {
         if (nvRef.current) {
-            nvRef.current.opts.crosshairWidth = isChecked ? CROSSHAIR.HIDDEN : CROSSHAIR.VISIBLE;
-            nvRef.current.opts.show3Dcrosshair = !isChecked;
+            nvRef.current.opts.crosshairWidth = checked ? CROSSHAIR.VISIBLE : CROSSHAIR.HIDDEN;
+            nvRef.current.opts.show3Dcrosshair = checked;
             nvRef.current.drawScene();
-            setIsCrosshairChecked(isChecked);
+            setIsCrosshairChecked(checked);
         }
     }
 
@@ -274,6 +274,12 @@ const NiiVue_comp = ({ images, segmentationUrl = { url: '' }, labels }) => {
                         label: getSliceName(view)
                     }))}
                 />
+                <MenuBar.Separator style={{ height: '1px', backgroundColor: '#ccc', margin: '4px 0' }} />
+                <MenubarCheckboxItem
+                    checked={isCrosshairChecked}
+                    onCheckedChange={handleCrosshairChange}
+                    label="Show Crosshair"
+                />
             </MenubarMenu>
 
         </MenuBar.Root>
@@ -295,14 +301,6 @@ const NiiVue_comp = ({ images, segmentationUrl = { url: '' }, labels }) => {
                             <option key={dragMode} value={dragMode}>{getDragModeName(dragMode)}</option>
                         ))}
                 </select>
-            </label>
-            <label>
-                <input
-                type="checkbox"
-                checked={isCrosshairChecked}
-                onChange={handleCrosshairChange}
-                />
-                Hide Crosshair
             </label>
         </div>
         <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
