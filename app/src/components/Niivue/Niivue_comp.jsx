@@ -142,13 +142,13 @@ const NiiVue_comp = ({ images, segmentationUrl = { url: '' }, labels }) => {
         }
     };
 
-    const handleSliceViewChange = (event) => {
-        const view = parseInt(event.target.value);
+    const handleSliceViewChange = (newView) => {
         if (nvRef.current) {
-            nvRef.current.setSliceType(view);
-            setCurrentSliceView(view);
+            nvRef.current.setSliceType(newView);
+            setCurrentSliceView(newView);
         }
     };
+
 
     const handleCrosshairChange = (event) => {
         const isChecked = event.target.checked;
@@ -265,18 +265,20 @@ const NiiVue_comp = ({ images, segmentationUrl = { url: '' }, labels }) => {
                 />
             </MenubarMenu>
 
+            <MenubarMenu label="View">
+                <MenuBarRadioGroup
+                    value={currentSliceView}
+                    onValueChange={handleSliceViewChange}
+                    items={AVAILABLE_VIEWS.map(view => ({
+                        value: view,
+                        label: getSliceName(view)
+                    }))}
+                />
+            </MenubarMenu>
+
         </MenuBar.Root>
 
         <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
-            <label>
-                Slice view { }
-                <select value={currentSliceView} onChange={handleSliceViewChange}>
-                    {AVAILABLE_VIEWS.map((sliceView) => (
-                        <option key={sliceView} value={sliceView}>{getSliceName(sliceView)}</option>
-                    ))}
-                </select>
-            </label>
-
             <label>
                 Multiplanar layout { }
                 <select value={currentMultiplanarLayout} onChange={handleMultiplanarLayoutChange}>
