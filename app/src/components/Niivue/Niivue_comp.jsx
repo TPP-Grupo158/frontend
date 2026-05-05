@@ -51,8 +51,6 @@ const NiiVue_comp = ({ images, segmentationUrl = { url: '' }, labels }) => {
     const [segmentationStats, setSegmentationStats] = useState(null);
     const [coloredLabels, setColoredLabels] = useState({});
 
-    const [worldspace, setWorldspace] = useState(false);
-
     useEffect(() => {
 
         async function setupAndLoad() {
@@ -214,13 +212,6 @@ const NiiVue_comp = ({ images, segmentationUrl = { url: '' }, labels }) => {
         }
     }
 
-    const handleWorldspaceChange = (event) => {
-        const isChecked = event.target.checked;
-        if (nvRef.current) {
-            nvRef.current.setSliceMM(isChecked);
-            setWorldspace(isChecked);
-        }
-    }
     
     return (  
     <div style={{ 
@@ -281,15 +272,6 @@ const NiiVue_comp = ({ images, segmentationUrl = { url: '' }, labels }) => {
                 onChange={handleCrosshairChange}
                 />
                 Hide Crosshair
-            </label>
-
-            <label>
-                <input
-                type="checkbox"
-                checked={worldspace}
-                onChange={handleWorldspaceChange}
-                />
-                Worldspace
             </label>
         </div>
         <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
