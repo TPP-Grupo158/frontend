@@ -155,7 +155,7 @@ const PatientListPage = () => {
             <colgroup>
               <col style={{ width: '20%' }} />{/* DNI */}
               <col style={{ width: '50%' }} />{/* Full Name */}
-              <col style={{ width: '20%' }} />{/* Date of Birth */}
+              <col style={{ width: '10%' }} />{/* Date of Birth */}
               <col style={{ width: '10%' }} />{/* Actions - reserved for future use */}
             </colgroup>
             <thead style={styles.table.header}>
