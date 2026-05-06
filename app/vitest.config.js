@@ -1,6 +1,12 @@
 import { defineConfig, configDefaults } from 'vitest/config'
+import { fileURLToPath, URL } from 'node:url'
 
 export default defineConfig({
+  resolve: {
+    alias: {
+      '@hooks': fileURLToPath(new URL('./src/hooks', import.meta.url)),
+    },
+  },
   test: {
     include: ['tests/**/*.unit.{js,ts,jsx,tsx}'],
     exclude: [
