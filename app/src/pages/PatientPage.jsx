@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import styles from "../components/styles";
 import Message from "../components/Message";
+import PaginationControls from '../components/PaginationControls'
 
 import { useNavigate } from "react-router-dom";
 import { getAge, formatTimestamp } from "../helpers";
@@ -9,7 +10,7 @@ import { getAge, formatTimestamp } from "../helpers";
 const PatientPage = () => {
   const { dni } = useParams();
   const navigate = useNavigate();
-
+  
   const [patientInfo, setPatientInfo] = useState(null);
   const [patientHistory, _setPatientHistory] = useState([
     {
@@ -27,6 +28,13 @@ const PatientPage = () => {
   const [fetchPatientError, setFetchPatientError] = useState(null);
 
   const [isMessageVisible, setIsMessageVisible] = useState(true);
+
+  const [currentPageNumber, setCurrentPageNumber] = useState(1)
+
+  const handlePageChange = (page) => {
+    // call the patient histor next/prev page
+    setCurrentPageNumber(page)
+  }
 
   useEffect(() => {
     
@@ -107,48 +115,55 @@ const PatientPage = () => {
           <dt><b>Email</b></dt><dd data-testid="patient-email">{patientInfo?.email || '-'}</dd>
         </dl>
       </section>
-      <section style={{ border: '1px solid #e5e7eb', borderRadius: 12, padding: 16 }}>
+      <section style={{ border: '1px solid #e5e7eb', borderRadius: 12, padding: 16}}>
         <h2>Patient History</h2>
-        <table style={styles.table.container}>
-          <colgroup>
-            <col style={{ width: '15%' }} />{/* Date */}
-            <col style={{ width: '10%' }} />{/* Prediction task */}
-            <col style={{ width: '20%' }} />{/* Solicited By */}
-            <col style={{ width: '10%' }} />{/* Actions */}
-            <col style={{ width: '30%' }} />{/* Empty space for now */}
-          </colgroup>
-          <thead style={styles.table.header}>
-            <tr>
-              <th>Date</th>
-              <th>Task</th>
-              <th>Solicited By</th>
-              <th>Actions</th>
-            </tr>
-          </thead>
-          <tbody>
-            {patientHistory.length === 0 && (
+        <div style={{width: "70%"}}> {/* white space for now*/}
+          <table style={styles.table.container}>
+            <colgroup>
+              <col style={{ width: '15%' }} />{/* Date */}
+              <col style={{ width: '10%' }} />{/* Prediction task */}
+              <col style={{ width: '20%' }} />{/* Solicited By */}
+              <col style={{ width: '10%' }} />{/* Actions */}
+            </colgroup>
+            <thead style={styles.table.header}>
               <tr>
-                <td colSpan="3" style={{ textAlign: 'center', padding: '16px' }}>No history available</td>
+                <th>Date</th>
+                <th>Task</th>
+                <th>Solicited By</th>
+                <th>Actions</th>
               </tr>
-            )}
-            {patientHistory.length !== 0 &&  (
-              patientHistory.map((prediction, index) => (
-              <tr key={prediction.id} style={{...styles.table.row, backgroundColor: index % 2 === 0 ? '#f9f9f9' : 'white'}}>
-                <td>{formatTimestamp(prediction.created_at)}</td>
-                <td>{prediction.task}</td>
-                <td>{prediction.solicited_by}</td>
-                <td>
-                  <button style={{ padding: '4px 8px', cursor: 'pointer', borderRadius: '4px', border: '1px solid #a4a3a3' }}
-                  onClick={() => onViewPrediction(prediction)}
-                  >
-                    View
-                  </button>
-                </td>
-              </tr>
-              )
-            ))}
-          </tbody>
-        </table>
+            </thead>
+            <tbody>
+              {patientHistory.length === 0 && (
+                <tr>
+                  <td colSpan="3" style={{ textAlign: 'center', padding: '16px' }}>No history available</td>
+                </tr>
+              )}
+              {patientHistory.length !== 0 &&  (
+                patientHistory.map((prediction, index) => (
+                <tr key={prediction.id} style={{...styles.table.row, backgroundColor: index % 2 === 0 ? '#f9f9f9' : 'white'}}>
+                  <td>{formatTimestamp(prediction.created_at)}</td>
+                  <td>{prediction.task}</td>
+                  <td>{prediction.solicited_by}</td>
+                  <td>
+                    <button style={{ padding: '4px 8px', cursor: 'pointer', borderRadius: '4px', border: '1px solid #a4a3a3' }}
+                    onClick={() => onViewPrediction(prediction)}
+                    >
+                      View
+                    </button>
+                  </td>
+                </tr>
+                )
+              ))}
+            </tbody>
+          </table>
+          <PaginationControls 
+            currentPageNumber={currentPageNumber}
+            handleNext={handlePageChange}
+            handlePrevious={handlePageChange}
+            hasMorePages={true}
+          />
+        </div>
       </section>
     </div>
   );

@@ -1,7 +1,7 @@
 import PropTypes from 'prop-types';
 
 
-const PaginationControls = ({ handleNext, handlePrevious, hasMorePages, currentPageNumber }) => {
+const PaginationControls = ({ handleNext, handlePrevious, hasMorePages, currentPageNumber, styles = {} }) => {
 
   const handleNextPageButton = () => {
 
@@ -14,7 +14,13 @@ const PaginationControls = ({ handleNext, handlePrevious, hasMorePages, currentP
   }
 
   return (
-    <div style={{alignItems: 'center', display: 'flex', justifyContent: 'center', marginTop: '16px'}}>
+    <div style={{
+      alignItems: 'center', 
+      display: 'flex', 
+      justifyContent: 'center', 
+      marginTop: '16px',
+      ...styles
+      }}>
       <button 
         onClick={handlePrevPageButton}
         disabled={currentPageNumber <= 1}
@@ -39,5 +45,6 @@ PaginationControls.propTypes = {
   handleNext: PropTypes.func.isRequired,
   handlePrevious: PropTypes.func.isRequired,
   hasMorePages: PropTypes.bool.isRequired,
-  currentPageNumber: PropTypes.number.isRequired
+  currentPageNumber: PropTypes.number.isRequired,
+  styles: PropTypes.object
 };
