@@ -150,16 +150,17 @@ const PredictionRequestForm = () => {
       <div style={{ flex: 1,  minWidth: '250px' }}>
         <h3>1. Select Procedures</h3>
         <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '10px' }}>
-          {PROCEDURES_CONFIG.map(proc => (
+            {PROCEDURES_CONFIG.map(proc => (
             <label key={proc.id} style={{ border: '1px solid #ddd', padding: '10px', borderRadius: '8px', cursor: 'pointer' }}>
               <input 
-                type="checkbox" 
-                checked={selectedProcs.includes(proc.id)}
-                onChange={() => handleCheckboxChange(proc.id)}
+                type="radio"
+                name="procedure-group"
+                checked={selectedProcs === proc.id} 
+                onChange={() => setSelectedProcs(proc.id)} 
               />
               {proc.label}
             </label>
-          ))}           
+          ))}
         </div>
 
         {requiredFiles.length > 0 && (
