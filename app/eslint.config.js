@@ -32,5 +32,11 @@ export default defineConfig([
       }],
     },
   },
+  {
+    files: ["tests/**/*.{js,jsx,ts,tsx}"],
+    rules: {
+      "react/prop-types": "off",
+    },
+  },
 
 ]);

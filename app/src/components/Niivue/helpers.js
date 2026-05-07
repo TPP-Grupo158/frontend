@@ -11,7 +11,7 @@ export const getSliceName = (sliceType) => {
         case SLICE_TYPE.SAGITTAL:
             return "Sagittal";
         case SLICE_TYPE.RENDER:
-            return "Render";
+            return "Render 3D";
         default:
             return "Unknown";
     }
@@ -47,12 +47,12 @@ export const getMultiplanarLayoutName = (layoutType) => {
 }
 
 export const parseSegmentationStats = (stats) => {
-    let result = ""
-    result += "Volume (mL): " + stats.volumeML.toFixed(2) + "\n";
-    result += "Volume (mm3): " + stats.volumeMM3.toFixed(2) + "\n";
-    result += "Intensity (max): " + stats.max.toFixed(2) + "\n";
-    result += "Intensity (min) " + stats.min.toFixed(2) + "\n";
-    result += "Intensity (mean): " + stats.mean.toFixed(2) + "\n";
-    result += "Intensity (stdev): " + stats.stdev.toFixed(2) + "\n";
+    const result = {}
+    result.volumeML = stats.volumeML.toFixed(2);
+    result.volumeMM3 = stats.volumeMM3.toFixed(2);
+    result.intensityMax = stats.max.toFixed(2);
+    result.intensityMin = stats.min.toFixed(2);
+    result.intensityMean = stats.mean.toFixed(2);
+    result.intensityStdev = stats.stdev.toFixed(2);
     return result;
 }
