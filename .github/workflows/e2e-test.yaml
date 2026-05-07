@@ -8,6 +8,10 @@ jobs:
   test:
     timeout-minutes: 60
     runs-on: ubuntu-latest
+    env:
+      VITE_GATEWAY_API: "http://localhost:8081/"
+      TEST_API_URL: "http://localhost:8081"
+      TEST_BASE_URL: "http://localhost:5173"
     defaults:
       run:
         working-directory: app
