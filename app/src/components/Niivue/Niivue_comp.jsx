@@ -1,5 +1,4 @@
 import { useRef, useEffect, useState } from "react";
-import styles from '../styles.js'
 import PropTypes from 'prop-types';
 
 import { 
@@ -14,6 +13,8 @@ import {
     AVAILABLE_VIEWS,
     AVAILABLE_MULTIPLANAR_LAYOUTS,
     CROSSHAIR,
+    SHOW_RENDER_ENUM,
+    MULTIPLANAR_LAYOUTS_ENUM
 } from "./constants.js";
 
 import { 
@@ -23,16 +24,28 @@ import {
     getMultiplanarLayoutName
 } from "./helpers.js";
 
+
+import * as MenuBar from "@radix-ui/react-menubar";
+import MenubarMenu from "./radix-ui/MenubarMenu.jsx";
+import MenuBarRadioGroup from "./radix-ui/MenubarRadioGroup.jsx";
+import MenubarCheckboxItem from "./radix-ui/MenubarCheckbox.jsx";
+import MenubarSlider from "./radix-ui/MenubarSlider.jsx";
+
+import SegmentationStatsDisplay from "./SegmentationStatsDisplay.jsx";
+import LabelsDisplay from "./LabelsDisplay.jsx";
+import CoordinatesDisplay from "./CoordinatesDisplay.jsx";
+
 const NiiVue_comp = ({ images, segmentationUrl = { url: '' }, labels }) => {
     const canvas = useRef(null);
     const nvRef = useRef(null);
 
     const [currentVolume, setCurrentVolume] = useState(images[0]);
 
-    const [isCrosshairChecked, setIsCrosshairChecked] = useState(false);
+    const [isCrosshairChecked, setIsCrosshairChecked] = useState(true);
 
     const [availableColormaps, setAvailableColormaps] = useState([]); 
     const [currentColormap, setCurrentColormap] = useState(DEFAULT_VOLUME_OPTIONS.colormap);
+    const [colormapFilter, setColormapFilter] = useState('')
     
     const [currentSliceView, setCurrentSliceView] = useState(DEFAULT_NIIVUE_OPTIONS.sliceType);
     const [currentMultiplanarLayout, setCurrentMultiplanarLayout] = useState(DEFAULT_NIIVUE_OPTIONS.multiplanarLayout);
@@ -44,9 +57,8 @@ const NiiVue_comp = ({ images, segmentationUrl = { url: '' }, labels }) => {
     const[currentVolumeGamma, setCurrentVolumeGamma] = useState(1.0);
     const[currentDrawOpacity, setCurrentDrawOpacity] = useState(0.6);
 
-    const [segmentationStats, setSegmentationStats] = useState("");
-
-    const [worldspace, setWorldspace] = useState(false);
+    const [segmentationStats, setSegmentationStats] = useState(null);
+    const [coloredLabels, setColoredLabels] = useState({});
 
     useEffect(() => {
 
@@ -54,9 +66,11 @@ const NiiVue_comp = ({ images, segmentationUrl = { url: '' }, labels }) => {
             console.log("Setting up Niivue instance...");
             const nv = new Niivue(DEFAULT_NIIVUE_OPTIONS);
 
-            //nv.opts.mouseEventConfig = defaultMouseConfig;
             const availableColormaps = nv.colormaps();
-            setAvailableColormaps(availableColormaps);
+            setAvailableColormaps(availableColormaps.map(colormap => ({
+                value: colormap,
+                label: colormap
+            })))
             nv.attachToCanvas(canvas.current);
 
             nv.onLocationChange = (location) => {
@@ -89,12 +103,20 @@ const NiiVue_comp = ({ images, segmentationUrl = { url: '' }, labels }) => {
                     await nv.loadDrawingFromUrl(url);
                 }
 
-            nvRef.current = nv;
+            // Get segmentation stats
+            const stats = nv.getDescriptives({
+                layer: 0,
+                drawingIsMask: true,
+            });
+            setSegmentationStats(parseSegmentationStats(stats));
             
+            // Get segmentation colors and map to labels
+            const labelsWithColors = {};
             labels.forEach((label, i) => {
                 const labelColor = nv.drawLut.lut.slice((i+1)*4, (i+2)*4);
-                nv.addLabel(label, {textScale: 1.0, bulletColor: labelColor, bulletScale: 1})
-            })
+                labelsWithColors[label] = labelColor;
+            });
+            setColoredLabels(labelsWithColors);
             
             nv.setDrawOpacity(currentDrawOpacity);
 
@@ -104,6 +126,8 @@ const NiiVue_comp = ({ images, segmentationUrl = { url: '' }, labels }) => {
                 y: initialVox[1],
                 z: initialVox[2]
             });
+
+            nvRef.current = nv;
         }
 
         if (!nvRef.current) {
@@ -117,8 +141,7 @@ const NiiVue_comp = ({ images, segmentationUrl = { url: '' }, labels }) => {
 
     }, []);
 
-    const handleColormapChange = (event) => {
-        const newColormap = event.target.value;
+    const handleColormapChange = (newColormap) => {
         if (nvRef.current && nvRef.current.volumes.length > 0) {
             const volumeId = nvRef.current.volumes[0].id;
             nvRef.current.setColormap(volumeId, newColormap);
@@ -126,51 +149,43 @@ const NiiVue_comp = ({ images, segmentationUrl = { url: '' }, labels }) => {
         }
     };
 
-    const handleSliceViewChange = (event) => {
-        const view = parseInt(event.target.value);
+    const handleSliceViewChange = (newView) => {
         if (nvRef.current) {
-            nvRef.current.setSliceType(view);
-            setCurrentSliceView(view);
+            nvRef.current.setSliceType(newView);
+            setCurrentSliceView(newView);
         }
     };
 
-    const handleCrosshairChange = (event) => {
-        const isChecked = event.target.checked;
+
+    const handleCrosshairChange = (checked) => {
         if (nvRef.current) {
-            nvRef.current.opts.crosshairWidth = isChecked ? CROSSHAIR.HIDDEN : CROSSHAIR.VISIBLE;
-            nvRef.current.opts.show3Dcrosshair = !isChecked;
+            nvRef.current.opts.crosshairWidth = checked ? CROSSHAIR.VISIBLE : CROSSHAIR.HIDDEN;
+            nvRef.current.opts.show3Dcrosshair = checked;
             nvRef.current.drawScene();
-            setIsCrosshairChecked(isChecked);
+            setIsCrosshairChecked(checked);
         }
     }
 
-    const handleDrawOpacityChange = (event) => {
-        const newOpacity = parseFloat(event.target.value);
+    const handleDrawOpacityChange = (newOpacity) => {
         if (nvRef.current) {
             nvRef.current.setDrawOpacity(newOpacity);
             setCurrentDrawOpacity(newOpacity);
         }
     }
 
-    const handleVolumeChange = async (event) => {
-        const newVolumeName = event.target.value;
+    const handleVolumeChange = async (newVolumeName) => {
         const newVolume = images.find(v => v.name === newVolumeName);
-        
-        console.debug("Changing volume to:", newVolume.name);
+
         if (nvRef.current) {
 
             nvRef.current.setDrawingEnabled(false);
 
             await nvRef.current.removeVolumeByIndex(0);
-            console.log(nvRef.current.volumes)
-            console.log(newVolume)
-            const current = await NVImage.loadFromFile({
-                file: newVolume.file,
-                name: newVolume.name,
-                ...DEFAULT_VOLUME_OPTIONS, 
-                colormap: currentColormap
+            await nvRef.current.addVolumeFromUrl({
+                url: currentVolume.url || currentVolume.file,
+                name: currentVolume.name,
+                ...DEFAULT_VOLUME_OPTIONS
             });
-            await nvRef.current.addVolume(current);
             setCurrentVolume(newVolume);
         }
     }
@@ -180,163 +195,182 @@ const NiiVue_comp = ({ images, segmentationUrl = { url: '' }, labels }) => {
             nvRef.current.saveImage({filename: 'segmentation.nii.gz', isSaveDrawing: true});
     }
 
-    const handleDragModeChange = (event) => {
-        const newDragMode = parseInt(event.target.value)
+    const handleDragModeChange = (newDragMode) => {
         if (nvRef.current) {
             nvRef.current.setDragMode(newDragMode);
             setCurrentDragMode(newDragMode);
         }
     }
 
-    const handleVolumeGammaChange = (event) => {
-        const newGamma = parseFloat(event.target.value);
+    const handleVolumeGammaChange = (newGamma) => {
         if (nvRef.current) {
             nvRef.current.setGamma(newGamma);
             setCurrentVolumeGamma(newGamma);
         }
     }
 
-    const updateSegmentationStats = () => {
+    const handleMultiplanarLayoutChange = (newLayout) => {
         if (nvRef.current) {
-            const stats = nvRef.current.getDescriptives({
-                layer: 0,
-                drawingIsMask: true,
-            });
-            setSegmentationStats(parseSegmentationStats(stats));
-        }
-    }
-    const handleMultiplanarLayoutChange = (event) => {
-        const newLayout = parseInt(event.target.value);
-        if (nvRef.current) {
+            if (newLayout === MULTIPLANAR_LAYOUTS_ENUM.GRID ) {
+                nvRef.current.opts.multiplanarShowRender = SHOW_RENDER_ENUM.ALWAYS
+            } else if (currentMultiplanarLayout === MULTIPLANAR_LAYOUTS_ENUM.GRID) {
+                nvRef.current.opts.multiplanarShowRender = SHOW_RENDER_ENUM.NEVER
+            }
+            
             nvRef.current.setMultiplanarLayout(newLayout);
             setCurrentMultiplanarLayout(newLayout);
         }
     }
 
-    const handleWorldspaceChange = (event) => {
-        const isChecked = event.target.checked;
-        if (nvRef.current) {
-            nvRef.current.setSliceMM(isChecked);
-            setWorldspace(isChecked);
-        }
-    }
     
     return (  
-    <div style={{display: "flex", flexDirection: "column", justifyContent: "center", alignItems: "center",  gap: "8px" }}>
-        <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
-            <button onClick={updateSegmentationStats} style={styles.button}>Update Segmentation Stats</button>
-            <label>
-                cmap
-                <select value={currentColormap} onChange={handleColormapChange}>
-                    {availableColormaps.map((colormap) => (
-                            <option key={colormap} value={colormap}>{colormap}</option>
-                        ))}
-                </select>
-            </label>
-
-            <label>
-                Slice view { }
-                <select value={currentSliceView} onChange={handleSliceViewChange}>
-                    {AVAILABLE_VIEWS.map((sliceView) => (
-                        <option key={sliceView} value={sliceView}>{getSliceName(sliceView)}</option>
-                    ))}
-                </select>
-            </label>
-
-            <label>
-                Multiplanar layout { }
-                <select value={currentMultiplanarLayout} onChange={handleMultiplanarLayoutChange}>
-                    {AVAILABLE_MULTIPLANAR_LAYOUTS.map((layout) => (
-                        <option key={layout} value={layout}>{getMultiplanarLayoutName(layout)}</option>
-                    ))}
-                </select>
-            </label>
-
-            <label>
-                Volume shown
-                <select value={currentVolume.name} onChange={handleVolumeChange}>
-                    {images.map((volume) => (
-                            <option key={volume.name} value={volume.name}>{volume.name}</option>
-                        ))}
-                </select>
-            </label>
-
-             <label>
-                Drag Mode
-                <select value={currentDragMode} onChange={handleDragModeChange}>
-                    {AVAILABLE_DRAG_MODES.map((dragMode) => (
-                            <option key={dragMode} value={dragMode}>{getDragModeName(dragMode)}</option>
-                        ))}
-                </select>
-            </label>
-            <button onClick={handleSaveDrawing} style={styles.button}>Save Segmentation</button>
-            <label>
-                <input
-                type="checkbox"
-                checked={isCrosshairChecked}
-                onChange={handleCrosshairChange}
+    <div style={{ 
+        display: "flex",
+        flexDirection: "column",
+        gap: "8px"
+        }}>
+        
+        <MenuBar.Root style={{
+            display: "flex",
+            width: "fit-content",
+            backgroundColor: "white",
+            padding: "3px",
+            borderRadius: "6px",
+            border: "1px solid #ccc",
+        }}>
+            <MenubarMenu label="File">
+                <MenuBarRadioGroup
+                    value={currentVolume.name}
+                    onValueChange={handleVolumeChange}
+                    items={images.map(volume => ({
+                        value: volume.name,
+                        label: volume.name
+                    }))}
                 />
-                Hide Crosshair
-            </label>
-
-            <label>
-                <input
-                type="checkbox"
-                checked={worldspace}
-                onChange={handleWorldspaceChange}
+                <MenuBar.Separator style={{ height: '1px', backgroundColor: '#ccc', margin: '4px 0' }} />
+                <MenuBar.Item onSelect={handleSaveDrawing} style={{ padding: '4px 8px', cursor: 'pointer' }}>
+                    Save Segmentation
+                </MenuBar.Item>
+            </MenubarMenu>
+            
+            <MenubarMenu
+                style={{
+                    padding: '4px 8px',
+                    cursor: 'pointer',
+                    maxHeight: '200px',
+                    overflowY: 'auto',
+                    paddingRight: 6,
+                }}
+                label="Colormap"
+            >   
+                <input 
+                    style={{
+                    fontSize: 13,
+                    lineHeight: "20px",
+                    padding: "6px 6px",
+                    borderRadius: 6,
+                    border: "1px solid #cbd5e1",
+                    backgroundColor: "#f8fafc",
+                    width: "100%",
+                    boxSizing: "border-box",
+                }}
+                    placeholder="Filter"
+                    value={colormapFilter}
+                    onChange={({target}) => setColormapFilter(target.value)}
                 />
-                Worldspace
-            </label>
-        </div>
-        <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
-            <label style={{ display: "flex", alignItems: "center", gap: "8px" }}>
-                { } Gamma
-                <input
-                    type="range"
-                    min={0.5}
-                    max={2.0}
-                    step={0.1}
+                <MenuBar.Separator style={{ height: '1px', backgroundColor: '#ccc', margin: '4px 0' }} />
+                <MenuBarRadioGroup
+                    value={currentColormap}
+                    onValueChange={handleColormapChange}
+                    items={availableColormaps.filter(
+                        (colormap) => colormap.label.includes(colormapFilter.toLowerCase()))
+                    }
+                />
+            </MenubarMenu>
+
+            <MenubarMenu label="View">
+                <MenuBarRadioGroup
+                    value={currentSliceView}
+                    onValueChange={handleSliceViewChange}
+                    items={AVAILABLE_VIEWS.map(view => ({
+                        value: view,
+                        label: getSliceName(view)
+                    }))}
+                />
+                <MenuBar.Separator style={{ height: '1px', backgroundColor: '#ccc', margin: '4px 0' }} />
+                <MenubarCheckboxItem
+                    checked={isCrosshairChecked}
+                    onCheckedChange={handleCrosshairChange}
+                    label="Show Crosshair"
+                />
+            </MenubarMenu>
+
+            <MenubarMenu label="Layout">
+                <MenuBarRadioGroup
+                    value={currentMultiplanarLayout}
+                    onValueChange={handleMultiplanarLayoutChange}
+                    items={AVAILABLE_MULTIPLANAR_LAYOUTS.map(layout => ({
+                        value: layout,
+                        label: getMultiplanarLayoutName(layout)
+                    }))}
+                />
+            </MenubarMenu>
+
+            <MenubarMenu label="Mode">
+                <MenuBarRadioGroup
+                    value={currentDragMode}
+                    onValueChange={handleDragModeChange}
+                    items={AVAILABLE_DRAG_MODES.map(mode => ({
+                        value: mode,
+                        label: getDragModeName(mode)
+                    }))}
+                />
+            </MenubarMenu>
+
+             <MenubarMenu label="Display">
+                <MenuBar.Label style={{ padding: '4px 8px', fontWeight: 'bold' }}>Volume Gamma</MenuBar.Label>
+                <MenubarSlider
                     value={currentVolumeGamma}
                     onChange={handleVolumeGammaChange}
+                    min={0.5}
+                    max={1.5}
+                    step={0.1}
                 />
-                {currentVolumeGamma}
-            </label>
-            <label style={{ display: "flex", alignItems: "center", gap: "8px" }}>
-                { } Draw opacity
-                <input
-                    type="range"
+                <MenuBar.Label style={{ padding: '4px 8px', fontWeight: 'bold' }}>Segmentation Opacity</MenuBar.Label>
+                <MenubarSlider
+                    value={currentDrawOpacity}
+                    onChange={handleDrawOpacityChange}
                     min={0.0}
                     max={1.0}
                     step={0.01}
-                    value={currentDrawOpacity}
-                    onChange={handleDrawOpacityChange}
                 />
-                {parseInt(currentDrawOpacity * 100)}%
-            </label>
-        </div>
+            </MenubarMenu>
+
+        </MenuBar.Root>
+
         <div style={{ 
-                border: "1px solid black", 
-                display: "flex", 
-                justifyContent: "center", 
+                display: "flex",
+                flexDirection: "column",
                 marginTop: "10px",
-                width: "100%", 
-                height: 700
+                height: 700,
+                borderBottom: "1px solid #e5e7eb",
             }}>
             <canvas ref={canvas} style={{ width: "100%", height: "100%" }} />
+             <div style={{
+                display: 'flex',
+                gap: '12px',
+                padding: "4px 0 4px 12px",
+                backgroundColor: "#1e1e1e",
+                boxSizing: "border-box",
+            }}>
+                <LabelsDisplay coloredLabels={coloredLabels} />
+                <CoordinatesDisplay coordinates={currentSlice} />
+            </div>
         </div>
-        <div>
-            <strong>{`X: ${currentSlice.x}, Y: ${currentSlice.y}, Z: ${currentSlice.z}`}</strong>
+        
+        <div style={{marginTop: '1rem'}}>
+            <SegmentationStatsDisplay stats={segmentationStats} />
         </div>
-        {segmentationStats && (
-        <div>
-            
-            <pre>
-                <strong>Segmentation Stats (does not include per-label info)</strong>
-                <br />
-                {segmentationStats}
-            </pre>
-        </div>
-        )}
     </div>
     )
 };
