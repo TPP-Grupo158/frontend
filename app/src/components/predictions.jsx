@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import NiiVue_comp from './Niivue/Niivue_comp';
+import PredictionResult from './PredictionResults';
 const NIFTI_BRAVO = "Bravo"
 const NIFTI_T1 = "T1"
 const NIFTI_T2 = "T2"
@@ -10,7 +11,7 @@ const PROCEDURES_CONFIG = [
   { id: 'alzheimer', label: 'Alzheimer', files: [NIFTI_BRAVO, NIFTI_T1, NIFTI_T2, NIFTI_FLAIR] },
   { id: 'acv', label: 'ACV', files: [NIFTI_T1] },
   { id: 'metastases', label: 'Metastases', files:  [NIFTI_BRAVO, NIFTI_T1, NIFTI_T2, NIFTI_FLAIR] },
-  { id: 'aneurysm', label: 'Aneurysm', files:  [NIFTI_BRAVO, NIFTI_T1, NIFTI_T2, NIFTI_FLAIR] },
+  { id: 'aneurysm', label: 'Aneurysm', files:  [NIFTI_T1] },
 ];
 
 
@@ -254,14 +255,20 @@ const PredictionRequestForm = () => {
             {/* ESTADO 2: Cargando */}
             {status === 'loading' && <p style={{color: '#000'}}>Processing studies please wait...</p>}
 
-            {/* ESTADO 3: Éxito (Aquí renderizamos NiiVue) */}
+            {/* ESTADO 3: Éxito*/}
             {status === 'success' && responseData &&task && responseData[task] &&(
-                <NiiVue_comp
+              <>
+                {task === 'aneurysm' ? (
+                  <PredictionResult data={responseData[task].prediction_result} />
+                ) : (
+                  <NiiVue_comp
                     key={task} 
                     images={[{ url: responseData[task].original_image, name: "test" }]}
                     segmentationUrl={responseData[task].prediction_image}
                     labels={selectedProcs} 
-                />
+                  />
+                )}
+              </>
             )}
 
             {/* ESTADO 4: Error */}
