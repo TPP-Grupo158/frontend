@@ -25,7 +25,7 @@ jobs:
     - name: Install Playwright Browsers
       run: npx playwright install --with-deps
     - name: Run Playwright tests
-      run: npx playwright test tests/e2e-mocked --reporter=line
+      run: npx playwright test tests/e2e-mocked --reporter=line,html
       env:
         DOTENV_CONFIG_QUIET: "true"
     - uses: actions/upload-artifact@v5
