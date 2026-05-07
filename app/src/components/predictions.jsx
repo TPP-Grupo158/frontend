@@ -166,7 +166,6 @@ const PredictionRequestForm = () => {
         {requiredFiles.length > 0 && (
           <>
             <h3 style={{ marginTop: '30px' }}>2. Upload Required Files</h3>
-            <p style={{ fontSize: '0.8rem', color: '#666' }}>Shared files will be used across all selected procedures.</p>
             <div style={{ background: '#f9f9f9', padding: '15px', borderRadius: '8px' }}>
               {requiredFiles.map(fileType => (
                 <div key={fileType} style={{ marginBottom: '15px' }}>
