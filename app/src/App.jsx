@@ -6,6 +6,7 @@ import Header from './components/header.jsx'
 
 import { useState , useEffect} from 'react';
 import PatientListPage from './pages/PatientListPage.jsx'
+import PatientHistoryPage from './pages/PatientHistoryPage.jsx'
 
 import {
   BrowserRouter as Router,
@@ -25,6 +26,7 @@ function App() {
             <Route path="/predict" element={<Predict />} />
             <Route path="/viewer" element={<NiiVue />} />
             <Route path="/patients" element={<PatientListPage />} />
+            <Route path="/patients/history" element={<PatientHistoryPage />} />
             <Route path="/" />
           </Route>
         </Route>
