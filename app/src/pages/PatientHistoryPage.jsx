@@ -1,4 +1,4 @@
-import React, { useState,useEffect, useCallback } from 'react';
+import { useState,useEffect, useCallback } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import NiiVue_comp from '../components/Niivue/Niivue_comp';
 import PredictionResult from '../components/PredictionResults';

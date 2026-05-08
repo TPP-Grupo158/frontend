@@ -1,5 +1,3 @@
-import React from 'react';
-
 const PredictionResult = ({ data }) => {
   if (!data) return null;
 

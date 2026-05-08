@@ -25,7 +25,7 @@ const PredictionRequestForm = () => {
   const [dniError, setDniError] = useState("");
   const [dniInput, setDniInput] = useState('');
   const [apiData, setApiData] = useState(null);
-  const handleCheckboxChange = (id) => {
+  /*const handleCheckboxChange = (id) => {
     console.log(apiData)
     setSelectedProcs(prev => 
       prev.includes(id) ? prev.filter(p => p !== id) : [...prev, id]
@@ -65,7 +65,7 @@ const PredictionRequestForm = () => {
     }else{
       setDniError("DNI must be 7 digits")
     }
-  };
+  };*/
 
   const requiredFiles = Array.from(new Set(
     PROCEDURES_CONFIG
