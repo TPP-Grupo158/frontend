@@ -109,12 +109,14 @@ const PatientListPage = () => {
       <div style={{padding: '0% 5%', display: 'flex', flexDirection: 'column'}}> 
         <h1 style={{margin: '0 0 16px 0' }}>Patient Search</h1>
         <div>
-          <Message
+          { error?.status_code !== 401  && error?.status_code !== 409 && (
+            <Message
             isError={!!error?.status_code}
             message={error?.message || successMessage}
             visible={isMessageVisible && !!error}
             onClick={handleMessageClose}
-          />
+            />
+          )}
           <div style={{display: 'flex', gap: '0.5rem', marginBottom: '4px'}}>
             {currentFilters === 'dni' && 
               <input 

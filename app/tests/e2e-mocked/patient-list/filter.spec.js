@@ -129,8 +129,7 @@ test('No patients found when filter returns no results', async ({ page }) => {
   await expect(noPatientsMessage).toBeVisible();
 });
 
-//Test skipped since the fix is on another branch and this test will fail until that fix is merged.
-test.fixme('Error message is shown when filter returns error', async ({ page }) => {
+test('Error message is shown when filter returns error', async ({ page }) => {
 
   const patients = getMockPatients(10, 'a')
   const dniFilterContent = '98765432';
