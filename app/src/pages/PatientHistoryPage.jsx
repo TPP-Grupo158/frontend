@@ -52,7 +52,17 @@ const PatientHistoryPage = () => {
         fetchPatientStudies();
       }
     }, [currentPatient, navigate, fetchPatientStudies]);
-  
+
+    const handleOriginalImages = (original_images_dict) => {
+      const imageList = Object.entries(selectedStudy.original_images).map(([key, value]) => {
+        return {
+          url: value,
+          name: key
+        };
+      });
+      return imageList
+    };
+
     if (!currentPatient) return null;
   
     return (
@@ -94,34 +104,24 @@ const PatientHistoryPage = () => {
         <main className="study-viewer-main">
           {selectedStudy ? (
             <div className="detail-card">
-              <h1 style={{ marginTop: 0 }}>Medical Report Details</h1>
-              
-              <div className="info-grid">
-                <div>
-                  <span className="field-label">Study Type</span>
-                  <p>{selectedStudy.task_type}</p>
+              <h1 style={{ marginTop: 0 }}>
+              <p>Medical Report Details {(new Date(selectedStudy.created_at)).toLocaleDateString('en-GB')}</p>
+              </h1>
+              <div>
+                  <span className="field-label">Doctor</span>
+                  <p>{selectedStudy.doctor_id}</p>
                 </div>
-                <div>
-                  <span className="field-label">Date</span>
-                  <p>{(new Date(selectedStudy.created_at)).toLocaleDateString('en-GB')}</p>
-                </div>
-                <div>
-                  <span className="field-label">Performing Physician</span>
-                  <p>{selectedStudy.doctor}</p>
-                </div>
-              </div>
-  
-              <hr />
   
               <div className="report-box">
-                <span className="field-label">Clinical Findings</span>
+                <span className="field-label">Results</span>
                 {selectedStudy.task_type === 'aneurysm' ? (
-                  <PredictionResult data={selectedStudy.prediction_result} />
+                  <PredictionResult data={selectedStudy.prediction_image} />
                 ) : (
                   <NiiVue_comp
                     key={selectedStudy.task_type} 
-                    images={[{ url: selectedStudy.original_images, name: "test" }]}
+                    images = {handleOriginalImages(selectedStudy.original_images)}
                     segmentationUrl={ selectedStudy.prediction_image}
+                    //labels={selectedProcs} 
                   />
                 )}
               </div>

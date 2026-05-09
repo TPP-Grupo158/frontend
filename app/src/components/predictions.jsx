@@ -31,6 +31,7 @@ const PredictionRequestForm = () => {
       prev.includes(id) ? prev.filter(p => p !== id) : [...prev, id]
     );
   };
+  */
   const fetchPatientData = async (dni) => {
     try {
       const response = await fetch(import.meta.env.VITE_GATEWAY_API+"patients/"+ dni, {
@@ -57,6 +58,7 @@ const PredictionRequestForm = () => {
       setDniError("Error while fetching patient")
       setApiData(null);
   }};
+  
   const handleDniChange = () => {
     const onlyDigits = dniInput.replace(/\D/g, '');
     if (onlyDigits.length >= 7) {
@@ -65,7 +67,7 @@ const PredictionRequestForm = () => {
     }else{
       setDniError("DNI must be 7 digits")
     }
-  };*/
+  };
 
   const requiredFiles = Array.from(new Set(
     PROCEDURES_CONFIG

@@ -7,7 +7,8 @@
   
   /* Left Column: Study List */
   .study-list-aside {
-    width: 30%;
+    width: 15%;
+    height: 100%;
     border-right: 1px solid #ddd;
     background-color: #f8f9fa;
     display: flex;
@@ -67,10 +68,10 @@
   
   /* Right Column: Viewer */
   .study-viewer-main {
-    width: 70%;
-    padding: 40px;
+    width: 85%;
+    height: 100%;
     background-color: #fff;
-    overflow-y: auto;
+    flex-direction: column;
   }
   
   .detail-card {

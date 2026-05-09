@@ -1,5 +1,36 @@
+import React, { useState, useEffect } from 'react';
+
 const PredictionResult = ({ data }) => {
-  if (!data) return null;
+  const [jsonContent, setJsonContent] = useState(null);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(null);
+
+  useEffect(() => {
+    // Si data es un string (URL), vamos a buscarlo
+    if (typeof data === 'string' && data.startsWith('http')) {
+      const fetchData = async () => {
+        setLoading(true);
+        try {
+          const response = await fetch(data);
+          if (!response.ok) throw new Error('Error al cargar el JSON desde MinIO');
+          const result = await response.json();
+          setJsonContent(result);
+        } catch (err) {
+          setError(err.message);
+        } finally {
+          setLoading(false);
+        }
+      };
+      fetchData();
+    } else {
+      // Si ya es un objeto (caso anterior), lo usamos directamente
+      setJsonContent(data);
+    }
+  }, [data]);
+
+  if (loading) return <div style={{padding: '20px'}}>Cargando resultados...</div>;
+  if (error) return <div style={{padding: '20px', color: 'red'}}>Error: {error}</div>;
+  if (!jsonContent) return null;
 
   const styles = {
     container: {
@@ -49,7 +80,7 @@ const PredictionResult = ({ data }) => {
           </tr>
         </thead>
         <tbody>
-          {Object.entries(data).map(([key, value], index) => (
+          {Object.entries(jsonContent).map(([key, value], index) => (
             <tr key={key} style={{ backgroundColor: index % 2 === 0 ? '#fff' : '#fafafa' }}>
               <td style={styles.td}>
                 {key.replace(/_/g, ' ')}
