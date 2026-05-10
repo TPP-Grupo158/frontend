@@ -277,7 +277,7 @@ const PredictionRequestForm = () => {
                     key={task} 
                     images={handleOriginalImages(responseData[task].original_images)}
                     segmentationUrl={responseData[task].prediction_image}
-                    labels={selectedProcs} 
+                    labels={[task]} 
                   />
                 )}
               </>

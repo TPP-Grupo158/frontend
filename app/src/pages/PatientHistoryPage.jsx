@@ -121,7 +121,7 @@ const PatientHistoryPage = () => {
                     key={selectedStudy.task_type} 
                     images = {handleOriginalImages(selectedStudy.original_images)}
                     segmentationUrl={ selectedStudy.prediction_image}
-                    //labels={selectedProcs} 
+                    labels={[selectedStudy.task_type]} 
                   />
                 )}
               </div>
