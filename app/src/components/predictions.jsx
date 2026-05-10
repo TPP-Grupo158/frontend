@@ -79,6 +79,16 @@ const PredictionRequestForm = () => {
     setFiles(prev => ({ ...prev, [fileType]: file }));
   };
 
+  const handleOriginalImages = (original_images_dict) => {
+    const imageList = Object.entries(original_images_dict).map(([key, value]) => {
+      return {
+        url: value,
+        name: key
+      };
+    });
+    return imageList
+  };
+
   const handleSendFiles = async () => {
   setStatus('loading'); // Trigger that right-side animation
   
@@ -265,7 +275,7 @@ const PredictionRequestForm = () => {
                 ) : (
                   <NiiVue_comp
                     key={task} 
-                    images={[{ url: responseData[task].original_image, name: "test" }]}
+                    images={handleOriginalImages(responseData[task].original_images)}
                     segmentationUrl={responseData[task].prediction_image}
                     labels={selectedProcs} 
                   />
