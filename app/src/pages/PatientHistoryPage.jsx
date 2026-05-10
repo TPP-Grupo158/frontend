@@ -53,7 +53,7 @@ const PatientHistoryPage = () => {
       }
     }, [currentPatient, navigate, fetchPatientStudies]);
 
-    const handleOriginalImages = (original_images_dict) => {
+    const handleOriginalImages = () => {
       const imageList = Object.entries(selectedStudy.original_images).map(([key, value]) => {
         return {
           url: value,

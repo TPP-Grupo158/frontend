@@ -1,4 +1,5 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
+import PropTypes from 'prop-types'; // 1. Importar PropTypes
 
 const PredictionResult = ({ data }) => {
   const [jsonContent, setJsonContent] = useState(null);
@@ -6,7 +7,6 @@ const PredictionResult = ({ data }) => {
   const [error, setError] = useState(null);
 
   useEffect(() => {
-    // Si data es un string (URL), vamos a buscarlo
     if (typeof data === 'string' && data.startsWith('http')) {
       const fetchData = async () => {
         setLoading(true);
@@ -23,7 +23,6 @@ const PredictionResult = ({ data }) => {
       };
       fetchData();
     } else {
-      // Si ya es un objeto (caso anterior), lo usamos directamente
       setJsonContent(data);
     }
   }, [data]);
@@ -94,6 +93,13 @@ const PredictionResult = ({ data }) => {
       </table>
     </div>
   );
+};
+
+PredictionResult.propTypes = {
+  data: PropTypes.oneOfType([
+    PropTypes.string,
+    PropTypes.object
+  ]).isRequired
 };
 
 export default PredictionResult;
