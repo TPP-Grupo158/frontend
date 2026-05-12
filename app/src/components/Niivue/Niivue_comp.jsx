@@ -35,7 +35,7 @@ import SegmentationStatsDisplay from "./SegmentationStatsDisplay.jsx";
 import LabelsDisplay from "./LabelsDisplay.jsx";
 import CoordinatesDisplay from "./CoordinatesDisplay.jsx";
 
-const NiiVue_comp = ({ images, segmentationUrl = { url: '' }, labels }) => {
+const NiiVue_comp = ({ images, segmentationUrl = { url: '' }, labels = [] }) => {
     const canvas = useRef(null);
     const nvRef = useRef(null);
 

@@ -104,6 +104,11 @@ const PatientListPage = () => {
     setIsMessageVisible(false);
     setSuccessMessage('');
   }
+  const handleViewHistory = (patient) => {
+    navigate('/patients/history', { 
+      state: { currentPatient: patient } 
+    });
+  };
 
     return (
       <div style={{padding: '0% 5%', display: 'flex', flexDirection: 'column'}}> 
@@ -169,6 +174,15 @@ const PatientListPage = () => {
                   <td>{patient.dni}</td>
                   <td>{patient.fullname}</td>
                   <td>{patient.date_of_birth}</td>
+                  <td style={{ padding: '12px' }}>
+                    {/* BOTÓN PARA IR AL HISTORIAL */}
+                    <button 
+                      onClick={() => handleViewHistory(patient)}
+                      className="view-history-btn"
+                    >
+                      View History
+                    </button>
+                  </td>
                 </tr>
               ))}
               { patients.length === 0 && 
