@@ -184,7 +184,8 @@ const NiiVue_comp = ({ images, segmentationUrl = { url: '' }, labels = [] }) => 
             await nvRef.current.addVolumeFromUrl({
                 url: currentVolume.url || currentVolume.file,
                 name: currentVolume.name,
-                ...DEFAULT_VOLUME_OPTIONS
+                ...DEFAULT_VOLUME_OPTIONS,
+                colormap: currentColormap,
             });
             setCurrentVolume(newVolume);
         }
