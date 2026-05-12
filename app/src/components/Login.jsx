@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import styles from './styles.js'
 import PropTypes from 'prop-types';
 import Message from './Message.jsx';
@@ -13,6 +13,28 @@ function Login({ onLoginSuccess }) {
   const [isErrorVisible, setIsErrorVisible] = useState(false);
 
   const navigate = useNavigate();
+
+  useEffect(() => {
+    const checkAuth = async () => {
+      try {
+        const response = await fetch(import.meta.env.VITE_GATEWAY_API + "auth", {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: null,
+          credentials: 'include'
+        });
+
+        if (response.ok) {
+          onLoginSuccess(); // Pass the token up to App.jsx if needed
+          navigate('/patients');
+        }
+      } catch (error) {
+        console.error('Auth check failed:', error);
+      }
+    };
+
+    checkAuth();
+  }, []);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
