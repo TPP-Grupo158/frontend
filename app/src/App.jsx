@@ -27,7 +27,8 @@ function App() {
             <Route path="/viewer" element={<NiiVue />} />
             <Route path="/patients" element={<PatientListPage />} />
             <Route path="/patients/history" element={<PatientHistoryPage />} />
-            <Route path="/" />
+            <Route path="/" element={<Navigate to="/patients" />} />
+            <Route path="*" element={<Navigate to="/patients" />} />
           </Route>
         </Route>
       </Routes>
