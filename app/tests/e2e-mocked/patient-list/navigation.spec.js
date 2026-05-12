@@ -1,5 +1,5 @@
 import { test, expect } from '@playwright/test';
-import { userIsAuthenticated, mockResponse, waitForResponseWithUrl } from '../helpers';
+import { userIsAuthenticated, userIsNotAuthenticated, mockResponse, waitForResponseWithUrl } from '../helpers';
 
 const API_URL = process.env.TEST_API_URL
 const BASE_URL = process.env.TEST_BASE_URL || 'http://localhost:5173';
@@ -36,12 +36,14 @@ test('When user token expires user can select button to go to login page', async
   await mockResponse(page, `${API_URL}/patients?offset=0&limit=10&dni=${dniFilterContent}`, 401, { message: 'Token expired' });
 
   await page.goto(`${BASE_URL}/patients`);
+  await waitForResponseWithUrl(page, `/patients?offset=0&limit=10`, 'GET');
   
   const waitForPatientsResponse = waitForResponseWithUrl(page, `/patients?offset=0&limit=10&dni=${dniFilterContent}`, 'GET');
   const dniFilterInput = page.getByPlaceholder('Search by DNI');
   await dniFilterInput.fill(dniFilterContent);
   await waitForPatientsResponse
 
+  await userIsNotAuthenticated(page);
   const navButton = page.getByText('Go to Login');
   await expect(navButton).toBeVisible();
   await navButton.click();
