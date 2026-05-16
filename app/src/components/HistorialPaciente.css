@@ -143,3 +143,11 @@
     display: block;
     margin: 0 auto;
   }
+
+  .pagination-container {
+    display: flex;
+    gap: 12px; 
+    justify-content: center; 
+    margin-top: 15px;
+    width: 100%;
+  }

@@ -126,16 +126,28 @@ const PatientHistoryPage = () => {
                 </p>
               </div>
             ))}
-  
+            <div className="pagination-container">
+            { page > 1 &&(
+                <button 
+                  className="load-more-btn" 
+                  onClick={() => setPage(prev => prev -1)}
+                  disabled={loading}
+                >
+                  {loading ? 'Loading...' : 'Prev'}
+                </button>
+                )
+            }
             {hasMore && (
               <button 
                 className="load-more-btn" 
                 onClick={() => setPage(prev => prev + 1)}
                 disabled={loading}
               >
-                {loading ? 'Loading...' : 'Load Older Studies'}
+                {loading ? 'Loading...' : 'Next'}
               </button>
             )}
+            </div>
+            
           </div>
         </aside>
   
