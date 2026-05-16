@@ -3,6 +3,8 @@ import { useLocation, useNavigate } from 'react-router-dom';
 import NiiVue_comp from '../components/Niivue/Niivue_comp';
 import PredictionResult from '../components/PredictionResults';
 import '../components/HistorialPaciente.css';
+const HISTORY_TABS_VIEWER= "viewer"
+const HISTORY_TABS_PREVIEW = "preview"
 
 const PatientHistoryPage = () => {
     const location = useLocation();
@@ -17,6 +19,7 @@ const PatientHistoryPage = () => {
     const [page, setPage] = useState(1);
     const [loading, setLoading] = useState(false);
     const [hasMore, setHasMore] = useState(true);
+    const [activeTab, setActiveTab] = useState(HISTORY_TABS_PREVIEW);
   
     // API Call logic
     const fetchPatientStudies = useCallback(async () => {
@@ -112,19 +115,57 @@ const PatientHistoryPage = () => {
                   <p>{selectedStudy.doctor_id}</p>
                 </div>
   
-              <div className="report-box">
-                <span className="field-label">Results</span>
-                {selectedStudy.task_type === 'aneurysm' ? (
-                  <PredictionResult data={selectedStudy.prediction_image} />
-                ) : (
-                  <NiiVue_comp
-                    key={selectedStudy.task_type} 
-                    images = {handleOriginalImages(selectedStudy.original_images)}
-                    segmentationUrl={ selectedStudy.prediction_image}
-                    labels={[selectedStudy.task_type]} 
-                  />
-                )}
-              </div>
+                <div className="report-box">
+                  <span className="field-label">Results</span>
+                  
+                  {selectedStudy.task_type === 'aneurysm' ? (
+                    <PredictionResult data={selectedStudy.prediction_image} />
+                  ) : (
+                    <div className="tabs-container">
+                      {/* Botones de las pestañas */}
+                      <div className="tabs-header">
+                        <button
+                          type="button"
+                          className={`tab-button ${activeTab === HISTORY_TABS_VIEWER ? 'active' : ''}`}
+                          onClick={() => setActiveTab(HISTORY_TABS_VIEWER)}
+                        >
+                          Viewer
+                        </button>
+                        <button
+                          type="button"
+                          className={`tab-button ${activeTab === HISTORY_TABS_PREVIEW ? 'active' : ''}`}
+                          onClick={() => setActiveTab(HISTORY_TABS_PREVIEW)}
+                        >
+                          Imagen
+                        </button>
+                      </div>
+
+                      {/* Contenido de las pestañas */}
+                      <div className="tab-content">
+                        {activeTab === HISTORY_TABS_VIEWER ? (
+                          <NiiVue_comp
+                            key={selectedStudy.task_type} 
+                            images={handleOriginalImages(selectedStudy.original_images)}
+                            segmentationUrl={selectedStudy.prediction_image}
+                            labels={[selectedStudy.task_type]} 
+                          />
+                        ) : (
+                          <div className="image-viewer-tab">
+                            {selectedStudy.visualization_image ? (
+                              <img 
+                                src={selectedStudy.visualization_image} 
+                                alt="Visualization Study" 
+                                className="tab-static-image"
+                              />
+                            ) : (
+                              <p className="no-image-placeholder">No Image</p>
+                            )}
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                  )}
+                </div>
             </div>
           ) : (
             <div style={{ textAlign: 'center', marginTop: '100px', color: '#999' }}>
