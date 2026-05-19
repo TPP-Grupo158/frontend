@@ -5,12 +5,16 @@ import ImageUploadForm from './components/ImageUploadForm.jsx'
 import Header from './components/header.jsx'
 
 import { useState , useEffect} from 'react';
+import { useUserContext } from './hooks/useUserContext.jsx'
+
 import PatientListPage from './pages/PatientListPage.jsx'
 import PatientHistoryPage from './pages/PatientHistoryPage.jsx'
+import ChangePasswordPage from './pages/ChangePasswordPage.jsx'
 
 import {
   BrowserRouter as Router,
-  Routes, Route, Navigate, Outlet
+  Routes, Route, Navigate, Outlet,
+  useLocation
 } from 'react-router-dom'
 
 function App() {
@@ -21,6 +25,7 @@ function App() {
       <Routes>
         <Route path="/login" element={<Login onLoginSuccess={() => setIsLoggedIn(true)} />} />
         <Route element={<ProtectedRoute />}>
+          <Route path="/change-password" element={<ChangePasswordPage />} />
           <Route element={<Header />}>
             <Route path="/upload" element={<ImageUploadForm />} />
             <Route path="/predict" element={<Predict />} />
@@ -38,7 +43,8 @@ function App() {
 
 const ProtectedRoute = () => {
   const [isValid, setIsValid] = useState(null); // null = checking, true = ok, false = fail
-
+  const { logout, mustChangePassword } = useUserContext();
+  const location = useLocation();
   useEffect(() => {
     const verifyToken = async () => {
       try {
@@ -53,6 +59,7 @@ const ProtectedRoute = () => {
           setIsValid(true);
         } else {
           setIsValid(false);
+          logout();
         }
       } catch (error) {
         console.error('Auth check failed:', error);
@@ -69,6 +76,10 @@ const ProtectedRoute = () => {
 
   if (isValid === false) {
     return <Navigate to="/login" replace />;
+  }
+
+  if (mustChangePassword() && location.pathname !== '/change-password') {
+    return <Navigate to="/change-password" replace />;
   }
 
   return <Outlet />;

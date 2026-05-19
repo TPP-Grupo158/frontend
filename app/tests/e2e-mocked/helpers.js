@@ -10,6 +10,16 @@ export const userIsAuthenticated = async (page) => {
   });
 }
 
+export const userIsAuthenticatedNeedsChangePassword = async (page) => {
+  await page.route(`${API_URL}/auth`, route => {
+    route.fulfill({
+      status: 200,
+      contentType: 'application/json',
+      body: JSON.stringify({ message: 'Authentication successful', must_change_password: true }),
+    });
+  });
+}
+
 export const userIsNotAuthenticated = async (page) => {
   await page.route(`${API_URL}/auth`, route => {
     route.fulfill({
