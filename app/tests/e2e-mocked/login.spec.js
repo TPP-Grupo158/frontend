@@ -7,14 +7,15 @@ const BASE_URL = process.env.TEST_BASE_URL || 'http://localhost:5173';
 test('When user logs in, its shown the patient search page', async ({ page }) => {
 
   await mockResponse(page, `${API_URL}/login`, 200, { message: 'Login successful' });
+  await mockResponse(page, `${API_URL}/patients?offset=0&limit=10`, 200, { patients: [], hasMore: false });
 
   await page.goto(`${BASE_URL}/login`);
 
-  await userIsAuthenticated(page);
   await page.getByPlaceholder('Email').fill('user@example.com');
   await page.getByPlaceholder('Password').fill('securePassword123!');
   await page.getByRole('button', { name: 'Login' }).click();
-
+  
+  await userIsAuthenticated(page);
   await page.waitForURL(`${BASE_URL}/patients`);
 
   await expect(page.getByRole('heading', { name: 'Patient Search' })).toBeVisible();
@@ -46,4 +47,16 @@ test('User logs in when server is unavailable', async ({ page }) => {
   await expect(page).toHaveURL(`${BASE_URL}/login`);
   await expect(page.getByRole('heading', { name: 'Patient Search' })).not.toBeVisible({timeout: 1000});
   await expect(page.getByText('Could not connect to the server.')).toBeVisible();
+});
+
+test('User is already logged in navigates to patient page', async ({ page }) => {
+
+  await mockResponse(page, `${API_URL}/patients?offset=0&limit=10`, 200, { patients: [], hasMore: false });
+
+  await userIsAuthenticated(page);
+  await page.goto(`${BASE_URL}/login`);
+  await page.waitForURL(`${BASE_URL}/patients`);
+
+  await page.waitForURL(`${BASE_URL}/patients`);
+  await expect(page.getByRole('heading', { name: 'Patient Search' })).toBeVisible();
 });

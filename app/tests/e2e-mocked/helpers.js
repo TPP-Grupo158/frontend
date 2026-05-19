@@ -10,6 +10,16 @@ export const userIsAuthenticated = async (page) => {
   });
 }
 
+export const userIsNotAuthenticated = async (page) => {
+  await page.route(`${API_URL}/auth`, route => {
+    route.fulfill({
+      status: 401,
+      contentType: 'application/json',
+      body: JSON.stringify({ message: 'Authentication failed' }),
+    });
+  });
+}
+
 export const mockResponse = async (page, url, status, body) => {
   await page.route(url, route => {
     if (route.request().method() === 'POST') {
