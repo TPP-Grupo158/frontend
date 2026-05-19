@@ -1,10 +1,12 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import NiiVue_comp from './Niivue/Niivue_comp';
 import PredictionResult from './PredictionResults';
+import './Prediction.css';
 const NIFTI_BRAVO = "Bravo"
 const NIFTI_T1 = "T1"
 const NIFTI_T2 = "T2"
 const NIFTI_FLAIR = "FLAIR"
+const GATEWAY = import.meta.env.VITE_GATEWAY_API
 
 
 const PROCEDURES_CONFIG = [
@@ -25,16 +27,11 @@ const PredictionRequestForm = () => {
   const [dniError, setDniError] = useState("");
   const [dniInput, setDniInput] = useState('');
   const [apiData, setApiData] = useState(null);
-  /*const handleCheckboxChange = (id) => {
-    console.log(apiData)
-    setSelectedProcs(prev => 
-      prev.includes(id) ? prev.filter(p => p !== id) : [...prev, id]
-    );
-  };
-  */
+  const [apiTrafficLight, setTrafficLight] = useState("red");
+  
   const fetchPatientData = async (dni) => {
     try {
-      const response = await fetch(import.meta.env.VITE_GATEWAY_API+"patients/"+ dni, {
+      const response = await fetch(GATEWAY+"patients/"+ dni, {
         method: 'GET',
         credentials: 'include'
       });  
@@ -58,7 +55,29 @@ const PredictionRequestForm = () => {
       setDniError("Error while fetching patient")
       setApiData(null);
   }};
-  
+
+const fetchAvailability = async () => {
+  try {
+    const response = await fetch(GATEWAY + "status", {
+      method: 'GET',
+      credentials: 'include',
+    });
+    const result = await response.json();
+    
+    setTrafficLight(result.color); 
+  } catch (error) {
+    console.error("Error al obtener disponibilidad:", error);
+    setTrafficLight("red");
+  }
+};
+
+  useEffect(() => {
+    fetchAvailability();
+
+    const interval = setInterval(fetchAvailability, 10000);
+    
+    return () => clearInterval(interval);
+  }, []);
   const handleDniChange = () => {
     const onlyDigits = dniInput.replace(/\D/g, '');
     if (onlyDigits.length >= 7) {
@@ -94,15 +113,12 @@ const PredictionRequestForm = () => {
   
   const formData = new FormData();
 
-  // 1. Add the Booleans (PredictionRequest)
-  // Even though they are booleans, FormData sends them as strings "true"/"false"
   PROCEDURES_CONFIG.forEach(proc => {
     const isSelected = selectedProcs.includes(proc.id);
     formData.append(proc.id, isSelected); 
   });
 
   // 2. Add the Files
-  // Mapping your internal names to the backend's expected keys
   if (files[NIFTI_T1]) formData.append('file_t1', files[NIFTI_T1]);
   if (files[NIFTI_BRAVO]) formData.append('file_t1ce', files[NIFTI_BRAVO]); // Bravo -> t1ce
   if (files[NIFTI_T2]) formData.append('file_t2', files[NIFTI_T2]);
@@ -110,7 +126,7 @@ const PredictionRequestForm = () => {
   formData.append("patient", apiData.dni); 
 
   try {
-    const response = await fetch(import.meta.env.VITE_GATEWAY_API+"predict", {
+    const response = await fetch(GATEWAY+"predict", {
       method: 'POST',
       body: formData,
       credentials: 'include'
@@ -133,6 +149,38 @@ const PredictionRequestForm = () => {
                   requiredFiles.every(f => files[f]);
 
   return (
+  
+  <>{apiTrafficLight === "red" && status === 'idle' &&(
+    <div style={{ 
+      height: '100vh', 
+      display: 'flex', 
+      flexDirection: 'column', 
+      alignItems: 'center', 
+      justifyContent: 'center',
+      backgroundColor: '#fffafb' 
+    }}>
+      <div className="loader-circle" style={{ marginBottom: '20px' }}></div>
+      
+      <h2 style={{ 
+        color: '#c0392b', 
+        margin: '0', 
+        fontFamily: 'sans-serif',
+        fontWeight: '600'
+      }}>
+        System is busy
+      </h2>
+      
+      <p style={{ color: '#7f8c8d', marginTop: '10px' }}>
+        Please wait a moment while we process current requests...
+      </p>
+    
+      
+      <span style={{ fontSize: '10px', color: '#bdc3c7', marginTop: '30px' }}>
+        Status Check Interval: 10s
+      </span>
+    </div>
+  )}
+  {apiTrafficLight === "green" && (
     <div style={{ display: 'flex', gap: '40px', padding: '20px' }}>
       {/* LEFT BLOCK */}
       {/* ESTADO 1: Elegir paciente*/}
@@ -144,11 +192,11 @@ const PredictionRequestForm = () => {
             type="text"
             inputMode="numeric"
             placeholder="Search by DNI"
-            value={dniInput} // Usamos el estado temporal
+            value={dniInput} 
             onChange={(e) => setDniInput(e.target.value)}
             onKeyDown={(e) => {
               if (e.key === 'Enter') handleDniChange();
-            }} // Opcional: buscar al presionar Enter
+            }} 
           />
           <button onClick={handleDniChange}>
             Search
@@ -287,7 +335,7 @@ const PredictionRequestForm = () => {
             {status === 'error' && <p style={{color: '#ff4d4d'}}>Error while precessing images</p>}
          </div>
       </div>
-    </div>
+    </div>)}</>
   );
 };
 
