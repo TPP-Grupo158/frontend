@@ -74,7 +74,7 @@ const fetchAvailability = async () => {
   useEffect(() => {
     fetchAvailability();
 
-    const interval = setInterval(fetchAvailability, 30000);
+    const interval = setInterval(fetchAvailability, 10000);
     
     return () => clearInterval(interval);
   }, []);
@@ -176,7 +176,7 @@ const fetchAvailability = async () => {
     
       
       <span style={{ fontSize: '10px', color: '#bdc3c7', marginTop: '30px' }}>
-        Status Check Interval: 30s
+        Status Check Interval: 10s
       </span>
     </div>
   )}
