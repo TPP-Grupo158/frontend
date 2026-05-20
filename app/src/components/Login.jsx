@@ -58,8 +58,7 @@ function Login({ onLoginSuccess }) {
       const data = await response.json();
 
       if (response.ok) {
-        console.log('Login successful:');
-        login(data.role, data.must_change_password);
+        login(data.user_role, data.must_change_password);
         onLoginSuccess(); // Pass the token up to App.jsx if needed
         
         data.must_change_password ? navigate('/change-password') : navigate('/patients');
