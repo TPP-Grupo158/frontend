@@ -16,6 +16,7 @@ import {
   Routes, Route, Navigate, Outlet,
   useLocation
 } from 'react-router-dom'
+import UserRegistrationPage from './pages/UserRegistrationPage.jsx'
 
 function App() {
   const [_isLoggedIn, setIsLoggedIn] = useState(false);
@@ -32,6 +33,7 @@ function App() {
             <Route path="/viewer" element={<NiiVue />} />
             <Route path="/patients" element={<PatientListPage />} />
             <Route path="/patients/history" element={<PatientHistoryPage />} />
+            <Route path="/users" element={<UserRegistrationPage />} />
             <Route path="/" element={<Navigate to="/patients" />} />
             <Route path="*" element={<Navigate to="/patients" />} />
           </Route>
@@ -43,7 +45,7 @@ function App() {
 
 const ProtectedRoute = () => {
   const [isValid, setIsValid] = useState(null); // null = checking, true = ok, false = fail
-  const { logout, mustChangePassword } = useUserContext();
+  const { logout, mustChangePassword, getUserRole } = useUserContext();
   const location = useLocation();
   useEffect(() => {
     const verifyToken = async () => {
@@ -80,6 +82,10 @@ const ProtectedRoute = () => {
 
   if (mustChangePassword() && location.pathname !== '/change-password') {
     return <Navigate to="/change-password" replace />;
+  }
+
+  if (getUserRole() !== 'admin' && location.pathname === '/users') {
+    return <Navigate to="/patients" replace />;
   }
 
   return <Outlet />;
