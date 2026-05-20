@@ -63,7 +63,7 @@ const fetchAvailability = async () => {
       credentials: 'include',
     });
     const result = await response.json();
-    
+  
     setTrafficLight(result.color); 
   } catch (error) {
     console.error("Error al obtener disponibilidad:", error);
@@ -180,7 +180,7 @@ const fetchAvailability = async () => {
       </span>
     </div>
   )}
-  {apiTrafficLight === "green" && (
+  {(apiTrafficLight === "green"|| status === "loading") && (
     <div style={{ display: 'flex', gap: '40px', padding: '20px' }}>
       {/* LEFT BLOCK */}
       {/* ESTADO 1: Elegir paciente*/}
