@@ -6,12 +6,13 @@ import PropTypes from "prop-types";
 const passwordSchema = object({
   password: string()
     .min(8, 'Password must be at least 8 characters')
-    .max(32, 'Password cannot exceed 32 characters')
-    .uppercase('Password must contain at least one uppercase letter')
-    .lowercase('Password must contain at least one lowercase letter')
+    .max(32, 'Password cannot be longer than 32 characters')
+    .matches(/[A-Z]/, 'Password must contain at least one uppercase character')
+    .matches(/[a-z]/, 'Password must contain at least one lowercase character')
     .matches(/\d/, 'Password must contain at least one number')
     .matches(/[#$%&@*¡!¿?()<>=+]/, 'Password must contain at least one special character (#$%&@*¡!¿?()<>=+)')
     .required('Password is required'),
+  currentPassword: string().required('Current password is required'),
 });
 
 const ChangePasswordForm = ({ onSubmit }) => {
@@ -19,13 +20,16 @@ const ChangePasswordForm = ({ onSubmit }) => {
   const [newPassword, setNewPassword] = useState('');
   const [newPasswordConfirm, setNewPasswordConfirm] = useState('');
 
-  const [validationErrors, setValidationErrors] = useState({});
+  const [error, setError] = useState({});
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    setError({});
+
     try {
-      await passwordSchema.validate({ password: newPassword }, { abortEarly: false })
+      await passwordSchema.validate({ password: newPassword, currentPassword }, { abortEarly: false })
       if (newPassword !== newPasswordConfirm) {
+        setError({passwordConfirm: 'Passwords do not match'});
         return;
       }
     } catch (e) {
@@ -33,7 +37,7 @@ const ChangePasswordForm = ({ onSubmit }) => {
       e.inner.forEach((error) => {
         errors[error.path] = error.message;
       });
-      setValidationErrors(errors);
+      setError(errors);
       return;
     }
     onSubmit({ current_password: currentPassword, new_password: newPassword });
@@ -46,25 +50,35 @@ const ChangePasswordForm = ({ onSubmit }) => {
         noValidate //validate using yup
         style={{ display: 'flex', flexDirection: 'column', gap: '4px'}}
         onSubmit={handleSubmit}
-      >
-        <input style={{ ...styles.input, marginBottom: validationErrors.password ? '0.25rem' : styles.input.marginBottom }}
-          type="password" 
-          placeholder="Current Password" 
-          value={currentPassword}
-          onChange={(e) => setCurrentPassword(e.target.value)}
-        />
-        <input style={{ ...styles.input, marginBottom: validationErrors.password ? '0.25rem' : styles.input.marginBottom }}
-          type="password" 
-          placeholder="New Password" 
-          value={newPassword}
-          onChange={(e) => setNewPassword(e.target.value)}
-        />
-        <input style={{ ...styles.input, marginBottom: validationErrors.password ? '0.25rem' : styles.input.marginBottom }}
-          type="password" 
-          placeholder="Confirm New Password" 
-          value={newPasswordConfirm}
-          onChange={(e) => setNewPasswordConfirm(e.target.value)}
-        />
+        >
+        <div style={{ display: 'flex', flexDirection: 'column'}}>
+          <input style={{ ...styles.input, marginBottom: error?.currentPassword ? '0.25rem' : styles.input.marginBottom }}
+            type="password" 
+            placeholder="Current Password" 
+            value={currentPassword}
+            onChange={(e) => setCurrentPassword(e.target.value)}
+          />
+          {error?.currentPassword && <span style={{color: 'red', fontSize: '12px', paddingLeft: '2px'}}>{error?.currentPassword}</span>}
+        </div>
+        <div style={{ display: 'flex', flexDirection: 'column'}}>
+          <input style={{ ...styles.input, marginBottom: error?.password ? '0.25rem' : styles.input.marginBottom }}
+            type="password" 
+            placeholder="New Password" 
+            value={newPassword}
+            onChange={(e) => setNewPassword(e.target.value)}
+          />
+          {error?.password && <span style={{color: 'red', fontSize: '12px', paddingLeft: '2px'}}>{error?.password}</span>}
+        </div>
+
+        <div style={{ display: 'flex', flexDirection: 'column'}}>
+          <input style={{ ...styles.input, marginBottom: error?.passwordConfirm ? '0.25rem' : styles.input.marginBottom }}
+            type="password" 
+            placeholder="Confirm New Password" 
+            value={newPasswordConfirm}
+            onChange={(e) => setNewPasswordConfirm(e.target.value)}
+          />
+          {error?.passwordConfirm && <span style={{color: 'red', fontSize: '12px', paddingLeft: '2px'}}>{error?.passwordConfirm}</span>}
+        </div>
         <div style={{flexDirection:'row', display: 'flex', justifyContent: 'flex-end', gap: '8px', marginTop: '1rem'}}>
           <button type="submit" style={styles.button}>Change Password</button>
         </div>

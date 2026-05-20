@@ -1,15 +1,20 @@
 import { useUserContext } from "../hooks/useUserContext.jsx";
+import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import ChangePasswordForm from "../components/changePasswordForm.jsx";
-
+import Message from "../components/Message.jsx";
 import styles from "../components/styles.js";
 
 const ChangePasswordPage = () => {
   const { setPasswordChanged } = useUserContext();
   const navigate = useNavigate();
 
+  const [error, setError] = useState('');
+  const [isErrorVisible, setIsErrorVisible] = useState(true);
+
   const handleChangePassword = async ({current_password, new_password}) => {
-    console.log('Changing password with current_password:', current_password, 'and new_password:', new_password);
+    setError('');
+    setIsErrorVisible(false);
     try {
       const response = await fetch(import.meta.env.VITE_GATEWAY_API + "change-password", {
         method: 'POST',
@@ -24,11 +29,19 @@ const ChangePasswordPage = () => {
         setPasswordChanged();
         navigate('/patients');
       } else {
-        console.error('Failed to change password');
+        const errorData = await response.json();
+        setError(errorData.detail || 'Failed to change password');
+        setIsErrorVisible(true);
       }
-    } catch (error) {
-      console.error('Error changing password:', error);
+    } catch {
+      setError('An error occurred while changing the password');
+      setIsErrorVisible(true);
     }
+  }
+
+  const onErrorMessage = (message) => {
+    setError(message);
+    setIsErrorVisible(true);
   }
 
   return (
@@ -39,10 +52,11 @@ const ChangePasswordPage = () => {
       transform: 'translate(-50%, -50%)', 
       backgroundColor: styles.container.backgroundColor
     }}>
-      <div style={{...styles.form, flexDirection: 'column', alignContent: 'center', gap: '1rem'} }>
+      <div style={{...styles.form, flexDirection: 'column', alignContent: 'center', gap: '4px'} }>
         <h2>Change Password</h2>
         <p>You must change your password before proceeding.</p>
-        <ChangePasswordForm onSubmit={handleChangePassword} />
+        {error && <Message isError message={error} visible={isErrorVisible} onClick={() => setIsErrorVisible(false)} />}
+        <ChangePasswordForm onSubmit={handleChangePassword} onErrorMessage={onErrorMessage} />
       </div>
     </div>
     
