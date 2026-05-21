@@ -5,6 +5,7 @@ const IconButton = ({ iconName, onClick, style, iconColor }) => {
 
   return (
     <button
+      type='button'
       onClick={onClick}
       style={{
         cursor: 'pointer',

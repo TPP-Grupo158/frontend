@@ -3,6 +3,8 @@ import { object, string } from 'yup';
 import styles from './styles';
 import PropTypes from "prop-types";
 
+import PasswordInput from "./PasswordInput";
+
 const passwordSchema = object({
   password: string()
     .min(8, 'Password must be at least 8 characters')
@@ -52,32 +54,38 @@ const ChangePasswordForm = ({ onSubmit }) => {
         onSubmit={handleSubmit}
         >
         <div style={{ display: 'flex', flexDirection: 'column'}}>
-          <input style={{ ...styles.input, marginBottom: error?.currentPassword ? '0.25rem' : styles.input.marginBottom }}
-            type="password" 
-            placeholder="Current Password" 
+          <PasswordInput 
             value={currentPassword}
-            onChange={(e) => setCurrentPassword(e.target.value)}
-          />
-          {error?.currentPassword && <span style={{color: 'red', fontSize: '12px', paddingLeft: '2px'}}>{error?.currentPassword}</span>}
+            placeholder="Current Password"
+            onChange={setCurrentPassword}
+            containerStyle={{ marginBottom: error?.currentPassword ? '0.25rem' : styles.input.marginBottom }}
+          />          
+          {error?.currentPassword && 
+            <span style={{color: 'red', fontSize: '12px', paddingLeft: '2px'}}>{error?.currentPassword}</span>
+          }
         </div>
         <div style={{ display: 'flex', flexDirection: 'column'}}>
-          <input style={{ ...styles.input, marginBottom: error?.password ? '0.25rem' : styles.input.marginBottom }}
-            type="password" 
-            placeholder="New Password" 
+          <PasswordInput 
             value={newPassword}
-            onChange={(e) => setNewPassword(e.target.value)}
-          />
-          {error?.password && <span style={{color: 'red', fontSize: '12px', paddingLeft: '2px'}}>{error?.password}</span>}
+            placeholder="New Password"
+            onChange={setNewPassword}
+            containerStyle={{ marginBottom: error?.password ? '0.25rem' : styles.input.marginBottom }}
+          />   
+          {error?.password && 
+            <span style={{color: 'red', fontSize: '12px', paddingLeft: '2px'}}>{error?.password}</span>
+          }
         </div>
 
         <div style={{ display: 'flex', flexDirection: 'column'}}>
-          <input style={{ ...styles.input, marginBottom: error?.passwordConfirm ? '0.25rem' : styles.input.marginBottom }}
-            type="password" 
-            placeholder="Confirm New Password" 
+          <PasswordInput 
             value={newPasswordConfirm}
-            onChange={(e) => setNewPasswordConfirm(e.target.value)}
-          />
-          {error?.passwordConfirm && <span style={{color: 'red', fontSize: '12px', paddingLeft: '2px'}}>{error?.passwordConfirm}</span>}
+            placeholder="Confirm New Password"
+            onChange={setNewPasswordConfirm}
+            containerStyle={{ marginBottom: error?.passwordConfirm ? '0.25rem' : styles.input.marginBottom }}
+          />   
+          {error?.passwordConfirm && 
+            <span style={{color: 'red', fontSize: '12px', paddingLeft: '2px'}}>{error?.passwordConfirm}</span>
+          }
         </div>
         <div style={{flexDirection:'row', display: 'flex', justifyContent: 'flex-end', gap: '8px', marginTop: '1rem'}}>
           <button type="submit" style={styles.button}>Change Password</button>
