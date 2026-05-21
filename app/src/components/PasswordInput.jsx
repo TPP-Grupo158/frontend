@@ -3,8 +3,9 @@ import default_styles from './styles';
 import PropTypes from "prop-types";
 
 import IconButton from "./IconButton";
+import Tooltip from "./Tooltip/Tooltip";
 
-const PasswordInput = ({ value, onChange, containerStyle, placeholder }) => {
+const PasswordInput = ({ value, onChange, containerStyle, placeholder, tooltip }) => {
 
   const in_style = {
     passwordContainer: { 
@@ -41,12 +42,16 @@ const PasswordInput = ({ value, onChange, containerStyle, placeholder }) => {
       display: 'flex', 
       flexDirection: 'row', 
       }}>
+      <Tooltip 
+        text={tooltip}
+      >
       <input style={in_style.passwordInput}
         type={isPasswordVisible ? 'text' : 'password'} 
         placeholder={placeholder}
         value={value}
         onChange={(e) => onChange(e.target.value)}
       />
+      </Tooltip>
     
       <IconButton 
         data-testid="toggle-password-visibility"
@@ -65,5 +70,6 @@ PasswordInput.propTypes = {
   value: PropTypes.string.isRequired,
   onChange: PropTypes.func.isRequired,
   containerStyle: PropTypes.object,
-  placeholder: PropTypes.string
+  placeholder: PropTypes.string,
+  tooltip: PropTypes.node
 }

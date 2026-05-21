@@ -1,0 +1,27 @@
+.tooltip-container {
+  display: flex;
+  flex-direction: row;
+  gap: 20px;
+  align-items: center;
+  position: relative;
+  flex: 1;
+}
+
+.tooltip {
+  width: max-content;
+  padding: 8px;
+  font-size: 12px;
+  background-color: aliceblue;
+  border-radius: 6px;
+  border: 1px solid #ccc;
+  position: absolute;
+  opacity: 0;
+  pointer-events: none;
+}
+
+
+.tooltip.open {
+  transform: translateX(315px) translateY(-12px);
+  opacity: 1;
+  pointer-events: auto;
+}

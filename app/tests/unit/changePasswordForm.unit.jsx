@@ -207,7 +207,7 @@ describe('ChangePasswordForm', () => {
 
     await user.click(submitButton);
 
-    expect(getByText('Password must contain at least one special character (#$%&@*¡!¿?()<>=+)')).toBeInTheDocument();
+    expect(getByText('Password must contain at least one special character (#$%&@*¡!¿?)')).toBeInTheDocument();
     expect(mockOnSubmit).not.toHaveBeenCalled();
   });
 

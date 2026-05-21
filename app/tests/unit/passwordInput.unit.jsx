@@ -32,4 +32,25 @@ describe('PasswordInput', () => {
     expect(passwordInput).toHaveAttribute('type', 'password'); 
   });
 
+  it('shows tooltip when provided and focused', async () => {
+    const user = userEvent.setup();
+    const mockOnChange = vi.fn();
+    const tooltipText = "Password must be at least 8 characters long.";
+    const { getByPlaceholderText, getByText } = render(
+      <PasswordInput value="" onChange={mockOnChange} placeholder="Password" tooltip={tooltipText} />
+    );
+
+    const passwordInput = getByPlaceholderText('Password');
+
+    // Tooltip should not be visible initially
+    expect(getByText(tooltipText)).not.toHaveClass('open');
+
+    // Focus the input to show the tooltip
+    await user.click(passwordInput);
+    expect(getByText(tooltipText)).toHaveClass('open');
+
+    // Blur the input to hide the tooltip
+    await user.tab();
+    expect(getByText(tooltipText)).not.toHaveClass('open');
+  });
 });

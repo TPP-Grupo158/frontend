@@ -12,10 +12,25 @@ const passwordSchema = object({
     .matches(/[A-Z]/, 'Password must contain at least one uppercase character')
     .matches(/[a-z]/, 'Password must contain at least one lowercase character')
     .matches(/\d/, 'Password must contain at least one number')
-    .matches(/[#$%&@*¡!¿?()<>=+]/, 'Password must contain at least one special character (#$%&@*¡!¿?()<>=+)')
+    .matches(/[#$%&@*¡!¿?]/, 'Password must contain at least one special character (#$%&@*¡!¿?)')
     .required('Password is required'),
   currentPassword: string().required('Current password is required'),
 });
+
+const tooltipText = (
+  <div style={{display: 'flex', flexDirection: 'column'}}>
+  <span style={{fontWeight: 'bold'}}>Password requirements</span>
+  <ul style={{
+    paddingLeft: 12
+  }}>
+    <li>Must be 8-32 characters long</li>
+    <li>Must contain at least one uppercase character</li>
+    <li>Must contain at least one lowercase character</li>
+    <li>Must contain at least one number</li>
+    <li>Must contain at least one special character (#$%&@*¡!¿?)</li>
+  </ul>
+  </div>
+);
 
 const ChangePasswordForm = ({ onSubmit }) => {
   const [currentPassword, setCurrentPassword] = useState('');
@@ -45,7 +60,6 @@ const ChangePasswordForm = ({ onSubmit }) => {
     onSubmit({ current_password: currentPassword, new_password: newPassword });
   }
 
-  //TODO: Add password requirements (min length, special chars, etc) and option to see password while typing.
   return (
     <div> 
       <form data-testid="change-password-form"
@@ -69,6 +83,7 @@ const ChangePasswordForm = ({ onSubmit }) => {
             value={newPassword}
             placeholder="New Password"
             onChange={setNewPassword}
+            tooltip={tooltipText}
             containerStyle={{ marginBottom: error?.password ? '0.25rem' : styles.input.marginBottom }}
           />   
           {error?.password && 
