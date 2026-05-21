@@ -1,12 +1,16 @@
 import UserRegistrationForm from "../components/UserRegistrationForm";
 import styles from "../components/styles.js";
 
+import Message from "../components/Message.jsx";
+import { useState } from "react";
+
 const UserRegistrationPage = () => {
+  const [errorMessage, setErrorMessage] = useState('');
+  const [isErrorVisible, setIsErrorVisible] = useState(false);
 
   const handleSubmit = async (data) => {
 
-    console.log("Submitting user registration:", data);
-
+    setErrorMessage('');
     try {
       const response = await fetch(import.meta.env.VITE_GATEWAY_API + "register", {
         method: 'POST',
@@ -19,12 +23,14 @@ const UserRegistrationPage = () => {
 
       const responseData = await response.json();
       if (response.ok) {
-        console.log('User registration successful:', responseData);//NO imprime nada por algun motivo
+        setIsErrorVisible(false);
       } else {
-        console.log('Failed to create user: ' + (responseData.detail || response.statusText));
+        setErrorMessage(responseData.detail || 'Failed to create user');
+        setIsErrorVisible(true);
       }
-    } catch (error) {
-      console.error('Error creating user:', error);
+    } catch {
+      setErrorMessage('Failed to create user');
+      setIsErrorVisible(true);
     }
 
   };
@@ -39,6 +45,10 @@ const UserRegistrationPage = () => {
     }}>
       <div style={{...styles.form, flexDirection: 'column', alignContent: 'center', gap: '4px'} }>
         <h2>Create new user</h2>
+        {errorMessage && 
+          <Message isError message={errorMessage} visible={isErrorVisible} onClick={() => setIsErrorVisible(false)} 
+        />}
+
         <UserRegistrationForm onSubmit={handleSubmit} />
       </div>
     </div>
