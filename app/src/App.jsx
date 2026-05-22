@@ -46,7 +46,7 @@ function App() {
 const ProtectedRoute = () => {
   const [isValid, setIsValid] = useState(null); // null = checking, true = ok, false = fail
   const [userData, setUserData] = useState(null);
-  const { logout } = useUserContext();
+  const { logout, mustChangePassword } = useUserContext();
   const location = useLocation();
   useEffect(() => {
     const verifyToken = async () => {
@@ -80,15 +80,21 @@ const ProtectedRoute = () => {
     return <div>Verifying session...</div>; 
   }
 
-  if (isValid === false) {
+  if (isValid === false || !userData) {
     return <Navigate to="/login" replace />;
   }
 
-  if (userData?.user.must_change_password && location.pathname !== '/change-password') {
+  // Backend can update the must_change_password status later
+  const user_must_change_password = userData.user.must_change_password && mustChangePassword();
+  if (location.pathname !== '/change-password' && user_must_change_password) {
     return <Navigate to="/change-password" replace />;
   }
 
-  if (userData?.user.role !== 'admin' && location.pathname === '/users') {
+  if (location.pathname === '/change-password' && !user_must_change_password) {
+    return <Navigate to="/patients" replace />;
+  }
+
+  if (userData.user.role !== 'admin' && location.pathname === '/users') {
     return <Navigate to="/patients" replace />;
   }
 

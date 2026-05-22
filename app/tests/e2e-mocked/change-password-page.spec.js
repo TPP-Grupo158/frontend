@@ -1,5 +1,5 @@
 import { test, expect } from '@playwright/test';
-import { userIsAuthenticated, mockResponse, waitForResponseWithUrl } from './helpers';
+import { userIsAuthenticated, mockResponse, waitForResponseWithUrl, userIsAuthenticatedNeedsChangePassword } from './helpers';
 
 const API_URL = process.env.TEST_API_URL
 const BASE_URL = process.env.TEST_BASE_URL || 'http://localhost:5173';
@@ -8,7 +8,7 @@ test('User can change password', async ({ page }) => {
 
   const currentPassword = 'currentPassword123!';
   const newPassword = 'newPassword123!';
-  await userIsAuthenticated(page);
+  await userIsAuthenticatedNeedsChangePassword(page);
 
   await mockResponse(page, `${API_URL}/change-password`, 200, { message: 'Password changed successfully' });
 
@@ -34,7 +34,7 @@ test('User sees error message on failed password change', async ({ page }) => {
 
   const currentPassword = 'currentPassword123!';
   const newPassword = 'newPassword123!';
-  await userIsAuthenticated(page);
+  await userIsAuthenticatedNeedsChangePassword(page);
 
   await mockResponse(page, `${API_URL}/change-password`, 400, { detail: 'Current password is incorrect' });
 
@@ -61,7 +61,7 @@ test('User can close error message', async ({ page }) => {
 
   const currentPassword = 'currentPassword123!';
   const newPassword = 'newPassword123!';
-  await userIsAuthenticated(page);
+  await userIsAuthenticatedNeedsChangePassword(page);
 
   await mockResponse(page, `${API_URL}/change-password`, 400, { detail: 'Current password is incorrect' });
 
@@ -92,7 +92,7 @@ test('User navigates to patients page after successful password change', async (
 
   const currentPassword = 'currentPassword123!';
   const newPassword = 'newPassword123!';
-  await userIsAuthenticated(page);
+  await userIsAuthenticatedNeedsChangePassword(page);
 
   await mockResponse(page, `${API_URL}/change-password`, 200, { message: 'Password changed successfully' });
 
@@ -106,6 +106,8 @@ test('User navigates to patients page after successful password change', async (
   await currentPasswordInput.fill(currentPassword);
   await newPasswordInput.fill(newPassword);
   await confirmPasswordInput.fill(newPassword);
+
+  await userIsAuthenticated(page);
 
   const changePasswordResponse = waitForResponseWithUrl(page, '/change-password', 'POST');
   await submitButton.click();

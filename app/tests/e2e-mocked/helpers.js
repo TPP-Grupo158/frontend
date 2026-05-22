@@ -45,6 +45,9 @@ export const userIsAuthenticatedNeedsChangePassword = async (page) => {
       }),
     });
   });
+  await page.addInitScript(() => {
+      localStorage.setItem('user_info', JSON.stringify({ role: 'admin', must_change_password: true }));
+    });
 }
 
 export const userIsNotAuthenticated = async (page) => {
