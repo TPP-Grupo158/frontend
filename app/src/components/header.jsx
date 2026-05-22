@@ -10,7 +10,6 @@ const Header = () => {
       <nav style={styles.nav}>
         <ul style={styles.links}>
           <li><Link to="/patients" style={styles.link}>Patients</Link></li>
-          <li><Link to="/upload" style={styles.link}>Upload Image</Link></li>
           <li><Link to="/predict" style={styles.link}>Predict</Link></li>
           {getUserRole() === 'admin' && <li><Link to="/users" style={styles.link}>Users</Link></li>}
         </ul>
