@@ -45,7 +45,8 @@ function App() {
 
 const ProtectedRoute = () => {
   const [isValid, setIsValid] = useState(null); // null = checking, true = ok, false = fail
-  const { logout, mustChangePassword, getUserRole } = useUserContext();
+  const [userData, setUserData] = useState(null);
+  const { logout } = useUserContext();
   const location = useLocation();
   useEffect(() => {
     const verifyToken = async () => {
@@ -57,8 +58,11 @@ const ProtectedRoute = () => {
           credentials: 'include'
         });
 
+        const data = await response.json();
+
         if (response.ok) {
           setIsValid(true);
+          setUserData(data);
         } else {
           setIsValid(false);
           logout();
@@ -80,11 +84,11 @@ const ProtectedRoute = () => {
     return <Navigate to="/login" replace />;
   }
 
-  if (mustChangePassword() && location.pathname !== '/change-password') {
+  if (userData?.user.must_change_password && location.pathname !== '/change-password') {
     return <Navigate to="/change-password" replace />;
   }
 
-  if (getUserRole() !== 'admin' && location.pathname === '/users') {
+  if (userData?.user.role !== 'admin' && location.pathname === '/users') {
     return <Navigate to="/patients" replace />;
   }
 

@@ -5,14 +5,26 @@ export const userIsAuthenticated = async (page) => {
     route.fulfill({
       status: 200,
       contentType: 'application/json',
-      body: JSON.stringify({ message: 'Authentication successful' }),
+      body: JSON.stringify({ 
+        status: "authenticated", 
+        user: {
+          role: 'doctor',
+          must_change_password: false
+        }
+      }),
     });
   });
 }
 
 export const userIsAdminWithLocalStorage = async (page) => {
   await page.route(`${API_URL}/auth`, route => {
-    route.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify({ message: 'Authentication successful' }) });
+    route.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify({ 
+      status: "authenticated", 
+      user: {
+        role: 'admin',
+        must_change_password: false
+      }
+    }) });
   });
   await page.addInitScript(() => {
     localStorage.setItem('user_info', JSON.stringify({ role: 'admin', must_change_password: false }));
@@ -24,7 +36,13 @@ export const userIsAuthenticatedNeedsChangePassword = async (page) => {
     route.fulfill({
       status: 200,
       contentType: 'application/json',
-      body: JSON.stringify({ message: 'Authentication successful', must_change_password: true, role: 'doctor' }),
+      body: JSON.stringify({ 
+        status: "authenticated", 
+        user: {
+          role: 'doctor',
+          must_change_password: true
+        }
+      }),
     });
   });
 }

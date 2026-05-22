@@ -1,4 +1,4 @@
-import { useUserContext } from "../hooks/useUserContext.jsx";
+//import { useUserContext } from "../hooks/useUserContext.jsx";
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import ChangePasswordForm from "../components/changePasswordForm.jsx";
@@ -6,7 +6,7 @@ import Message from "../components/Message.jsx";
 import styles from "../components/styles.js";
 
 const ChangePasswordPage = () => {
-  const { setPasswordChanged } = useUserContext();
+  //const { setPasswordChanged } = useUserContext();
   const navigate = useNavigate();
 
   const [error, setError] = useState('');
@@ -26,7 +26,7 @@ const ChangePasswordPage = () => {
       });
 
       if (response.ok) {
-        setPasswordChanged();
+        //setPasswordChanged();
         navigate('/patients');
       } else {
         const errorData = await response.json();
