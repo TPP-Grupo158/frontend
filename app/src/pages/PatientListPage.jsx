@@ -198,13 +198,26 @@ const PatientListPage = () => {
                     <td>&nbsp;</td>
                     <td>&nbsp;</td>
                     <td>&nbsp;</td>
+                    <td style={{padding: '12px'}}>&nbsp;</td>
                   </tr>
                 ))
               }
             </tbody>
           </table>
-          <div style={{alignItems: 'center', display: 'flex', justifyContent: 'center', marginTop: '16px'}}>
+          <div style={{
+            alignItems: 'center', 
+            display: 'flex', 
+            justifyContent: 'center', 
+            marginTop: '16px',
+            minHeight: '40px'
+          }}>
             <button 
+              style={{ 
+                padding: '6px 10px', 
+                cursor: currentPageNumber > 1 ? 'pointer' : 'not-allowed', 
+                borderRadius: '4px', 
+                border: '1px solid #a4a3a3' 
+              }}
               onClick={() => handlePageChange(currentPageNumber - 1)}
               disabled={currentPageNumber <= 1}
             >
@@ -212,6 +225,12 @@ const PatientListPage = () => {
             </button>
             <span data-testid="patient-pagination-page-num" style={{ margin: '0 8px' }}> {currentPageNumber}</span>
             <button 
+              style={{ 
+                padding: '6px 10px', 
+                cursor: hasMorePages ? 'pointer' : 'not-allowed', 
+                borderRadius: '4px', 
+                border: '1px solid #a4a3a3' 
+              }}
               onClick={() => handlePageChange(currentPageNumber + 1)}
               disabled={!hasMorePages}
             >
