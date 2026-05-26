@@ -4,7 +4,7 @@ export const styles = {
   input: { marginBottom: '1rem', padding: '0.5rem', borderRadius: '4px', border: '1px solid #ccc' },
   button: { padding: '0.7rem', backgroundColor: '#007bff', color: 'white', border: 'none', borderRadius: '4px', cursor: 'pointer' },
   table:{
-    container : { tableLayout: 'fixed', borderCollapse: 'separate', borderSpacing: '2px 2px', width: '100%'},
+    container : { tableLayout: 'fixed', borderCollapse: 'separate', borderSpacing: '2px 2px', width: '100%', overflow: 'hidden' },
     header: { backgroundColor: '#007bff', color: 'white' },
     row: { textAlign: 'center' }
   }

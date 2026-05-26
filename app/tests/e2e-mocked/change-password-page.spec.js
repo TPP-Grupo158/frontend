@@ -1,0 +1,117 @@
+import { test, expect } from '@playwright/test';
+import { userIsAuthenticated, mockResponse, waitForResponseWithUrl, userIsAuthenticatedNeedsChangePassword } from './helpers';
+
+const API_URL = process.env.TEST_API_URL
+const BASE_URL = process.env.TEST_BASE_URL || 'http://localhost:5173';
+
+test('User can change password', async ({ page }) => {
+
+  const currentPassword = 'currentPassword123!';
+  const newPassword = 'newPassword123!';
+  await userIsAuthenticatedNeedsChangePassword(page);
+
+  await mockResponse(page, `${API_URL}/change-password`, 200, { message: 'Password changed successfully' });
+
+  await page.goto(`${BASE_URL}/change-password`);
+
+  const currentPasswordInput = page.getByPlaceholder('Current Password');
+  const newPasswordInput = page.getByPlaceholder('New Password', { exact: true });
+  const confirmPasswordInput = page.getByPlaceholder('Confirm New Password');
+  const submitButton = page.getByRole('button', { name: 'Change Password' });
+
+  await currentPasswordInput.fill(currentPassword);
+  await newPasswordInput.fill(newPassword);
+  await confirmPasswordInput.fill(newPassword);
+
+  const changePasswordResponse = waitForResponseWithUrl(page, '/change-password', 'POST');
+  await submitButton.click();
+  const response = await changePasswordResponse;
+
+  expect(response.status()).toBe(200);
+});
+
+test('User sees error message on failed password change', async ({ page }) => {
+
+  const currentPassword = 'currentPassword123!';
+  const newPassword = 'newPassword123!';
+  await userIsAuthenticatedNeedsChangePassword(page);
+
+  await mockResponse(page, `${API_URL}/change-password`, 400, { detail: 'Current password is incorrect' });
+
+  await page.goto(`${BASE_URL}/change-password`);
+
+  const currentPasswordInput = page.getByPlaceholder('Current Password');
+  const newPasswordInput = page.getByPlaceholder('New Password', { exact: true });
+  const confirmPasswordInput = page.getByPlaceholder('Confirm New Password');
+  const submitButton = page.getByRole('button', { name: 'Change Password' });
+
+  await currentPasswordInput.fill(currentPassword);
+  await newPasswordInput.fill(newPassword);
+  await confirmPasswordInput.fill(newPassword);
+
+  const changePasswordResponse = waitForResponseWithUrl(page, '/change-password', 'POST');
+  await submitButton.click();
+  await changePasswordResponse;
+
+  const errorMessage = page.getByText('Current password is incorrect');
+  await expect(errorMessage).toBeVisible();
+});
+
+test('User can close error message', async ({ page }) => {
+
+  const currentPassword = 'currentPassword123!';
+  const newPassword = 'newPassword123!';
+  await userIsAuthenticatedNeedsChangePassword(page);
+
+  await mockResponse(page, `${API_URL}/change-password`, 400, { detail: 'Current password is incorrect' });
+
+  await page.goto(`${BASE_URL}/change-password`);
+
+  const currentPasswordInput = page.getByPlaceholder('Current Password');
+  const newPasswordInput = page.getByPlaceholder('New Password', { exact: true });
+  const confirmPasswordInput = page.getByPlaceholder('Confirm New Password');
+  const submitButton = page.getByRole('button', { name: 'Change Password' });
+
+  await currentPasswordInput.fill(currentPassword);
+  await newPasswordInput.fill(newPassword);
+  await confirmPasswordInput.fill(newPassword);
+
+  const changePasswordResponse = waitForResponseWithUrl(page, '/change-password', 'POST');
+  await submitButton.click();
+  await changePasswordResponse;
+
+  const errorMessage = page.getByText('Current password is incorrect');
+  await expect(errorMessage).toBeVisible();
+
+  const closeButton = page.getByText('×');
+  await closeButton.click();
+  await expect(errorMessage).not.toBeVisible();
+});
+
+test('User navigates to patients page after successful password change', async ({ page }) => {
+
+  const currentPassword = 'currentPassword123!';
+  const newPassword = 'newPassword123!';
+  await userIsAuthenticatedNeedsChangePassword(page);
+
+  await mockResponse(page, `${API_URL}/change-password`, 200, { message: 'Password changed successfully' });
+
+  await page.goto(`${BASE_URL}/change-password`);
+
+  const currentPasswordInput = page.getByPlaceholder('Current Password');
+  const newPasswordInput = page.getByPlaceholder('New Password', { exact: true });
+  const confirmPasswordInput = page.getByPlaceholder('Confirm New Password');
+  const submitButton = page.getByRole('button', { name: 'Change Password' });
+
+  await currentPasswordInput.fill(currentPassword);
+  await newPasswordInput.fill(newPassword);
+  await confirmPasswordInput.fill(newPassword);
+
+  await userIsAuthenticated(page);
+
+  const changePasswordResponse = waitForResponseWithUrl(page, '/change-password', 'POST');
+  await submitButton.click();
+  await changePasswordResponse;
+
+  await expect(page).toHaveURL(`${BASE_URL}/patients`);
+});

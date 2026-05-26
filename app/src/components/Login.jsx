@@ -4,6 +4,7 @@ import PropTypes from 'prop-types';
 import Message from './Message.jsx';
 
 import { useNavigate } from 'react-router-dom';
+import { useUserContext } from '../hooks/useUserContext.jsx';
 
 function Login({ onLoginSuccess }) {
   const [email, setEmail] = useState('');
@@ -11,6 +12,8 @@ function Login({ onLoginSuccess }) {
   const [error, setError] = useState('');
   const [_loading, setLoading] = useState(false);
   const [isErrorVisible, setIsErrorVisible] = useState(false);
+
+  const { login } = useUserContext();
 
   const navigate = useNavigate();
 
@@ -55,10 +58,10 @@ function Login({ onLoginSuccess }) {
       const data = await response.json();
 
       if (response.ok) {
-        console.log('Login successful:');
+        login(data.user_role, data.must_change_password);
         onLoginSuccess(); // Pass the token up to App.jsx if needed
         
-        navigate('/patients');
+        data.must_change_password ? navigate('/change-password') : navigate('/patients');
       } else {
         setError(data.message || 'Invalid credentials');
         setIsErrorVisible(true);
