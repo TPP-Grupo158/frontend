@@ -46,7 +46,7 @@ function Login({ onLoginSuccess }) {
     setIsErrorVisible(false);
 
     try {
-      const response = await fetch(import.meta.env.VITE_GATEWAY_API + "login", {
+      const response = await fetch(import.meta.env.VITE_GATEWAY_API + "login/", {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
