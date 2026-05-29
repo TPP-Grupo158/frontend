@@ -228,7 +228,8 @@ test('Eye icon toggles password visibility', async ({ page }) => {
   await expect(passwordInput).toBeVisible();
   await expect(passwordInput).toHaveAttribute('type', 'password');
 
-  const eyeButton = page.locator('button').filter({ has: page.locator('svg') });
+  //const eyeButton = page.locator('button').filter({ has: page.locator('svg') });
+  const eyeButton = page.getByTestId('toggle-password-visibility');
   await eyeButton.click();
   await expect(passwordInput).toHaveAttribute('type', 'text');
 
