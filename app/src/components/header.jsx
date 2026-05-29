@@ -1,8 +1,33 @@
 import { Link, Outlet } from 'react-router-dom';
 import { useUserContext } from '../hooks/useUserContext';
+import { useNavigate } from 'react-router-dom';
+
+import LogoutButton from './LogoutButton';
 
 const Header = () => {
-  const { getUserRole } = useUserContext();
+  const { getUserRole, logout } = useUserContext();
+    const navigate = useNavigate();
+  
+    const handle_logout = async () => {
+  
+      try {
+        const response = await fetch(import.meta.env.VITE_GATEWAY_API + "logout", {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: null,
+          credentials: 'include'
+        });
+  
+        if (response.ok) {
+          logout();
+          navigate('/login');
+        } else {
+          console.error('Logout failed.');
+        }
+      } catch (error) {
+        console.error('Error during logout:', error);
+      }
+    };
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', minHeight: '100vh' }}>
@@ -13,6 +38,15 @@ const Header = () => {
           <li><Link to="/predict" style={styles.link}>Predict</Link></li>
           {getUserRole() === 'admin' && <li><Link to="/users" style={styles.link}>Users</Link></li>}
         </ul>
+        <LogoutButton 
+        style={{ 
+          ...styles.link,
+          border: 'none',
+          background: 'transparent', 
+          padding: '4px',
+        }}
+        onClick={handle_logout}
+        />
       </nav>
 
       <main style={{ padding: '20px', flex: 1 }}>

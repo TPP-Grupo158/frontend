@@ -147,7 +147,7 @@ const UserRegistrationPage = () => {
                 value={userInfo.temp_password} />
 
                 <IconButton 
-                data-testid="toggle-password-visibility"
+                testId="toggle-password-visibility"
                 style={in_style.iconButton}
                 iconName={isPasswordVisible ? 'eyeOff' : 'eye'}
                 iconColor='#666'
