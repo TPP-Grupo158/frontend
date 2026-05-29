@@ -14,6 +14,9 @@ export const userIsAuthenticated = async (page) => {
       }),
     });
   });
+    await page.addInitScript(() => {
+    localStorage.setItem('user_info', JSON.stringify({ role: 'doctor', must_change_password: false }));
+  });
 }
 
 export const userIsAdminWithLocalStorage = async (page) => {

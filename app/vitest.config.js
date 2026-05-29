@@ -14,6 +14,9 @@ export default defineConfig({
       ...configDefaults.exclude,
       'tests/e2e-mocked/**',
     ],
+    coverage: {
+      provider: 'v8'
+    },
     environment: 'jsdom',
     globals: true,
     setupFiles: ['./tests/setup.js'],
