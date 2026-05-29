@@ -167,7 +167,7 @@ const PatientHistoryPage = () => {
               <div className="report-box">
                 <span className="field-label">Results</span>
                 
-                {selectedStudy.task_type === 'aneurysm' ? (
+                {selectedStudy.task_type === 'aneurysm' || selectedStudy.task_type === 'alzheimer'? (
                   <PredictionResult data={selectedStudy.prediction_image} />
                 ) : (
                   <div className="tabs-container">

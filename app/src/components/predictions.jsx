@@ -10,7 +10,7 @@ const GATEWAY = import.meta.env.VITE_GATEWAY_API
 
 
 const PROCEDURES_CONFIG = [
-  { id: 'alzheimer', label: 'Alzheimer', files: [NIFTI_BRAVO, NIFTI_T1, NIFTI_T2, NIFTI_FLAIR] },
+  { id: 'alzheimer', label: 'Alzheimer', files: [NIFTI_T1] },
   { id: 'acv', label: 'ACV', files: [NIFTI_T1] },
   { id: 'metastases', label: 'Metastases', files:  [NIFTI_BRAVO, NIFTI_T1, NIFTI_T2, NIFTI_FLAIR] },
   { id: 'aneurysm', label: 'Aneurysm', files:  [NIFTI_T1] },
@@ -318,8 +318,8 @@ const fetchAvailability = async () => {
             {/* ESTADO 3: Éxito*/}
             {status === 'success' && responseData &&task && responseData[task] &&(
               <>
-                {task === 'aneurysm' ? (
-                  <PredictionResult data={responseData[task].prediction_result} />
+                {task === 'aneurysm' || task === 'alzheimer' ? (
+                  <PredictionResult data={responseData[task].prediction_image} />
                 ) : (
                   <NiiVue_comp
                     key={task} 
