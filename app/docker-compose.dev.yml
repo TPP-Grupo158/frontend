@@ -13,3 +13,9 @@ services:
       - /app/node_modules
     environment:
       - CHOKIDAR_USEPOLLING=true
+  tunel:
+    image: cloudflare/cloudflared:latest
+    command: tunnel --url http://ui:5173
+    restart: always
+    depends_on:
+    -  ui
