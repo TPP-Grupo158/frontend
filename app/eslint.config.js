@@ -8,6 +8,10 @@ export default defineConfig([
     ignores: [
       "**/test-results/**",
       "**/playwright-report/**",
+      "**/coverage/**",
+      "**/dist/**",
+      "**/build/**",
+      "**/node_modules/**",
     ],
   },
   js.configs.recommended,
