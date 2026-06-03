@@ -96,6 +96,14 @@ const PatientListPage = () => {
 
     if (!response.error?.status_code) {
       setSuccessMessage('Patient created successfully.');
+      
+      // Refetch patients to include the newly created one, resetting to the first page
+      const offset = (currentPageNumber - 1) * ITEMS_PER_PAGE
+      if (currentFilters === 'dni') {
+        await fetchPatients(debouncedDniFilter, '', offset, ITEMS_PER_PAGE);
+      } else if (currentFilters === 'name') {
+        await fetchPatients('', debouncedNameFilter, offset, ITEMS_PER_PAGE);
+      }
     }
     setCreatePatientShowForm(false);
   }
