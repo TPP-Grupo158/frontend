@@ -1,6 +1,6 @@
-# Visualizador de nifti
+# Frontend
 
-Visualizador de Nifti hecho en React usando Niivue
+Frontend hecho en React usando Niivue
 
 
 Para ejecutar los comandos posicionarse dentro de la carpeta app
