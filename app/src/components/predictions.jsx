@@ -180,7 +180,7 @@ const fetchAvailability = async () => {
       </span>
     </div>
   )}
-  {(apiTrafficLight === "green"|| status === "loading") && (
+  {(apiTrafficLight === "green" || status === "loading") && (
     <div style={{ display: 'flex', gap: '40px', padding: '20px' }}>
       {/* LEFT BLOCK */}
       {/* ESTADO 1: Elegir paciente*/}
@@ -259,7 +259,7 @@ const fetchAvailability = async () => {
           {status === 'loading' ? 'Analyzing...' : 'Run Analysis'}
         </button>
              {/*Botones para cambiar que resultado se quiere ver*/}
-       {status === 'success' && responseData && (
+       {(status === 'success' || status === 'idle') && responseData && (
         <div style={{ marginTop: '20px' }}>
           <h4 style={{ marginBottom: '10px' }}>Available Results:</h4>
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '10px' }}>

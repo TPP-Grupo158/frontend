@@ -1,7 +1,7 @@
 import { DRAG_MODE, SHOW_RENDER, SLICE_TYPE, MULTIPLANAR_TYPE } from "@niivue/niivue"
 
 export const DEFAULT_NIIVUE_OPTIONS = {
-    logLevel: "debug",
+    logLevel: "info",
     show3Dcrosshair: true,
     crosshairWidth: 1,
     crosshairWidthUnit: "mm",
